@@ -1,0 +1,566 @@
+\documentclass[article,nojss]{jss}
+\DeclareGraphicsExtensions{.pdf,.eps}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Add-on packages and fonts
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{float}
+
+
+\newcommand{\noun}[1]{\textsc{#1}}
+%% Bold symbol macro for standard LaTeX users
+\providecommand{\boldsymbol}[1]{\mbox{\boldmath $#1$}}
+
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+\newcommand{\fme}{\textbf{\textsf{FME }}}
+\newcommand{\ds}{\textbf{\textsf{deSolve }}}
+\newcommand{\rs}{\textbf{\textsf{rootSolve }}}
+\newcommand{\R}{\proglang{R}}
+\title{\proglang{R}-package \fme: utilities for the application of models consisting of differential equations}
+\Plaintitle{FME}
+
+\Keywords{simlation models, differential equations, fitting, sensitivity, monte carlo, identifiability,
+  \proglang{R}}
+
+\Plainkeywords{simulation models, differential equations, fitting, sensitivity, monte carlo, identifiability, R}
+
+
+\author{Karline Soetaert\\
+NIOO-CEME\\
+The Netherlands
+}
+
+\Plainauthor{Karline Soetaert}
+
+\Abstract{ \R package \fme contains functions to perform complex applications
+of models, consisting of differential equations. This is a preliminary version.}
+
+%% The address of (at least) one author should be given
+%% in the following format:
+\Address{
+  Karline Soetaert\\
+  Centre for Estuarine and Marine Ecology (CEME)\\
+  Netherlands Institute of Ecology (NIOO)\\
+  4401 NT Yerseke, Netherlands\\
+  E-mail: \email{k.soetaert@nioo.knaw.nl}\\
+  URL: \url{http://www.nioo.knaw.nl/ppages/ksoetaert}\\
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% R/Sweave specific LaTeX commands.
+%% need no \usepackage{Sweave}
+%\VignetteIndexEntry{FME - utilities for the application of models consisting of differential equations}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Begin of the document
+\begin{document}
+\SweaveOpts{engine=R,eps=FALSE}
+\SweaveOpts{keep.source=TRUE}
+
+<<preliminaries,echo=FALSE,results=hide>>=
+library("FME")
+options(prompt = "> ")
+@
+
+\maketitle
+
+\section{Introduction}
+\R-package \fme contains part of the functions present in the software environment
+\code{FEMME} \citep{FEMME}, a \emph{F}lexible \emph{E}nvironment for \emph{M}athematically
+\emph{M}odelling the \emph{E}nvironment.
+
+\code{FEMME} was written in FORTRAN. \fme is -obviously- written in \R.
+
+Although \fme can work with many types of functions, it is mainly meant to be used with models that are written as
+(a system of) differential equations (ordinary or partial), which
+are solved either with routines from package \code{deSolve} \citep{deSolve}, which integrate the model in time,
+of from package \code{rootSolve} \citep{rootSolve} which estimate steady-state conditions.
+
+\fme contains:
+\begin{itemize}
+\item functions to perform local and global sensitivity analysis
+\item functions to perform identifiability analysis
+\item a function to estimate the model cost function, useful for fitting a model to data.
+\end{itemize}
+
+In addition, there are functions to generate parameter combinations corresponding to a certain distribution.
+
+In this document a -very quick- survey of de functionality are given, based on a
+simple model from \citep{Soetaert08}.
+
+\section{The example model}
+The example model describes growth of bacteria (\code{BACT}) on a substrate (\code{SUB}),
+and in a closed vessel.
+
+The model equations are:
+\begin{eqnarray*}
+\frac{dBact}{dt}= gmax \cdot eff \cdot \frac{Sub}{Sub+ks}\cdot Bact - d \cdot Bact - r_B \cdot Bact\\
+\frac{dSub}{dt}=- gmax \cdot eff \cdot \frac{Sub}{Sub+ks}\cdot Bact + d \cdot Bact
+\end{eqnarray*}
+
+where the first, second and third term of the rate of change of \code{Bact} is growth of bacteria,
+death and respiration respectively.
+
+In \R, this model is implemented and solved as (see help pages of \ds):
+<<>>=
+# model definition
+model <- function(t,state,pars)
+{
+with (as.list(c(state,pars)), {
+
+ dBact = gmax*eff*Sub/(Sub+ks)*Bact - dB*Bact - rB*Bact
+ dSub  =-gmax    *Sub/(Sub+ks)*Bact + dB*Bact
+
+return(list(c(dBact,dSub)))
+                              })
+}
+
+# parameters
+pars <- list(gmax =0.5,eff = 0.5,
+              ks =0.5, rB =0.01, dB =0.01)
+
+#initial conditions
+Bini=0.1
+Sini=100
+
+# ouptut times
+tout    <- seq(0,50,by=0.5)
+state   <- c(Bact=Bini,Sub = Sini)
+
+# run model dynamically
+out     <- as.data.frame(ode(state,tout,model,pars))
+@
+and output plotted as:
+<<label=ode,include=FALSE>>=
+plot(out$time,out$Bact,ylim=range(c(out$Bact,out$Sub)),
+     xlab="time, hour",ylab="molC/m3",type="l",lwd=2)
+lines(out$time,out$Sub,lty=2,lwd=2)
+lines(out$time,out$Sub+out$Bact)
+
+legend("topright",c("Bacteria","Glucose","TOC"),
+       lty=c(1,2,1),lwd=c(2,2,1))
+@
+\setkeys{Gin}{width=0.4\textwidth}
+\begin{figure}
+\begin{center}
+<<label=odefig,fig=TRUE,echo=FALSE>>=
+<<ode>>
+@
+\end{center}
+\caption{Solution of the simple bacterial growth model - see text for \R-code}
+\label{fig:ode}
+\end{figure}
+
+\section{Global sensitivity}
+
+In global sensitivity analysis, certain parameters are changed over a large range,
+and the effect on certain model ouput variables assessed.
+
+In \fme this is done via function \code{sensRange}.
+
+First the sensitivity parameters are defined and a distribution assigned;
+here we specify the minimum and maximum values of three parameters, in a data.frame.
+<<>>=
+parRanges <- data.frame(min=c(0.4,0.4,0.),max=c(0.6,0.6,0.02))
+rownames(parRanges)<- c("gmax","eff","rB")
+parRanges
+@
+
+First we estimate the sensitivity to one parameter, \code{rB} (parameter 3), varying its values
+according to a regular grid (\code{dist=grid}). The effect of that on sensitivitiy
+variables \code{Bact} and \code{Sub} are estimated.
+To do this, the model is run 100 times (\code{num=100}). The \code{system.time} is printed (in seconds)
+
+<<>>=
+tout    <- 0:50
+print(system.time(
+Sens <- sensRange(func=model,y=state,times=tout,parms=pars,dist="grid",
+                   sensvar="Bact",parRange=parRanges[3,],num=100)$summ
+))
+head(Sens)
+@
+The results are represented as a data.frame, containing summary information of the
+value of the sensitivity variable (\code{var}) at each time step (\code{x})
+
+It is relatively simple to use this data.frame to plot ranges around the mean value.
+
+<<label=sens,include=FALSE>>=
+yrange<-range(cbind(Sens$Min,Sens$Max))
+plot(tout,ylim=yrange,xlab="time, hour",ylab="molC/m3",type="n",
+     main="Sensitivity rB")
+
+polygon(c(tout,rev(tout)),c(Sens$Min,rev(Sens$Max)),
+        col=grey(0.9),border=NA)
+polygon(c(tout,rev(tout)),c(Sens$Mean-Sens$Sd,
+        rev(Sens$Mean+Sens$Sd)),col=grey(0.8),border=NA)
+lines(tout,Sens$Mean,lwd=2)
+legend("topleft",fill=c(grey(0.9),grey(0.8)),
+       legend=c("Min-Max","Mean+-sd"),bty="n")
+legend("left",lty=1,lwd=2,legend="Mean",bty="n")
+@
+\setkeys{Gin}{width=0.4\textwidth}
+\begin{figure}
+\begin{center}
+<<label=sensfig,fig=TRUE,echo=FALSE>>=
+<<sens>>
+@
+\end{center}
+\caption{Sensitivity range for one parameter - see text for \R-code}
+\label{fig:sens}
+\end{figure}
+
+Sensitivity ranges can also be estimated for a combination of parameters. Here we
+use all 3 parameters, and select a latin hypercube distribution.
+
+<<>>=
+Sens2 <- sensRange(func=model,y=state,times=tout,parms=pars,dist="latin",
+                   sensvar="Bact",parRange=parRanges,num=100)$summ
+yrange<-range(cbind(Sens2$Min,Sens2$Max))
+@
+<<label=sens2,include=FALSE>>=
+plot(tout,ylim=yrange,xlab="time, hour",ylab="molC/m3",type="n",
+     main="Sensitivity gmax,eff,rB")
+polygon(c(tout,rev(tout)),c(Sens2$Min,rev(Sens2$Max)),
+        col=grey(0.9),border=NA)
+polygon(c(tout,rev(tout)),c(Sens2$Mean-Sens2$Sd,
+          rev(Sens2$Mean+Sens2$Sd)),col=grey(0.8),border=NA)
+lines(tout,Sens2$Mean,lwd=2)
+@
+\setkeys{Gin}{width=0.4\textwidth}
+\begin{figure}
+\begin{center}
+<<label=sensfig2,fig=TRUE,echo=FALSE>>=
+<<sens2>>
+@
+\end{center}
+\caption{Sensitivity range for a combination of parameters - see text for \R-code}
+\label{fig:sens2}
+\end{figure}
+
+
+\section{Local sensitivity}
+In local sensitivity, the effect of a parameter value near its nominal value is estimated.
+
+The methods implemented in \fme are based on \citep{Brun} which should be consulted for details.
+
+They are based on so-called "sensitivity functions".
+
+\subsection{Sensitivity functions}
+<<>>=
+Sns<- sensFun(func=model,y=state,times=tout,parms=pars,
+                   sensvar="Bact",varscale=1)
+
+SnsBact <- Sns$fun
+head(SnsBact)
+
+@
+which can easily be plotted:
+<<label=sfun, include=FALSE>>=
+matplot(tout,SnsBact[,-(1:2)],type="l",ylab="Sfun",
+        main="sensitivity functions")
+legend("topleft",names(SnsBact[-(1:2)]),col=1:5,lty=1:5)
+
+@
+\setkeys{Gin}{width=0.4\textwidth}
+\begin{figure}
+\begin{center}
+<<label=sfunfig,fig=TRUE,echo=FALSE>>=
+<<sfun>>
+@
+\end{center}
+\caption{Sensitivity functions - see text for \R-code}
+\label{fig:sfun}
+\end{figure}
+\subsection{univariate sensitivity}
+Based on the sensitivity functions, several summaries are generated, which
+allow to rank the parameters based on their influence on the selected variables.
+<<>>=
+Sns$model
+@
+\subsection{Bivariate sensitivity}
+
+The pairwise relationships in paramter sensitivity is easily assessed by plotting the
+sensitivity functions using \R-function \code{pairs}, and calculating the correlation.
+
+<<>>=
+cor(SnsBact[,-(1:2)])
+panel.cor <- function(x, y)
+             text(x=mean(range(x)),y=mean(range(y)),
+             labels=format(cor(x,y),digits=2))
+@
+<<label=pairs,include=FALSE>>=
+pairs(SnsBact[,-(1:2)],upper.panel=panel.cor)
+mtext(outer=TRUE,side=3,line=-2,
+      "Sensitivity functions",cex=1.5)
+@
+\setkeys{Gin}{width=0.8\textwidth}
+\begin{figure}
+\begin{center}
+<<label=pairsfig,fig=TRUE,echo=FALSE>>=
+<<pairs>>
+@
+\end{center}
+\caption{Pairs of sensitivity functions - see text for \R-code}
+\label{fig:pairs}
+\end{figure}
+
+\section{multivariate sensitivity analysis}
+Based on the sensitivity functions of model variables to selection of parameters,
+function \code{collin} calculates the \emph{collinearity} or
+\emph{identifiability} of sets of parameter.
+
+The larger the collinearity value, the less identifiable the data set.
+In general a collinearity value less than about 20 is "identifiable"
+
+<<>>=
+Coll <- collin(SnsBact[,-(1:2)])
+format(data.frame(Coll),digits=2,scientific=FALSE)
+Coll [Coll[,"collinearity"]<20&Coll[,"N"]==4,]
+@
+
+Below we plot the collinarity as a function of the number of parameters selected.
+
+<<label=coll, include=FALSE>>=
+nc <- ncol(Coll)
+plot(Coll[,nc-1],Coll[,nc],log="y",main="Collinearity",
+     xlab="Nr parameters",ylab="coll")
+abline(h=20,col="red")
+@
+\setkeys{Gin}{width=0.4\textwidth}
+\begin{figure}
+\begin{center}
+<<label=collfig,fig=TRUE,echo=FALSE>>=
+<<coll>>
+@
+\end{center}
+\caption{Collinearity analysis - see text for \R-code}
+\label{fig:coll}
+\end{figure}
+
+\section{Fitting the model to data}
+\subsection{data structures}
+There are two modes of data input
+\begin{itemize}
+\item \emph{data table (long) format}; this is a two to four column data.frame that contains the
+\code{name} of the observed variable (always the FIRST column),
+the (optional) \code{value of the independent variable} (default = "time"), the
+\code{value of the observation} and the
+(optional) \code{value of the error}.
+\item \emph{crosstable format}; this is a matrix, where each column denotes one
+dependent (or independent) variable; the column name is the name of the observed variable.
+ \end{itemize}
+
+As an example of both formats consider the data, called \code{Dat} consisting of two observed variables, called
+"Obs1" and "Obs2", both containing two observations, at time 1 and 2:
+\begin{table}[H]
+\center
+\begin{tabular}{llll}
+  name    & time   &   val & err \\ \hline
+  Obs1    & 1      &   50  & 5  \\
+  Obs1    & 2      &  150  & 15  \\
+  Obs2    & 1      &  1    & 0.1  \\
+  Obs2    & 2      &  2    & 0.2 \\   \hline
+\end{tabular}
+\end{table}
+
+for the long format and
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lll}
+
+ time   &   Obs1 & Obs2 \\  \hline
+   1    &  50    & 1 \\
+   2    &  150   & 2 \\   \hline
+
+
+\end{tabular}
+\end{table}
+for the crosstab format. Note, that in the latter case it is not possible to
+provide separate errors per data point
+
+\subsection{the model cost function}
+\fme function \code{modCost} estimates the "model cost", which the sum of (weighted)
+squared residuals of the model versus the data.
+
+Assume the following model output (in a matrix or data.frame called \code{Mod}
+\begin{table}[H]
+\centering
+\begin{tabular}{lll}
+ time   &   Obs1 & Obs2 \\ \hline
+   0      &  4   & 1 \\
+   1      &  4   & 2 \\
+   2      &  4   & 3 \\
+   3      &  4   & 4 \\  \hline
+
+\end{tabular}
+\end{table}
+
+Then the modCost will give:
+<<>>=
+Dat<- data.frame(name=c("Obs1","Obs1","Obs2","Obs2"),
+                 time=c(1,2,1,2),val=c(50,150,1,2),
+                 err=c(5,15,0.1,0.2))
+Mod <- Mod <- data.frame(time=0:3,Obs1=rep(4,4),Obs2=1:4)
+modCost(mod=Mod,obs=Dat,y="val")
+@
+in case the residuals are not weighed and
+<<>>=
+modCost(mod=Mod,obs=Dat,y="val",err="err")
+@
+in case the residuals are weighed by 1/error
+\subsection{model fitting}
+Assume the following data set (in crosstab (wide) format):
+<<>>=
+Data <- matrix (nc=2,byrow=2,data=
+c(  2,  0.14,    4,  0.21,    6,  0.31,    8,  0.40,
+   10,  0.69,   12,  0.97,   14,  1.42,   16,  2.0,
+   18,  3.0,    20,  4.5,    22,  6.5,    24,  9.5,
+   26, 13.5,    28, 20.5,    30,  29 , 35, 65, 40, 61)
+)
+colnames(Data) <- c("time","Bact")
+head(Data)
+@
+and assume that we want to fit the model parameters \code{gmax} and \code{eff} to these
+data.
+
+First it is instructive to establish whether these parameters are identifiable based
+on the data set. We assess that by means of the identifiability function \code{collin},
+selecting only the output variables at the instances when there is an observation.
+
+<<>>=
+collin(sensFun(func=model,y=state,times=Data[,1],parms=pars,
+              senspar=c("gmax","eff"),sensvar="Bact",varscale=1)$fun)
+@
+The collinearity index is small enough to enable estimating both parameters.
+
+We next define an objective function that returns the sum of squared residuals, which
+should be minimised. Input to the function are the current values of the parameters.
+
+After updating the parameter vector with the new values, the model is run and the
+model cost estimated by comparing the model output with the data, and using function \code{modCost}.
+
+<<>>=
+Objective <- function (x)
+{
+ pars[c("gmax","eff")]<- x
+
+ # output times
+ tout    <- seq(0,50,by=0.5)
+ state   <- c(Bact=Bini,Sub = Sini)
+
+ # run model dynamically
+ out     <- as.data.frame(ode(state,tout,model,pars))
+
+ # Model cost
+ Cost  <- modCost(obs=Data,model=out)
+
+ return(Cost$model)
+}
+@
+Here we use \R function \code{nlminb} to locate the minimum. A similar procedure
+can be written and that makes use of the Levenberg-marquardt algorithm ; see one of
+the examples in the example subdirectory of the package.
+
+We let nlminb to find the minimum; parameters are constrained to be > 0
+<<>>=
+print(system.time(Fit<-nlminb(start=c(0.5,0.5),
+                  obj=Objective,lower=c(0.,0.))))
+Fit
+@
+
+Finally, the best-fit model is run, the model cost function estimated
+and the model outcome compared to data.
+<<>>=
+ pars[c("gmax","eff")]<- Fit$par
+ tout    <- seq(0,50,by=0.5)
+ state   <- c(Bact=Bini,Sub = Sini)
+
+ out     <- as.data.frame(ode(state,tout,model,pars))
+
+ Cost  <- modCost(obs=Data,model=out)
+ Cost
+@
+<<label=fit,include=FALSE>>=
+ plot(out$time,out$Bact,ylim=range(out$Bact),
+     xlab="time, hour",ylab="molC/m3",type="l",lwd=2)
+ points(Data,cex=2,pch=18)
+@
+\setkeys{Gin}{width=0.4\textwidth}
+\begin{figure}
+\begin{center}
+<<label=fitfig,fig=TRUE,echo=FALSE>>=
+<<fit>>
+@
+\end{center}
+\caption{Fitting the model to data - see text for \R-code}
+\label{fig:fit}
+\end{figure}
+
+Finally, model residuals are plotted
+<<label=res, include=FALSE>>=
+ plot(Cost$residual$x, Cost$residual$res,xlab="time",ylab="",main="residual")
+@
+\setkeys{Gin}{width=0.4\textwidth}
+\begin{figure}
+\begin{center}
+<<label=resfig,fig=TRUE,echo=FALSE>>=
+<<res>>
+@
+\end{center}
+\caption{Model-data residuals - see text for \R-code}
+\label{fig:res}
+\end{figure}
+
+\section{distributions}
+parameter values can be generated according to 4 different distributions:
+\code{Grid,Uniform,Normal,Latinhyper}.
+<<label=dist, include=FALSE>>=
+par(mfrow=c(2,2))
+Minmax <- data.frame(min=c(1,2),max=c(2,3))
+rownames(Minmax) <-c("par1","par2")
+Mean   <- c(par1=1.5,par2=2.5)
+Covar  <- matrix(nr=2,data=c(2,2,2,3))
+plot(Unif(Minmax,100),main="Unif",xlim=c(1,2),ylim=c(2,3))
+plot(Grid(Minmax,100),main="Grid",xlim=c(1,2),ylim=c(2,3))
+plot(Latinhyper(Minmax,5),main="Latin hypercube",xlim=c(1,2),ylim=c(2,3))
+grid()
+plot(Norm(parMean=Mean,parCovar=Covar,num=1000),main="multi normal")
+@
+\setkeys{Gin}{width=0.8\textwidth}
+\begin{figure}
+\begin{center}
+<<label=distfig,fig=TRUE,echo=FALSE>>=
+<<dist>>
+@
+\end{center}
+\caption{distributions}
+\label{fig:dist}
+\end{figure}
+
+\section{examples}
+Several examples are present in subdirectory examples of the package.
+
+They include:
+\begin{itemize}
+\item BODO2\_FME.R, a 1-D model of oxygen dynamics in a river. This model consists of two
+coupled partial differential equations, which are solved to steady-state.
+\item ccl4model\_FME.R. Here the functions are applied to "ccl4model", one of the models
+included in package \ds. This is a model that has been written in FORTRAN.
+\item Omexdia\_FME.R. Here the functions are applied to a model implemented in \pkg{simecol},
+An Object-Oriented Framework for Ecological Modeling (\citep{simecol}, more specifically
+in package \pkg{simecolModels} \citep{simecolModels}. The omexdia model is a 1-D diagenetic model.
+\item O2profile\_FME.R. This contains a simple model of oxygen, diffusing along a spatial gradient,
+with imposed upper and lower boundary concentration
+\end{itemize}
+
+
+\section{finally}
+This vignette is mainly a Sweave \citep{Leisch02} translation of part of the \fme help files.
+
+\clearpage
+\bibliography{vignettes}
+
+\end{document}

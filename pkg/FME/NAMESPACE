@@ -1,0 +1,2 @@
+export(modCost,sensFun,collin,sensRange,Unif,Norm,Latinhyper,Grid)
+

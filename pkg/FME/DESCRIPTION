@@ -1,0 +1,10 @@
+Package: FME
+Version: 1.0
+Title: Flexible Modelling Environment
+Author: Karline Soetaert <k.soetaert@nioo.knaw.nl>
+Maintainer: Karline Soetaert <k.soetaert@nioo.knaw.nl>
+Depends: R (>= 2.01), deSolve, rootSolve, minpack.lm
+Description: Provides functions to help in fitting models to data, to perform monte carlo, sensitivity and identifiability analysis. Models should be written as a set of differential equations that are solved either by an integration routine from package deSolve, or a steady-state solver from package rootSolve.
+License: GPL
+LazyData: yes
+
