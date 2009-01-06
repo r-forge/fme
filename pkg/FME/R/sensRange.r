@@ -46,8 +46,18 @@ if (solver == "steady.2D")
     matrix(nr=1,data=res,dimnames=list(NULL,cn))} else
 stop("Cannot proceed: solver not known ")
 
+if (is.matrix(parms))
+  {
+  dist<-"input"
+  nr <- nrow(parms)
+  if (num >= nr) ii <- 1: num else
+                 ii <- sample(1:nr,size=num,replace=FALSE)
+  parset <-parms[ii,]
+  Parms <- parset[1,]
+   } else Parms <- parms
+
 # reference run
-yRef  <- Solve(parms)
+yRef  <- Solve(Parms)
 
 if (is.vector(yRef)) yRef<- matrix(nr=1,yRef)
 if (is.data.frame(yRef)) yRef <- as.matrix(yRef)
@@ -88,17 +98,18 @@ senspar <- names(parMean)
 if (is.null(senspar)) senspar <- rownames(parRange)
 if (is.null(senspar)) senspar <- rownames(parCovar)
 if (is.null(senspar)) senspar <- colnames(parCovar)
-if (is.null(senspar)) stop("parameter names are not known")
+if (is.null(senspar)) senspar <- names(Parms)
+#if (is.null(senspar)) stop("parameter names are not known")
 
 npar  <- length(senspar)
 
-ipar <- findvar(parms,senspar,"parameters")
-pp   <- unlist(parms)[ipar]
+ipar <- findvar(Parms,senspar,"parameters")
+pp   <- unlist(Parms)[ipar]
 
 # sanity checks for random parameters
 if (dist == "norm" && (is.null(parMean) | is.null(parCovar)))
   stop("parMean and parCovar should be given if dist = norm")
-if(dist != "norm" && is.null(parRange))
+if(!(dist  %in% c("norm","input")) && is.null(parRange))
   stop("parRange should be given if dist = unif, grid or latin")
 
 # generate random parameters
@@ -110,7 +121,7 @@ if (dist =="latin")
  parset <- Latinhyper(parRange,num)                else
 if (dist =="grid")
  parset <- Grid(parRange,num)                      else
-stop("dist should be one of 'norm','unif','latin' or 'grid' ")
+if (dist != "input" )stop("dist should be one of 'norm','unif','latin' or 'grid' ")
 
 
 # The sensitivity output
@@ -118,8 +129,8 @@ colnames(Sens) <- svar
 
 for (i in 1:num)
 {
-  parms[ipar]  <- parset[i,]
-  yRef <- Solve(parms)
+  Parms[ipar]  <- parset[i,]
+  yRef <- Solve(Parms)
   if (is.vector(yRef)) Sens[i,] <- yRef[ivar] else
                        Sens[i,] <- as.vector(unlist(yRef[,ivar]))   # unlist in case it is a data.frame
 }

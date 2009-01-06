@@ -61,7 +61,8 @@ if (! is.null(err))    # weighing
    Ndat     <- NCOL(obs)-1
    Names    <- colnames(obs)
    ilist    <- (1:NCOL(obs))        # column positions of the (dependent) observed variables
-   if (length(ix)>0) ilist <- ilist[-ix]
+   exclude  <- c(ix,ierr)           # exclude columns that are not
+   if (length(exclude)>0) ilist <- ilist[-exclude]
  }
 
 #================================
@@ -90,6 +91,7 @@ if (! is.null(err))    # weighing
 # Compare model and data...
 #================================
  xDat <- 0
+ iDat <- 1: nrow(obs)
  for (i in ilist)    # for each observed variable..
  {
    ii     <-which (ModNames ==Names[i])
@@ -115,19 +117,24 @@ if (! is.null(err))    # weighing
     obsdat <- mean(obsdat)
    }
    if (scaleVar) Scale <- 1/length(obsdat) else Scale <- 1
-   res <- (ModVar- obsdat)/Err
+   Res <- (ModVar- obsdat)
+   res <- Res/Err
    Residual <- rbind(Residual,data.frame(name=Names[i],x=xDat,obs=obsdat,mod=ModVar,
-                     weight=1/Err, res=res))
-   CostVar <- rbind(CostVar,data.frame(name=Names[i],scale=Scale,SSR=sum(res^2)))
+                     weight=1/Err, res.unweighted=Res, res=res))
+   CostVar <- rbind(CostVar,data.frame(name=Names[i],scale=Scale,SSR.unweighted=sum(Res^2),SSR=sum(res^2)))
  }
 
 # SSR
   Cost <- sum(CostVar$SSR*CostVar$scale)
+  Lprob <- -sum(log(pmax(1e-500,dnorm(Residual$mod,Residual$obs,Err))))    #avoid log(0)
   if (! is.null(cost))
   {
     Cost     <- Cost + cost$model
     CostVar  <- rbind(CostVar,cost$var)
     Residual <- rbind(Residual,cost$residual)
+    Lprob    <- Lprob + cost$Lprob
   }
-  return(list(model=Cost,var=CostVar,residual=Residual))
+  out <- list(model=Cost,minlogp=Lprob,var=CostVar,residual=Residual)
+  class(out) <- "modCost"
+  return(out)
  }

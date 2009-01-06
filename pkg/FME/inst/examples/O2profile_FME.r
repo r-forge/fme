@@ -161,8 +161,7 @@ Fit
 ##===============================================================##
 
 # 1. Define the model residuals
-
-Residual <- function(xx)     # X have to be positive -> the log-transformed X's are fitted
+Cost <- function(xx)     # X have to be positive -> the log-transformed X's are fitted
 {
   pars[]<-exp(xx)                    # parameter values
  # Solve the steady-state conditions of the model
@@ -174,8 +173,11 @@ Residual <- function(xx)     # X have to be positive -> the log-transformed X's 
  modFl <- c(UpFlux=ox$UpFlux,LowFlux=ox$LowFlux)
  Cost <- modCost(obs=O2flux,model=modFl,x=NULL,cost=Cost)
 
- return(Cost$residual$res)        # return residuals between model and data
+ return(Cost)        # model cost
 }
+
+
+Residual <- function(xx)  return(Cost(xx)$residual$res)
 
 # 2. nls.lm fits the model to the data - note the transformation to ensure positivity
 # This algorithm also requires better initial conditions...

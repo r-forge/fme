@@ -170,7 +170,7 @@ abline(h=20,col="red")
 
 ##===============================================================##
 ##===============================================================##
-##         Fitting the model to the data - using nlminb          ##
+##                 Fitting the model to the data                 ##
 ##===============================================================##
 ##===============================================================##
 # three parameters are fitted: r, p, ks
@@ -185,12 +185,13 @@ Objective <- function(X)
 
  Model <-cbind(x=x,O2=out$y[(N+1):(2*N)])       # select modeled oxygen conc
 
- modCost(model=Model,obs=Data,x="x")$model                # return SSR between model and data
+ modCost(model=Model,obs=Data,x="x")                # return SSR between model and data
 }
 
 # 2. nlminb finds the minimum; parameters constrained to be > 0
-print(system.time(Fit<-nlminb(start=c(r=1,p=1,ks=1),
-                  obj=Objective,lower=c(0,0,0))))
+print(system.time(Fit<-modFit(p=c(r=1,p=1,ks=1),
+                  f=Objective,lower=c(0,0,0),method="Port")))
+summary(Fit)
 
 # 3. run the model with best-fit parameters
 pars[c("r","p","ks")]<-Fit$par
@@ -211,24 +212,8 @@ legend("bottomright",c("initial guess","fitted"),
 ## Fit the model to data using the Levenberg-Marquardt algorithm ##
 ##===============================================================##
 ##===============================================================##
+# needs good initial conditions..
+FitMrq <- modFit(p=c(r=0.1,p=.1,ks=.1),f=Objective,lower=c(0,0,0,0),upper=c(1,1,100))
 
-# 1. Define the model residuals
-Residual <- function(X)     # X have to be positive -> the log-transformed X's are fitted
-{
-  pars[c("r","p","ks")]<-exp(X)                    # parameter values
-
- out   <- steady.1D (y=rep(200,2*N),func=O2BOD,    # estimate steady-state
-                     parms=pars, nspec=2,pos=TRUE)
- Model <-cbind(x=x,O2=out$y[(N+1):(2*N)])          # select modeled oxygen conc
-
- modCost(model=Model,obs=Data,x="x")$residual$res  # return residuals between model and data
-}
-
-# 2. nls.lm fits the model to the data - note the log-transformation to ensure positivity
-# This algorithm also requires better initial conditions...
-FitMrq <- nls.lm(par=log(c(r=0.1,p=0.1,ks=0.1)),fn=Residual)
-
-# 3. the best parameter values (backtransformed)...
-(Bestpar <- exp(FitMrq$par))
-FitMrq[]
+summary(FitMrq)
 

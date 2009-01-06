@@ -17,7 +17,8 @@ sensRange(parms,sensvar=NULL,dist="unif",
  num=100, Full=FALSE, ...)
  }
 \arguments{
-  \item{parms }{parameters passed to the solver; should be a vector or a list, with named elements}
+  \item{parms }{parameters passed to the solver; should be either a vector, or a list with named elements
+    or a matrix of dimension (num, npar) with the values of the sensitivity parameters}
   \item{sensvar }{the output variables for which the sensitivity needs to be estimated. Either \code{NULL}, the default=all output variables,
   or a vector with output variable \code{names} (which should be present in model output matrix),
   or a vector with \code{indices} to output variables as present in the model output matrix
@@ -30,15 +31,17 @@ sensRange(parms,sensvar=NULL,dist="unif",
   parameter means \code{parMean} and variance-covariance matrix, \code{parCovar}. Note that,
   if the distribution is \code{"norm"} and \code{parRange} is given, then a truncated distribution
   will be generated. (This is useful to prevent for instance that certain parameters become negative).
-  }
+  Ignored if \code{parms} is a matrix}
   \item{parRange }{the range (min, max) of the sensitivity parameters, a matrix or (preferred) a data.frame with
   one row for each parameter, and two columns with the minimum (1st) and maximum (2nd) value.
   The rownames of \code{parRange} should be parameter names that are known in argument \code{parms}
+  Ignored if \code{parms} is a matrix
   }
   \item{parMean }{only when \code{dist} is \code{"norm"}: the mean value of each parameter   }
   \item{parCovar }{only when \code{dist} is \code{"norm"}: the parameters variance-covariance matrix  }
   \item{solver }{the name of the solver routine, one of "ode", "ode.1D", "ode.2D", "steady", "steady.1D", "steady.2D"}
-  \item{num }{the number of times the model has to be run. Set large enough.}
+  \item{num }{the number of times the model has to be run. Set large enough. If \code{parms} is a matrix,
+  then \code{num} parameters are selected randomly (from the rows of \code{parms}}
   \item{Full }{when TRUE full output is given, including all model runs and the parameter samples, when FALSE, only the summaries are returned}
   \item{... }{additional arguments passed to the integrator \code{ode}}
   }

@@ -1,4 +1,5 @@
 library("simecol")
+require(FME)
 
 fem2mu <- 1e+6 * 1e-15
 mu2fem <- 1e+9
@@ -113,8 +114,8 @@ plot.mcyst(dat, sc)
 # Solver function
 Solver <- function (p)
 {
- parms(mc2)[whichpar]<- p
- out(sim(mc2))
+ parms(sc)[whichpar]<- p
+ out(sim(sc))
 }
 
 # Cost of model versus data
@@ -124,23 +125,31 @@ Cost <- function (p)
  return ( modCost(model=Run,obs=dat,weight="std"))
 }
 
-# Levenberg algorithm requires residuals...
-resFun  <- function (p) Cost(p)$residual$res
-costFun <- function (p) Cost(p)$model
+print(system.time(Fit<-modFit(p=parms(mc2)[whichpar],
+                  f=Cost,lower=lower, upper=upper,method="Port")))
+summary(Fit)             # not converged...
 
-# 2. nlminb finds the minimum; parameters constrained
-print(system.time(Fit<-nlminb(start=parms(mc2)[whichpar],
-                  obj=costFun,lower=lower, upper=upper)))
-Fit             # not converged...
+print(system.time(Fit<-modFit(p=parms(mc2)[whichpar],
+                  f=Cost,lower=lower, upper=upper,method="L-BFGS-B")))
+summary(Fit)             # not converged...
 
-# 3. optim finds the minimum; parameters constrained
-print(system.time(Fit2<-optim(par=parms(sc)[whichpar],
-                  fn=costFun,lower=lower, upper=upper, method="L-BFGS-B")))
-Fit2            # not converged...
+print(system.time(Fit<-modFit(p=parms(mc2)[whichpar],
+                  f=Cost,lower=lower, upper=upper,method="BFGS")))
+summary(Fit)             # not converged...
 
-# 2. nls.lm fits the model to the data
-FitMrq <- nls.lm(par=parms(mc2)[whichpar],fn=resFun)
+FITmrq <- modFit(Cost,parms(mc2)[whichpar],
+                  lower=lower, upper=upper,method="Marq")
+summary(FITmrq)
+
+# 2. nls.lm fits the model to the data, using the residuals
+FitMrq<- modFit(p=parms(mc2)[whichpar],f=Cost,method="Marq")
 FitMrq[]
+summary(FitMrq)
+
+# a dirty trick
+diag(FitMrq$hessian) <- diag(FitMrq$hessian) + 1e-11
+summary(FitMrq)
+
 BestPar <- FitMrq$par
 Cost(Fit$par)
 Cost(FitMrq$par)

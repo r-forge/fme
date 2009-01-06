@@ -161,44 +161,36 @@ c(  2,  0.14,    4,  0.21,    6,  0.31,    8,  0.40,
 colnames(Data) <- c("time","Bact")
 head(Data)
 
-# 1. Objective function to minimise; parameters gmax and eff are fitted
+# Objective function to minimise; parameters gmax and eff are fitted
 
-Objective <- function (x)
+Run <- function(x)
 {
  pars[c("gmax","eff")]<- x
 
- # output times
  tout    <- seq(0,50,by=0.5)
  state   <- c(Bact=Bini,Sub = Sini)
-
- # run model dynamically
  out     <- as.data.frame(ode(state,tout,model,pars))
-
- # Model cost
- Cost  <- modCost(obs=Data,model=out)
-
- return(Cost$model)
+ return(out)
 }
 
-# 2. nlminb finds the minimum; parameters constrained to be > 0
-print(system.time(Fit<-nlminb(start=c(0.5,0.5),
-                  obj=Objective,lower=c(0.,0.))))
+
+Objective <- function (x)      # Model cost
+{
+ out     <- Run(x)
+ return(modCost(obs=Data,model=out))
+}
+
+# 2. modFit finds the minimum; parameters constrained to be > 0
+print(system.time(Fit<-modFit(p=c(0.5,0.5),f=Objective)))
 
 Fit
+summary(Fit)
 
 # Run best-fit model....
- pars[c("gmax","eff")]<- Fit$par
+ out <- Run(Fit$par)
 
- # output times
- tout    <- seq(0,50,by=0.5)
- state   <- c(Bact=Bini,Sub = Sini)
-
- # run model dynamically
- out     <- as.data.frame(ode(state,tout,model,pars))
-
- # Model cost
+# Model cost
  Cost  <- modCost(obs=Data,model=out)
-Cost
 
 # Plot residuals
 plot(Cost$residual$x, Cost$residual$res,xlab="time",ylab="",main="residual")
@@ -207,3 +199,4 @@ plot(Cost$residual$x, Cost$residual$res,xlab="time",ylab="",main="residual")
 plot(out$time,out$Bact,ylim=range(out$Bact),
      xlab="time, hour",ylab="molC/m3",type="l",lwd=2)
 points(Data,cex=2,pch=18)
+
