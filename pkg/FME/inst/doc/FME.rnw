@@ -97,7 +97,7 @@ and in a closed vessel.
 The model equations are:
 \begin{eqnarray*}
 \frac{dBact}{dt}= gmax \cdot eff \cdot \frac{Sub}{Sub+ks}\cdot Bact - d \cdot Bact - r_B \cdot Bact\\
-\frac{dSub}{dt}=- gmax \cdot eff \cdot \frac{Sub}{Sub+ks}\cdot Bact + d \cdot Bact
+\frac{dSub}{dt}=- gmax \cdot \frac{Sub}{Sub+ks}\cdot Bact + d \cdot Bact
 \end{eqnarray*}
 
 where the first, second and third term of the rate of change of \code{Bact} is growth of bacteria,
@@ -105,32 +105,30 @@ death and respiration respectively.
 
 In \R, this model is implemented and solved as (see help pages of \ds):
 <<>>=
-# model definition
-model <- function(t,state,pars)
-{
-with (as.list(c(state,pars)), {
-
- dBact = gmax*eff*Sub/(Sub+ks)*Bact - dB*Bact - rB*Bact
- dSub  =-gmax    *Sub/(Sub+ks)*Bact + dB*Bact
-
-return(list(c(dBact,dSub)))
-                              })
-}
-
-# parameters
+# the parameters
 pars <- list(gmax =0.5,eff = 0.5,
               ks =0.5, rB =0.01, dB =0.01)
 
-#initial conditions
-Bini=0.1
-Sini=100
+# runs the model
+solveBact <- function(pars, times=seq(0,50,by=0.5))
+{
+ derivs <- function(t,state,pars)     # returns rate of change
+  {
+  with (as.list(c(state,pars)), {
 
-# ouptut times
-tout    <- seq(0,50,by=0.5)
-state   <- c(Bact=Bini,Sub = Sini)
+  dBact = gmax*eff*Sub/(Sub+ks)*Bact - dB*Bact - rB*Bact
+  dSub  =-gmax    *Sub/(Sub+ks)*Bact + dB*Bact
 
-# run model dynamically
-out     <- as.data.frame(ode(state,tout,model,pars))
+  return(list(c(dBact,dSub)))
+                              })
+  }
+
+ state   <- c(Bact=0.1,Sub = 100)
+ # ode solves the model by integration...
+ return(as.data.frame(ode(y=state,times=times,func=derivs,parms=pars)))
+}
+
+out <- solveBact(pars)
 @
 and output plotted as:
 <<label=ode,include=FALSE>>=
@@ -176,29 +174,18 @@ To do this, the model is run 100 times (\code{num=100}). The \code{system.time} 
 <<>>=
 tout    <- 0:50
 print(system.time(
-Sens <- sensRange(func=model,y=state,times=tout,parms=pars,dist="grid",
-                   sensvar="Bact",parRange=parRanges[3,],num=100)$summ
+Sens <- summary(sensRange(func=solveBact,parms=pars,dist="grid",
+                   sensvar="Bact",parRange=parRanges[3,],num=100))
 ))
 head(Sens)
 @
 The results are represented as a data.frame, containing summary information of the
-value of the sensitivity variable (\code{var}) at each time step (\code{x})
+value of the sensitivity variable (\code{var}) at each time step (\code{x}).
 
-It is relatively simple to use this data.frame to plot ranges around the mean value.
+It is relatively simple to plot ranges around the mean value.
 
 <<label=sens,include=FALSE>>=
-yrange<-range(cbind(Sens$Min,Sens$Max))
-plot(tout,ylim=yrange,xlab="time, hour",ylab="molC/m3",type="n",
-     main="Sensitivity rB")
-
-polygon(c(tout,rev(tout)),c(Sens$Min,rev(Sens$Max)),
-        col=grey(0.9),border=NA)
-polygon(c(tout,rev(tout)),c(Sens$Mean-Sens$Sd,
-        rev(Sens$Mean+Sens$Sd)),col=grey(0.8),border=NA)
-lines(tout,Sens$Mean,lwd=2)
-legend("topleft",fill=c(grey(0.9),grey(0.8)),
-       legend=c("Min-Max","Mean+-sd"),bty="n")
-legend("left",lty=1,lwd=2,legend="Mean",bty="n")
+plot(Sens,main="Sensitivity rB",xlab="time, hour",ylab="molC/m3")
 @
 \setkeys{Gin}{width=0.4\textwidth}
 \begin{figure}
@@ -215,18 +202,11 @@ Sensitivity ranges can also be estimated for a combination of parameters. Here w
 use all 3 parameters, and select a latin hypercube distribution.
 
 <<>>=
-Sens2 <- sensRange(func=model,y=state,times=tout,parms=pars,dist="latin",
-                   sensvar="Bact",parRange=parRanges,num=100)$summ
-yrange<-range(cbind(Sens2$Min,Sens2$Max))
+Sens2 <- summary(sensRange(func=solveBact,parms=pars,
+             dist="latin",sensvar="Bact",parRange=parRanges,num=100))
 @
 <<label=sens2,include=FALSE>>=
-plot(tout,ylim=yrange,xlab="time, hour",ylab="molC/m3",type="n",
-     main="Sensitivity gmax,eff,rB")
-polygon(c(tout,rev(tout)),c(Sens2$Min,rev(Sens2$Max)),
-        col=grey(0.9),border=NA)
-polygon(c(tout,rev(tout)),c(Sens2$Mean-Sens2$Sd,
-          rev(Sens2$Mean+Sens2$Sd)),col=grey(0.8),border=NA)
-lines(tout,Sens2$Mean,lwd=2)
+plot(Sens2,main="Sensitivity gmax,eff,rB",xlab="time, hour",ylab="molC/m3")
 @
 \setkeys{Gin}{width=0.4\textwidth}
 \begin{figure}
@@ -249,18 +229,13 @@ They are based on so-called "sensitivity functions".
 
 \subsection{Sensitivity functions}
 <<>>=
-Sns<- sensFun(func=model,y=state,times=tout,parms=pars,
+SnsBact<- sensFun(func=solveBact,parms=pars,
                    sensvar="Bact",varscale=1)
-
-SnsBact <- Sns$fun
 head(SnsBact)
-
 @
 which can easily be plotted:
 <<label=sfun, include=FALSE>>=
-matplot(tout,SnsBact[,-(1:2)],type="l",ylab="Sfun",
-        main="sensitivity functions")
-legend("topleft",names(SnsBact[-(1:2)]),col=1:5,lty=1:5)
+plot(SnsBact)
 
 @
 \setkeys{Gin}{width=0.4\textwidth}
@@ -277,7 +252,7 @@ legend("topleft",names(SnsBact[-(1:2)]),col=1:5,lty=1:5)
 Based on the sensitivity functions, several summaries are generated, which
 allow to rank the parameters based on their influence on the selected variables.
 <<>>=
-Sns$model
+summary(SnsBact)
 @
 \subsection{Bivariate sensitivity}
 
@@ -286,14 +261,10 @@ sensitivity functions using \R-function \code{pairs}, and calculating the correl
 
 <<>>=
 cor(SnsBact[,-(1:2)])
-panel.cor <- function(x, y)
-             text(x=mean(range(x)),y=mean(range(y)),
-             labels=format(cor(x,y),digits=2))
+
 @
 <<label=pairs,include=FALSE>>=
-pairs(SnsBact[,-(1:2)],upper.panel=panel.cor)
-mtext(outer=TRUE,side=3,line=-2,
-      "Sensitivity functions",cex=1.5)
+pairs(SnsBact)
 @
 \setkeys{Gin}{width=0.8\textwidth}
 \begin{figure}
@@ -315,17 +286,16 @@ The larger the collinearity value, the less identifiable the data set.
 In general a collinearity value less than about 20 is "identifiable"
 
 <<>>=
-Coll <- collin(SnsBact[,-(1:2)])
-format(data.frame(Coll),digits=2,scientific=FALSE)
+Coll <- collin(SnsBact)
+Coll
 Coll [Coll[,"collinearity"]<20&Coll[,"N"]==4,]
 @
 
 Below we plot the collinarity as a function of the number of parameters selected.
+We add a line at the height of 20, shich is a critical value
 
 <<label=coll, include=FALSE>>=
-nc <- ncol(Coll)
-plot(Coll[,nc-1],Coll[,nc],log="y",main="Collinearity",
-     xlab="Nr parameters",ylab="coll")
+plot(Coll,log="y")
 abline(h=20,col="red")
 @
 \setkeys{Gin}{width=0.4\textwidth}
@@ -431,8 +401,8 @@ on the data set. We assess that by means of the identifiability function \code{c
 selecting only the output variables at the instances when there is an observation.
 
 <<>>=
-collin(sensFun(func=model,y=state,times=Data[,1],parms=pars,
-              senspar=c("gmax","eff"),sensvar="Bact",varscale=1)$fun)
+collin(sensFun(func=solveBact,times=Data[,1],parms=pars,
+              senspar=c("gmax","eff"),sensvar="Bact",varscale=1))
 @
 The collinearity index is small enough to enable estimating both parameters.
 
@@ -446,39 +416,28 @@ model cost estimated by comparing the model output with the data, and using func
 Objective <- function (x)
 {
  pars[c("gmax","eff")]<- x
+ tout    <- seq(0,50,by=0.5)
 
  # output times
- tout    <- seq(0,50,by=0.5)
- state   <- c(Bact=Bini,Sub = Sini)
-
- # run model dynamically
- out     <- as.data.frame(ode(state,tout,model,pars))
-
+ out <- solveBact(pars,tout)
  # Model cost
- Cost  <- modCost(obs=Data,model=out)
-
- return(Cost$model)
+ return(modCost(obs=Data,model=out))
 }
 @
-Here we use \R function \code{nlminb} to locate the minimum. A similar procedure
-can be written and that makes use of the Levenberg-marquardt algorithm ; see one of
-the examples in the example subdirectory of the package.
+We then use function \code{modFit} to locate the minimum. It includes several fitting procedures;
+the default one is the Levenberg-marquardt algorithm.
 
-We let nlminb to find the minimum; parameters are constrained to be > 0
+Parameters are constrained to be > 0
 <<>>=
-print(system.time(Fit<-nlminb(start=c(0.5,0.5),
-                  obj=Objective,lower=c(0.,0.))))
-Fit
+print(system.time(Fit<-modFit(p=c(0.5,0.5),f=Objective,lower=c(0.,0.))))
+summary(Fit)
 @
 
-Finally, the best-fit model is run, the model cost function estimated
+The best-fit model is run, the model cost function estimated
 and the model outcome compared to data.
 <<>>=
  pars[c("gmax","eff")]<- Fit$par
- tout    <- seq(0,50,by=0.5)
- state   <- c(Bact=Bini,Sub = Sini)
-
- out     <- as.data.frame(ode(state,tout,model,pars))
+ out   <- solveBact(pars)
 
  Cost  <- modCost(obs=Data,model=out)
  Cost
@@ -514,8 +473,60 @@ Finally, model residuals are plotted
 \label{fig:res}
 \end{figure}
 
+\section{Markov chain monte carlo}n
+We can use the results of the fit to run a MCMC (\citep{Gelman})
+
+The summary returns the model variance, which can be used as the model error
+variance, and the parameter covariance which is ideally suited for generating
+new parameter values.
+<<>>=
+SF<-summary(Fit)
+SF
+SF[]
+Var0<- SF$modVariance
+covIni <-SF$cov.scaled
+MCMC<-modMCMC(p=coef(Fit),f=Objective,jump=covIni,
+              var0=Var0,updatecov=10)
+@
+The \code{plot} method shows the trace of the parameters and, in \code{Full} is
+\code{TRUE}, also the model function.
+
+<<label=mcmcplot, include=FALSE>>=
+ plot(MCMC,Full=TRUE)
+@
+\setkeys{Gin}{width=0.4\textwidth}
+\begin{figure}
+\begin{center}
+<<label=mcmcfig,fig=TRUE,echo=FALSE>>=
+<<mcmcplot>>
+@
+\end{center}
+\caption{MCMC parameter values per iteration - see text for \R-code}
+\label{fig:mcmc1}
+\end{figure}
+The \code{pairs} method plots both parameters as a function of one another.
+<<label=mcmcplot2, include=FALSE>>=
+ pairs(MCMC)
+@
+\setkeys{Gin}{width=0.4\textwidth}
+\begin{figure}
+\begin{center}
+<<label=mcmcfig2,fig=TRUE,echo=FALSE>>=
+<<mcmcplot2>>
+@
+\end{center}
+\caption{Pairs plot of MCMC results. See text for \R-code}
+\label{fig:mcmc2}
+\end{figure}
+Finally, we compare the covariances based on generated parameters with the ones
+from the fit.
+<<>>=
+cov(MCMC$pars)
+covIni
+@
 \section{distributions}
 parameter values can be generated according to 4 different distributions:
+
 \code{Grid,Uniform,Normal,Latinhyper}.
 <<label=dist, include=FALSE>>=
 par(mfrow=c(2,2))
@@ -561,6 +572,43 @@ with imposed upper and lower boundary concentration
 This vignette is mainly a Sweave \citep{Leisch02} translation of part of the \fme help files.
 
 \clearpage
+\begin{table*}[t]
+\caption{Summary of the functions in package FME}\label{tb:tb1}
+\centering
+\begin{tabular}{p{.25\textwidth}p{.7\textwidth}}\hline
+ Function          &Description\\
+\hline \hline
+sensFun            & Sensitivity functions                                 \\  \hline
+sensRange          & Sensitivity ranges                                    \\  \hline
+modCost            & Estimates cost functions                              \\  \hline
+modFit             & Fits a model to data                                  \\ \hline
+modMCMC            & Runs a markov chain monte carlo                       \\ \hline
+collin             & Estimates collinearity based on sensitivity functions \\ \hline
+Grid, Norm, & \\
+Unif, Latinhyper & Generates parameter sets based on grid, normal, uniform or latin hypercube design         \\ \hline
+\hline
+\end{tabular}
+\end{table*}
+
+\begin{table*}[t]
+\caption{Summary of the methods in package FME}\label{tb:tb2}
+\centering
+\begin{tabular}{p{.15\textwidth}p{.15\textwidth}p{.65\textwidth}}\hline
+Method & Function          &Description\\
+\hline \hline
+summary       & modFit  & Summary statistics, including parameter std deviations, significance, parameter correlation\\  \hline
+deviance      & modFit  & model deviance (sum of squared residuals) \\  \hline
+coef          & modFit  & values of fitted parameters               \\  \hline
+residuals     & modFit  & residuals of model and data               \\  \hline
+df.residual   & modFit  & degrees of freedom                        \\  \hline
+print.summary & modFit  & printout of model summary                 \\  \hline
+summary       & modMCMC & Summary statisticsof sampled parameters   \\  \hline
+plot          & modMCMC & Plots all sampled parameters              \\  \hline
+pairs         & modMCMC & Pairwise plots all sampled parameters     \\  \hline
+\hline
+\end{tabular}
+\end{table*}
+
 \bibliography{vignettes}
 
 \end{document}

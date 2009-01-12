@@ -92,24 +92,20 @@ lines(out$time,out$CP,lwd=2)
 # 1. Sensitivity functions
 # All parameters are sensitivity parameters, all variables selected
 Sens <- sensFun(solver=ccl4model,times=times,y=y,parms=Pm,varscale=1)
-Sens$model
 
 ##====================================
 ## univariate sensitivity
 ##====================================
-format(Sens$model,digits=2)
+(SF<-summary(Sens))
 
 # select the ones with highest sensitivity
-pselect <- names(Pm)[which (Sens$model$L2>50)]
+pselect <- names(Pm)[which (SF$L2>1.5)]
 
 ##====================================
 ## bivariate sensitivity
 ##====================================
-panel.cor <- function(x, y)
-             text(x=mean(range(x)),y=mean(range(y)),
-             labels=format(cor(x,y),digits=2))
 
-pairs(Sens$fun[,pselect],upper.panel=panel.cor,gap=0)
+pairs(Sens[,pselect])
 mtext(outer=TRUE,side=3,line=-1.5,
       "Sensitivity functions",cex=1.5)
 
@@ -117,14 +113,12 @@ mtext(outer=TRUE,side=3,line=-1.5,
 ## multivariate sensitivity
 ##====================================
 
-Coll<-collin(Sens$fun[,pselect])
+Coll<-collin(Sens[,pselect])
 head(Coll)
 tail(Coll)
 
-plot(Coll$N,Coll$collinearity,xlab="N",ylab="collinearity",
-     main="identifiability",log="y")
+plot(Coll,log="y")
 abline(h=20,col="red")
-
 
 # 'identifiable parameter combinations' with 7 parameters
 Coll[which(Coll$N==7 & Coll$collinearity < 20),]
@@ -141,56 +135,20 @@ rownames(parRange) <- names(Pm[pselect])
 
 parRange
 # sensitivity range for sensitivity variable CP
-Sr <- sensRange(solver=ccl4model,times=times,y=y,parms=Pm,sensvar="CP",
-                parRange=parRange[1,],num=100)$summ
-
-yrange<-range(cbind(Sr$Min,Sr$Max))
-plot(times,xlim=range(times),ylim=yrange,xlab="time, hour",type="n",
+Sr <- summary(sensRange(solver=ccl4model,times=times,y=y,parms=Pm,
+                sensvar="CP",parRange=parRange[1,],num=100))
+plot(Sr,xlab="time, hour",
      ylab="Chamber Concentration (ppm)",main="Sensitivity BW")
-
-polygon(c(times,rev(times)),c(Sr$Min,rev(Sr$Max)),
-        col=grey(0.9),border=NA)
-polygon(c(times,rev(times)),c(Sr$Mean-Sr$Sd,
-        rev(Sr$Mean+Sr$Sd)),col=grey(0.8),border=NA)
-lines(times,Sr$Mean,lwd=2)
-legend("topright",fill=c(grey(0.9),grey(0.8)),
-       legend=c("Min-Max","Mean+-sd"),bty="n")
-legend("right",lty=1,lwd=2,legend="Mean",bty="n")
 
 # and so on for other parameters
 
-
 ##===============================================================##
 ##===============================================================##
-##         Fitting the model to the data - using nlminb          ##
+## Fit the model to data                                         ##
 ##===============================================================##
 ##===============================================================##
-
 # fitted parameters
 fitPAR <- c("VMAX","CONC","KM")
-
-# model cost is to be minimised
-Objective <- function(P)
-{
- Pm[fitPAR]<-P
- VCH <- Pm[["VCHC"]] - Pm[["RATS"]]*Pm[["BW"]]
- AI0 <- VCH * Pm[["CONC"]]*Pm[["MW"]]/24450
- y["AI"] <- AI0
-
- out <- as.data.frame(ccl4model(times,y,Pm))
- Cost <- sum((out$CP-Obs$ChamberConc)^2)
- return(Cost)
-}
-# this one does not work
-(Fit<-nlminb(start=c(VMAX=0.04,CONC=1000,KM=0.4),
-             lower=c(0,0,0),obj=Objective))
-
-
-##===============================================================##
-##===============================================================##
-## Fit the model to data using the Levenberg-Marquardt algorithm ##
-##===============================================================##
-##===============================================================##
 
 # 1. Define the model residuals
 
@@ -204,9 +162,14 @@ Residuals <- function(P)
  out <- as.data.frame(ccl4model(times,y,Pm))
  return(out$CP-Obs$ChamberConc)
 }
+# this one does not work
+(Fit<-modFit(p=c(VMAX=0.04,CONC=1000,KM=0.4),
+             lower=c(0,0,0),f=Residuals,method="Port"))
 
-(MrqFit<-nls.lm(par=c(VMAX=1,CONC=500,KM=1),fn=Residuals))
-MrqFit$hessian  #!!!
+# this one (the default) does work...
+(MrqFit<-modFit(p=c(VMAX=0.04,CONC=1000,KM=0.4),
+             lower=c(0,0,0),f=Residuals))
+summary(MrqFit)
 
 # run model with the optimized value:
  Pm[fitPAR]<-MrqFit$par
@@ -222,4 +185,9 @@ plot(ChamberConc ~ time,data=Obs,xlab="Time (hours)",
          log="y",main = "ccl4model-fitted")
 lines(fitted$time,fitted$CP,lwd=2)
 
-MrqFit[]
+
+##===============================================================##
+##===============================================================##
+## MCMC application -still to try                                ##
+##===============================================================##
+##===============================================================##

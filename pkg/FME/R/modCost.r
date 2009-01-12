@@ -61,7 +61,8 @@ if (! is.null(err))    # weighing
    Ndat     <- NCOL(obs)-1
    Names    <- colnames(obs)
    ilist    <- (1:NCOL(obs))        # column positions of the (dependent) observed variables
-   exclude  <- c(ix,ierr)           # exclude columns that are not
+   exclude  <- ix                   # exclude columns that are not
+   if (ierr>0) exclude  <- c(ix,ierr)           # exclude columns that are not
    if (length(exclude)>0) ilist <- ilist[-exclude]
  }
 
@@ -121,7 +122,8 @@ if (! is.null(err))    # weighing
    res <- Res/Err
    Residual <- rbind(Residual,data.frame(name=Names[i],x=xDat,obs=obsdat,mod=ModVar,
                      weight=1/Err, res.unweighted=Res, res=res))
-   CostVar <- rbind(CostVar,data.frame(name=Names[i],scale=Scale,SSR.unweighted=sum(Res^2),SSR=sum(res^2)))
+   CostVar <- rbind(CostVar,data.frame(name=Names[i],scale=Scale,
+                                       N=length(Res),SSR.unweighted=sum(Res^2),SSR=sum(res^2)))
  }
 
 # SSR
@@ -131,10 +133,22 @@ if (! is.null(err))    # weighing
   {
     Cost     <- Cost + cost$model
     CostVar  <- rbind(CostVar,cost$var)
-    Residual <- rbind(Residual,cost$residual)
+    Residual <- rbind(Residual,cost$residuals)
     Lprob    <- Lprob + cost$Lprob
   }
-  out <- list(model=Cost,minlogp=Lprob,var=CostVar,residual=Residual)
+  out <- list(model=Cost,minlogp=Lprob,var=CostVar,residuals=Residual)
   class(out) <- "modCost"
   return(out)
  }
+
+
+plot.modCost<- function(x,legpos="topleft",...)
+{
+nvar <- nrow(x$var)
+
+plot(x$residuals$x, x$residuals$res,
+     pch=c(16:24)[x$residuals$name],col=c(1:nvar)[x$residuals$name],...)
+
+if (! is.na(legpos)) legend(legpos,legend=x$var$name,col=1:nvar,pch=16:24)
+
+}

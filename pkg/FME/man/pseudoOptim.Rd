@@ -2,14 +2,14 @@
 \alias{pseudoOptim}
 \title{Pseudo-random search optimisation algorithm of Price (1997)}
 \description{Pseudo-random search algorithm of Price (1997), a random-based fitting technique.}
-\usage{pseudoOptim(f, p,..., lower=-Inf, upper=Inf, control=list())}
+\usage{pseudoOptim(f, p,..., lower, upper, control=list())}
 \arguments{
   \item{f }{function to be minimised, its first argument should be the vector of parameters
     over which minimization is to take place. It should return a scalar result, the model cost, e.g the sum of squared residuals.}
   \item{p }{initial values of the parameters to be optimised}
   \item{... }{arguments passed to funtion \code{f}}
-  \item{lower }{minimal values of the parameters to be optimised}
-  \item{upper }{maximal values of the parameters to be optimised}
+  \item{lower }{minimal values of the parameters to be optimised; these must be specified; they cannot be -Inf}
+  \item{upper }{maximal values of the parameters to be optimised; these must be specified; they cannot be +Inf}
   \item{control}{a list of control parameters - see details}
 }
 \value{
@@ -23,8 +23,7 @@
   \item{rsstrace}{a 2-columned matrix with the iteration number and the model cost at each succesful iteration}
 }
 \author{Karline Soetaert <k.soetaert@nioo.knaw.nl>}
-\examples{  # will display the code
-
+\examples{
 amp    <- 6
 period <- 5
 phase  <- 0.5
@@ -48,7 +47,8 @@ legend ("bottomright",lty=c(1,2,3),c("Price","Mathematical","Simulated annealing
 \details{
 The \code{control} argument is a list that can supply any of the following components:
  \item{npop }{number of elements in the population. Defaults to max(5*length(p),50)}
-  \item{numiter }{number of iterations to be performed. Defaults to 10000. There is no other stopping criterion. }
+  \item{numiter }{maximal number of iterations to be performed. Defaults to 10000. The algorithm
+  either stops when numiter iterations has been performed or when the remaining variation is less than \code{varleft} }
   \item{centroid }{number of elements from which to estimate a new parameter vector, defaults to 3}
   \item{varleft }{relative variation remaining; if below this value algorithm stops; defaults to 1e-8}
   \item{verbose }{if TRUE, more verbose output will contain the parameters in final population,

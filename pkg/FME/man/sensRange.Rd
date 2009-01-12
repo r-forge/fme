@@ -1,5 +1,9 @@
 \name{sensRange}
 \alias{sensRange}
+\alias{summary.sensRange}
+\alias{plot.sensRange}
+\alias{plot.summary.sensRange}
+
 \title{Global sensitivity analysis}
 \description{Given a model consisting of differential equations, estimates
 the global effect of certain (sensitivity) parameters on selected sensitivity variables.
@@ -12,17 +16,24 @@ This function thus produces 'envelopes' around the sensitivity variables.
 
 }
 \usage{
-sensRange(parms,sensvar=NULL,dist="unif",
- parRange=NULL, parMean=NULL, parCovar=NULL, solver="ode",
- num=100, Full=FALSE, ...)
+sensRange(func,parms,sensvar=NULL,dist="unif",
+ parRange=NULL, parMean=NULL, parCovar=NULL, map=1,
+ num=100,  ...)
+
+\method{summary}{sensRange}(object,  \dots)
+\method{plot}{summary.sensRange}(x, main=NULL, legpos="topleft", \dots)
+\method{plot}{sensRange}(x, main=NULL, \dots)
+
  }
 \arguments{
-  \item{parms }{parameters passed to the solver; should be either a vector, or a list with named elements
+  \item{func }{An R-function that has as first argument \code{parms} and that returns a matrix with
+  the values of the output variables (columns), and -optionally- a mapping variable (by default the first column)}
+  \item{parms }{parameters passed to \code{func}; should be either a vector, or a list with named elements
     or a matrix of dimension (num, npar) with the values of the sensitivity parameters}
   \item{sensvar }{the output variables for which the sensitivity needs to be estimated. Either \code{NULL}, the default=all output variables,
-  or a vector with output variable \code{names} (which should be present in model output matrix),
-  or a vector with \code{indices} to output variables as present in the model output matrix
-  (note that the first column of this matrix is "times" and should not be selected) }
+  or a vector with output variable \code{names} (which should be present in the matrix returned by \code{func}),
+  or a vector with \code{indices} to output variables as present in the output matrix
+  (note that the column of this matrix with the mapping variable should not be selected) }
   \item{dist }{the distribution according to which parameter should be generated, one of
   "unif" (uniformly random samples), "norm", (normally distributed random samples),
   "latin" (latin hypercube distribution), "grid" (parameters arranged on a grid).
@@ -39,44 +50,51 @@ sensRange(parms,sensvar=NULL,dist="unif",
   }
   \item{parMean }{only when \code{dist} is \code{"norm"}: the mean value of each parameter   }
   \item{parCovar }{only when \code{dist} is \code{"norm"}: the parameters variance-covariance matrix  }
-  \item{solver }{the name of the solver routine, one of "ode", "ode.1D", "ode.2D", "steady", "steady.1D", "steady.2D"}
   \item{num }{the number of times the model has to be run. Set large enough. If \code{parms} is a matrix,
   then \code{num} parameters are selected randomly (from the rows of \code{parms}}
-  \item{Full }{when TRUE full output is given, including all model runs and the parameter samples, when FALSE, only the summaries are returned}
-  \item{... }{additional arguments passed to the integrator \code{ode}}
+  \item{map }{The column number with the (independent) mapping variable in the output matrix returned by \code{func}. For
+  dynamic models solved by integration, this will be the (first) column with \code{time}.
+  Set to NULL if there is no mapping variable. Mapping variables cannot be selected for estimating
+  sensitivity ranges; they are used for plotting.}
+  \item{object }{an object of class \code{sensRange}}
+  \item{x }{an object of class \code{sensRange}}
+  \item{legpos }{position of the legend; set to NULL to avoid legend}
+  \item{main }{a main title for the plot}
+  \item{... }{additional arguments passed to function \code{func} or to the methods}
   }
 \value{
-  a list containing:
-  \item{summ }{the summary of sensitivity variables, a data.frame with as many rows as there are
-  sensitivity output
-  variables (see details) and the following columns: \code{Mean}, the mean, \code{sd}, the standard deviation,
-  \code{Min}{, the minimal value, \code{Max}, the maximal value, \code{q25},  \code{q50}, \code{q75},
-  the 25th, 50 and 75\% quantile}
+  a data.frame of type \code{sensRange} containing the parameter set and
+  the corresponding values of the sensitivity output variables.
+  
+  The list returned by \code{sensRange} has a method for the generic functions
+   \code{\link{summary}},\code{\link{plot}} and \code{plot.summary}
+ - see note.
+
   }
-  \item{sens }{Only when \code{Full} is TRUE: the full output, consisting of the parameter set and
-  the corresponding values of the sensitivity output variables.}
-}
+
 \details{
-When the model consists of \emph{differential equations} that are solved either by integration (package \code{deSolve} or
-by steady-state calculation (package \code{rootSolve}), then the following (named) input arguments should be included:
 
-  \item{func }{an \R-function that computes the values of the derivatives in the ODE system (the model definition) at time t.
-       \code{func} must be defined as:
-      \code{yprime = func(t, y, parms,...)}.  \code{t} is the current time point
-      in the integration, \code{y} is the current estimate of the variables
-      in the ODE system.  See details of integration routines in package \code{deSolve}}
-  \item{y }{the initial (state) values for the ODE system, a vector. }
-  \item{times }{if integrated: time sequence for which output is wanted; the first value of \code{times} must be the initial time}
-  \item{time }{if steady-state: time at which steady-state should be estimated}
+Models solved by integration (i.e. by using one of \code{'ode', 'ode.1D', 'ode.band', 'ode.2D'}),
+have the output already in a form usable by \code{sensRange}.
 
-
-When the model is solved by integration (i.e. \code{solver} is one of \code{'ode', 'ode.1D', 'ode.band', 'ode.2D'}),
-then for each sensitivity variable, as specified through \code{sensvar}, several output values are generated, one
-for each element in \code{times}.
-
-When the steady-state of the model is solved (i.e. \code{solver} is one of \code{steady, steady.1D,
-steady.band, steady.2D}, then only one output value is generated.
+The output for models solved by a steady-state solver (i.e. one of \code{steady, steady.1D,
+steady.band, steady.2D}, needs to be rearranged - see examples.
 }
+\note{
+The following \emph{methods} are included:
+
+ \code{\link{summary}}, estimates summary statistics for the sensitivity variables,
+ a data.frame with as many rows as there are mapping variables (or rows in the matrix returned by \code{func})
+ and the following columns: \code{x}, the mapping value, \code{Mean}, the mean, \code{sd}, the standard deviation,
+  \code{Min}, the minimal value, \code{Max}, the maximal value, \code{q25},  \code{q50}, \code{q75},
+  the 25th, 50 and 75\% quantile
+  
+ \code{\link{plot}}, produces a "matplot" of the \code{sensRange} output, one plot for each sensitivity variable and
+ with the mapping variable on the x-axis.
+
+ \code{summary.plot}, produces a plot of the summary of the \code{sensRange} output, one plot for each sensitivity variable and
+ with the ranges and mean +- standard deviation as coloured polygons.
+  }
 \examples{
 
 #========================================
@@ -87,24 +105,28 @@ steady.band, steady.2D}, then only one output value is generated.
 pars <- list(gmax =0.5,eff = 0.5,
               ks =0.5, rB =0.01, dB =0.01)
 
-model <- function(t,state,pars)
+solveBact <- function(pars)
 {
-with (as.list(c(state,pars)), {
+ derivs <- function(t,state,pars)     # returns rate of change
+  {
+  with (as.list(c(state,pars)), {
 
-dBact = gmax*eff*Sub/(Sub+ks)*Bact - dB*Bact - rB*Bact
-dSub  =-gmax    *Sub/(Sub+ks)*Bact + dB*Bact
+  dBact = gmax*eff*Sub/(Sub+ks)*Bact - dB*Bact - rB*Bact
+  dSub  =-gmax    *Sub/(Sub+ks)*Bact + dB*Bact
 
-return(list(c(dBact,dSub)))
+  return(list(c(dBact,dSub)))
                               })
+  }
+
+ state   <- c(Bact=0.1,Sub = 100)
+ tout    <- seq(0,50,by=0.5)
+ # ode solves the model by integration...
+ return(as.data.frame(ode(y=state,times=tout,func=derivs,parms=pars)))
 }
 
-Bini=0.1
-Sini=100
+out <- solveBact(pars)
 
-state   <- c(Bact=Bini,Sub = Sini)
-tout    <- seq(0,50,by=0.5)
-out     <- as.data.frame(ode(y=state,times=tout,func=model,parms=pars))
-mf<-par(mfrow=c(2,2))
+mf  <-par(mfrow=c(2,2))
 
 plot(out$time,out$Bact,main="Bacteria",,
      xlab="time, hour",ylab="molC/m3",type="l",lwd=2)
@@ -116,33 +138,18 @@ parRanges
 
 tout    <- 0:50
 # sensitivity to rB; equally-spaced parameters ("grid")
-Sens <- sensRange(func=model,y=state,times=tout,parms=pars,dist="grid",
-                   sensvar="Bact",parRange=parRanges[3,],num=50)$summ
-yrange<-range(cbind(Sens$Min,Sens$Max))
-plot(tout,ylim=yrange,xlab="time, hour",ylab="molC/m3",type="n",
-     main="Sensitivity rB")
+SensR <- sensRange(func=solveBact,parms=pars,dist="grid",
+                   sensvar="Bact",parRange=parRanges[3,],num=50)
 
-polygon(c(tout,rev(tout)),c(Sens$Min,rev(Sens$Max)),
-        col=grey(0.9),border=NA)
-polygon(c(tout,rev(tout)),c(Sens$Mean-Sens$Sd,
-        rev(Sens$Mean+Sens$Sd)),col=grey(0.8),border=NA)
-lines(tout,Sens$Mean,lwd=2)
-legend("topleft",fill=c(grey(0.9),grey(0.8)),
-       legend=c("Min-Max","Mean+-sd"),bty="n")
-legend("left",lty=1,lwd=2,legend="Mean",bty="n")
+Sens  <-summary(SensR)
+plot(Sens,legpos="topleft",xlab="time, hour",ylab="molC/m3",
+     main="Sensitivity to rB")
 
 # sensitivity to all; latin hypercube
-Sens2 <- sensRange(func=model,y=state,times=tout,parms=pars,dist="latin",
-                   sensvar="Bact",parRange=parRanges,num=50)$summ
-yrange<-range(cbind(Sens2$Min,Sens2$Max))
-plot(tout,ylim=yrange,xlab="time, hour",ylab="molC/m3",type="n",
-     main="Sensitivity gmax,eff,rB")
-
-polygon(c(tout,rev(tout)),c(Sens2$Min,rev(Sens2$Max)),
-        col=grey(0.9),border=NA)
-polygon(c(tout,rev(tout)),c(Sens2$Mean-Sens2$Sd,
-          rev(Sens2$Mean+Sens2$Sd)),col=grey(0.8),border=NA)
-lines(tout,Sens2$Mean,lwd=2)
+Sens2 <- summary(sensRange(func=solveBact,parms=pars,dist="latin",
+                   sensvar=c("Bact","Sub"),parRange=parRanges,num=50))
+plot(Sens2,xlab="time, hour",ylab="molC/m3",
+     main="Sensitivity to gmax,eff,rB")
 
 par(mfrow=mf )
 }

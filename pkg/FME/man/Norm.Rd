@@ -25,8 +25,8 @@ distribution, as specified through the mean value and the variance-covariance ma
 parameters. In addition, it is possible to impose a minimum and maximum of each parameter,
 via \code{parRange}. This will generate a truncated distribution.
 Use this for instance if certain parameters cannot become negative.
-
-Note that, for \code{Norm} to work, parCovar must be a valid variance-covariance matrix.
+}
+\note{For function \code{Norm} to work, \code{parCovar} must be a valid variance-covariance matrix.
 (i.e. positive definite). If this is not the case, then the function will fail.
 
 }

@@ -13,7 +13,7 @@ Data<- matrix(nc=2,byrow=TRUE,data =c(
    50,   9.5,  1050,   3.5,  2050,   5.3,  3050,  10.5,
  4050,  35.7,  5050, 112.1,  6050, 180.6,  7050, 236.1,
  8050, 268.2,  9050, 284.8))
-colnames(Data) <- c("x","O2")
+colnames(Data) <- c("dist","O2")
 
 ##===============================================================##
 ##===============================================================##
@@ -24,28 +24,41 @@ colnames(Data) <- c("x","O2")
 #==================#
 # Model equations
 #==================#
-O2BOD <- function(t,state,pars)
-
+O2BOD <- function (pars)
 {
-with(as.list(pars),
 
-{
-  BOD <- state[1:N]
-  O2  <- state[(N+1):(2*N)]
+ derivs <- function(t,state,pars)  {
+   with(as.list(pars),
+
+   {
+    BOD <- state[1:N]
+    O2  <- state[(N+1):(2*N)]
 
 # BOD dynamics
-  FluxBOD <-  v*c(BOD_0,BOD)  # fluxes due to water flow (advection)
-  FluxO2  <-  v*c(O2_0,O2)
+    FluxBOD <-  v*c(BOD_0,BOD)  # fluxes due to water flow (advection)
+    FluxO2  <-  v*c(O2_0,O2)
 
-  BODrate <- r*BOD*O2/(O2+ks)  # 1-st order consumption, Monod in oxygen
+    BODrate <- r*BOD*O2/(O2+ks)  # 1-st order consumption, Monod in oxygen
 
 #rate of change = flux gradient - consumption  + reaeration (O2)
-  dBOD         <- -diff(FluxBOD)/dx  - BODrate
-  dO2          <- -diff(FluxO2)/dx   - BODrate + p*(O2sat-O2)
+    dBOD         <- -diff(FluxBOD)/dx  - BODrate
+    dO2          <- -diff(FluxO2)/dx   - BODrate + p*(O2sat-O2)
 
-  return(list(c(dBOD=dBOD,dO2=dO2),BODrate=BODrate))
- })
- }    # END O2BOD
+    return(list(c(dBOD=dBOD,dO2=dO2),BODrate=BODrate))
+    })
+   }    # END derivs
+
+# solving the model to steady-state
+# initial guess
+state <- c(rep(200,N),rep(200,N))
+
+# steady-state solution
+out <-steady.1D (y=state,func=derivs,parms=pars,
+           nspec=2,pos=TRUE,names=c("BOD","O2"))
+
+data.frame(dist=x,unlist(out$y),BODrate=out$BODrate)
+
+} #end BODO2
 
 #==================#
 # Model parameters
@@ -69,14 +82,11 @@ N       <- length(x)
 #==================#
 # Model solution
 #==================#
-# initial guess
-state <- c(rep(200,N),rep(200,N))
 
-# steady-state solution
-out   <- steady.1D (y=state,func=O2BOD,parms=pars, nspec=2,pos=TRUE)
+out <- O2BOD(pars)
 
 # initial oxygen concentration
-O2_in <- out$y[(N+1):(2*N)]
+O2_in <- out$O2
 
 plot(x,O2_in,xlab= "Distance from river",
      ylab="Oxygen, mmol/m3",main="O2-BOD model",type="l")
@@ -91,28 +101,15 @@ plot(x,O2_in,xlab= "Distance from river",
 parRange=matrix(nc=2,data=c(500,600,0.1,0.5,0.5,2),byrow=TRUE)
 rownames(parRange) <- c("v","r","p")
 
-# 2. Calculate sensitivity ranges for O2 (variable (N+1):(2*N))
-#    model is solved 100 times
+# 2. Calculate sensitivity ranges for O2, BOD, and BODrate
+
 print(system.time(
-Sens<-sensRange(func=O2BOD,y=state,time=0,parms=pars,
-                sensvar=(N+1):(2*N),solver="steady.1D",
-                nspec=2,pos=TRUE,dist="unif",parRange=parRange,num=100)$summ
+Sens<-summary(SS<-sensRange(parms=pars,map=1,
+                func=O2BOD,dist="unif",parRange=parRange,num=100))
 ))
 
 # 3. Plot the results...
-yrange<-range(cbind(Sens$Min,Sens$Max))
-
-plot(x,xlim=range(x),ylim=yrange,xlab= "Distance from river",
-     ylab="Oxygen, mmol/m3",main="Sensitivity to v, r, p",type="n")
-
-polygon(c(x,rev(x)),c(Sens$Min,rev(Sens$Max)),
-        col=grey(0.9),border=NA)
-polygon(c(x,rev(x)),c(Sens$Mean-Sens$Sd,
-        rev(Sens$Mean+Sens$Sd)),col=grey(0.8),border=NA)
-lines(x,Sens$Mean,lwd=2)
-legend("bottomright",fill=c(grey(0.9),grey(0.8)),
-       legend=c("Min-Max","Mean+-sd"),bty="n")
-legend("right",lty=1,lwd=2,legend="Mean",bty="n")
+plot(Sens)
 
 ##===============================================================##
 ##===============================================================##
@@ -127,12 +124,20 @@ parRange <- data.frame(min=10,max=5000)
 rownames(parRange) <- "v"
 parRange
 
-sens <-  sensRange(func=O2BOD,y=rep(1,2*N),time=0,parms=pars,dist="grid",
-                  sensvar=2*N,solver="steady.1D", Full=TRUE,
-                  nspec=2,pos=TRUE,parRange=parRange,num=100)$sens
+Sens2Vmodel <- function (pars)
+{
+# steady-state solution
+out   <-O2BOD(pars)
+
+out$O2[100]
+}
+
+# there is no mapping variable here...
+sens <-sensRange(parms=pars,func=Sens2Vmodel,map=NULL,
+                dist="grid",parRange=parRange,num=100)
 
 head(sens)
-plot(sens,xlab="velocity,m/day",ylab="mmol/m3",main="oxygen at outflow")
+plot(sens[,1],sens[,2],xlab="velocity,m/day",ylab="mmol/m3",main="oxygen at outflow")
 
 ##===============================================================##
 ##===============================================================##
@@ -141,31 +146,24 @@ plot(sens,xlab="velocity,m/day",ylab="mmol/m3",main="oxygen at outflow")
 ##===============================================================##
 
 # All parameters, all variables...
-Sens <- sensFun(func=O2BOD,y=state,time=0,parms=pars,sensvar=NULL,
-                solver="steady.1D",nspec=2,pos=TRUE)
+Sens <- sensFun(parms=pars,func=O2BOD)
 
 # univariate sensitivity
-format(Sens$model,digits=2)
+summary(Sens)
 
 # bivariate sensitivity
-panel.cor <- function(x, y)
-             text(x=mean(range(x)),y=mean(range(y)),
-             labels=format(cor(x,y),digits=2))
-
-pairs(Sens$fun[,-(1:2)],upper.panel=panel.cor)
+pairs(Sens)
 mtext(outer=TRUE,side=3,line=-1.5,
       "Sensitivity functions",cex=1.5)
 
-cor(Sens$fun[,-(1:2)])
+cor(Sens[,-(1:2)])
 
 # multivariate sensitivity
-Coll <- collin(Sens$fun[,-(1:2)])
+Coll <- collin(Sens)
 head(Coll)
 tail(Coll)
 
-plot(Coll$N,Coll$collinearity,xlab="N",ylab="collinearity",
-     main="identifiability",log="y")
-
+plot(Coll,log="y")
 abline(h=20,col="red")
 
 ##===============================================================##
@@ -179,31 +177,27 @@ abline(h=20,col="red")
 Objective <- function(X)
 {
  pars[c("r","p","ks")]<-X                       # set parameter values
+ out <- O2BOD(pars)
 
- out <- steady.1D (y=rep(200,2*N),func=O2BOD,   # estimate steady-state
-                   parms=pars, nspec=2,pos=TRUE)
-
- Model <-cbind(x=x,O2=out$y[(N+1):(2*N)])       # select modeled oxygen conc
-
- modCost(model=Model,obs=Data,x="x")                # return SSR between model and data
+ modCost(model=out,obs=Data,x="dist")            # return SSR between model and data
 }
 
 # 2. nlminb finds the minimum; parameters constrained to be > 0
+print("Port")
 print(system.time(Fit<-modFit(p=c(r=1,p=1,ks=1),
                   f=Objective,lower=c(0,0,0),method="Port")))
 summary(Fit)
 
 # 3. run the model with best-fit parameters
 pars[c("r","p","ks")]<-Fit$par
-out   <- steady.1D (y=state,func=O2BOD,parms=pars, nspec=2,pos=TRUE)
-O2    <- out$y[(N+1):(2*N)]
+O2new    <- O2BOD(pars)
 
 # Plotting output  #
 plot(Data,pch=18,cex=2,xlab= "Distance from river",
      ylab="mmol/m3",main="Oxygen",col="darkblue",ylim=c(0,300))
 
 lines(x,O2_in,col="darkgrey")
-lines(x,O2,lwd=2)
+lines(O2new$dist,O2new$O2,lwd=2)
 legend("bottomright",c("initial guess","fitted"),
        col=c("darkgrey","black"),lwd=c(1,2))
 
@@ -213,7 +207,11 @@ legend("bottomright",c("initial guess","fitted"),
 ##===============================================================##
 ##===============================================================##
 # needs good initial conditions..
-FitMrq <- modFit(p=c(r=0.1,p=.1,ks=.1),f=Objective,lower=c(0,0,0,0),upper=c(1,1,100))
+print("Levenberg-Marquardt")
+print(system.time(FitMrq <- modFit(p=c(r=0.1,p=.1,ks=.1),
+                 f=Objective,lower=c(0,0,0))))
 
 summary(FitMrq)
 
+Cost <- Objective(FitMrq$par)
+plot(Cost,main="residuals")

@@ -59,15 +59,15 @@ rownames(pRange) <- "cons"
 # 2. Calculate sensitivity ranges for O2
 #    model is solved 100 times, uniform parameter distribution (default)
 
-Sens <- sensRange(parms=pars,y=runif(n),func=O2fun,nspec=1,num=100,
-                  solver="steady.band",parRange=pRange,time=0)$summ
+Sens <- summary(sensRange(parms=pars,y=runif(n),func=O2fun,nspec=1,num=100,
+                  solver="steady.band",parRange=pRange,time=0))
 
 # same, now with normal distribution of consumption (mean = 80, variance=100)
 Sens2 <- sensRange(parms=pars,y=runif(n),func=O2fun,nspec=1,dist="norm",time=0,
-           num=100,solver="steady.band",parMean=c(cons=80),parCovar=100)$summ
+           num=100,solver="steady.band",parMean=c(cons=80),parCovar=100)
 
 # 3. Plot results
-O2 <- Sens2[1:100,]    # first 100 columns are O2
+O2 <- summary(Sens2)[1:100,]    # first 100 rows are O2
 o2range<-range(cbind(O2$Min,O2$Max))
 
 plot(0,ylim=rev(range(X)),xlim=o2range,xlab= "O2",
@@ -94,25 +94,17 @@ O2sens <- sensFun(func=O2fun,y=runif(n),parms=pars,
                   nspec=1,solver="steady.band")
 
 # univariate sensitivity
-format(O2sens$model,digits=2)
+O2sens
 
 # bivariate sensitivity
-panel.cor <- function(x, y)
-             text(x=mean(range(x)),y=mean(range(y)),
-             labels=format(cor(x,y),digits=2))
+pairs(O2sens)
 
-pairs(O2sens$fun[,-(1:2)],upper.panel=panel.cor)
-mtext(outer=TRUE,side=3,line=-1.5,
-      "Sensitivity functions",cex=1.5)
-
-cor(O2sens$fun[,-(1:2)])
+cor(O2sens[,-(1:2)])
 
 # multivariate sensitivity
-Coll <- collin(O2sens$fun[,-(1:2)])
+Coll <- collin(O2sens)
 Coll
-plot(Coll$N,Coll$collinearity,xlab="N",ylab="collinearity",
-     main="identifiability",log="y")
-
+plot(Coll,log="y")
 abline(h=20,col="red")
 
 ##===============================================================##
@@ -183,10 +175,13 @@ Residual <- function(xx)  return(Cost(xx)$residual$res)
 # This algorithm also requires better initial conditions...
 FitMrq <- nls.lm(par=log(c(360,10,80,1)),fn=Residual)
 
+summary(FitMrq)
+
 # 3. the best parameter values...
 (Bestpar <- exp(FitMrq$par))
 
 pars[]<-Bestpar                   # parameter values
+
 # Solve the steady-state conditions of the model
 ox <- steady.band(y=runif(n),func=O2fun,parms=pars,nspec=1)
 

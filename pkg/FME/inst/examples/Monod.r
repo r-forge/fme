@@ -30,7 +30,7 @@ print(sP)
 
 # estimate of parameter covariances (to update parameters) and the model variance
 Covar   <- sP$cov.scaled * 2.4^2/2
-s2prior <- sP$variance
+s2prior <- sP$modVariance
 
 # set nprior = 0 to avoid updating model variance
 MCMC <- modMCMC(f=Residuals,p=P$par,jump=Covar,niter=10000,
@@ -41,3 +41,4 @@ pairs(MCMC)
 cor(MCMC$pars)
 cov(MCMC$pars)
 sP$cov.scaled
+

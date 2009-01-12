@@ -18,9 +18,11 @@ Unif(parRange,num)
 }
 
 \details{
-
-For small sample sizes, the latin hypercube distributed parameter sets may give better coverage in parameter space
-than the uniform random design.
+In the uniform sampling, each parameter is uniformly random distributed over its range.
+}
+\note{
+For small sample sizes, the latin hypercube distributed parameter sets (\code{\link{Latinhyper}})
+may give better coverage in parameter space than the uniform random design.
 }
 \examples{
 

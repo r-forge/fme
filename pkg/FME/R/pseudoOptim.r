@@ -3,11 +3,19 @@ pseudoOptim <- function (
             f,                         # function to minimise
             p,                         # initial par estimates
             ...,
-            lower=-Inf, # minimal parameter values
-            upper=Inf,  # maximal parameter values
+            lower, # minimal parameter values
+            upper,  # maximal parameter values
             control=list())
 
 {
+ npar  <- length(p)
+# test input
+ if (! all(is.finite(lower))) stop("lower cannot be Inf or -Inf")
+ if (! all(is.finite(upper))) stop("upper cannot be Inf or -Inf")
+ if (length(lower)!= npar & length(lower)!=1)
+   stop("length of 'lower' should be either 1 or equal to number of parameters")
+ if (length(upper)!= npar & length(upper)!=1)
+   stop("length of 'upper' should be either 1 or equal to number of parameters")
 
 # Initialisation
  con <- list(npop=max(5*length(p),50),  # nr elements in population
@@ -19,7 +27,7 @@ pseudoOptim <- function (
 
  con[(namc <- names(control))]<-control
  if (length(noNms <- namc[!namc %in% nmsC]) > 0)
-        warning("unknown names in control: ", paste(noNms, collapse = ", "))
+        stop("unknown names in control: ", paste(noNms, collapse = ", "))
 
  npop    <- con$npop
  numiter <- con$numiter
@@ -27,7 +35,6 @@ pseudoOptim <- function (
  varleft <-con$varleft
  
  cost  <- function (par) f(par,...)
- npar  <- length(p)
  tiny  <- 1e-8
  varleft<-max(tiny,varleft)
  rsstrace  <- NULL

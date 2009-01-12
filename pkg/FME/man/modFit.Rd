@@ -1,5 +1,11 @@
 \name{modFit}
 \alias{modFit}
+\alias{summary.modFit}
+\alias{deviance.modFit}
+\alias{coef.modFit}
+\alias{residuals.modFit}
+\alias{df.residual.modFit}
+\alias{print.summary.modFit}
 \title{Constrained fitting}
 \description{Fitting a model to data, with lower and/or upper bounds}
 \usage{modFit(f, p, ..., lower=-Inf, upper=Inf,
@@ -7,21 +13,32 @@ method=c("Marq","Port","Newton",
          "Nelder-Mead","BFGS","CG","L-BFGS-B","SANN",
          "Pseudo"),
 control=list(),hessian=TRUE)
+
+\method{summary}{modFit}(object, \dots)
+\method{deviance}{modFit}(object,  \dots)
+\method{coef}{modFit}(object, \dots)
+\method{residuals}{modFit}(object, \dots)
+\method{df.residual}{modFit}(object, \dots)
+\method{print}{summary.modFit}(x, digits = max(3, getOption("digits") - 3), \dots)
+
                      }
 \arguments{
   \item{f }{A function to be minimized, with first argument the vector of parameters over which minimization is to take place.
               It should return either a vector of \emph{residuals} (of model versus data) or
               an element of class \emph{modCost} (as returned by a call to \code{\link{modCost}}.}
   \item{p }{Initial values for the parameters to be optimized over}
-  \item{...}{additional arguments passed to function \code{f}}
+  \item{...}{additional arguments passed to function \code{f} (modFit) or passed to the methods}
   \item{lower }{Lower bounds on the parameters; if unbounded set equal to \code{-Inf}}
   \item{upper }{Upper bounds on the parameters; if unbounded set equal to \code{Inf}}
   \item{method }{The method to be used, one of "Marq","Port","Newton","Nelder-Mead",
         "BFGS", "CG", "L-BFGS-B", "SANN", "Pseudo" - see details}
-  \item{hessian}{TRUE if hessian is to be estimated. If FALSE, then a summary cannot be estiamted}
-  \item{control}{additional control arguments passed to the optimisation routine -
+  \item{hessian }{TRUE if hessian is to be estimated. If FALSE, then a summary cannot be estimated}
+  \item{control }{additional control arguments passed to the optimisation routine -
              see details of \code{\link[minpack.lm]{nls.lm}} ("Marq"), \code{\link{nlminb}} ("Port"),
                       \code{\link{optim}} ("Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN"), \code{\link{nlm}} ("Newton")}
+  \item{object }{an object of class \code{modFit}}
+  \item{x }{an object of class \code{modFit}}
+  \item{digits }{number of significant digits in printout}
                       }
 \value{
   a list of class \emph{modFit} containing the results as returned from the called optimisation routines.
@@ -34,8 +51,7 @@ control=list(),hessian=TRUE)
     at the solution found. - see note}
   \item{residuals}{The result of the last \code{f} evaluation; that is, the
   residuals. }
-  \item{...}{any other arguments returned by the called optimisation routine.
-            n}
+  \item{...}{any other arguments returned by the called optimisation routine.}
   Note: this means that some return arguments of the original functions are renamed.
   
   More specifically, "objective" and "counts" from routine  \code{\link{nlminb}} (method=Port) are renamed
@@ -43,7 +59,10 @@ control=list(),hessian=TRUE)
    are renamed "counts" and "value"; "minimum" and "estimate" from routine  \code{\link{nlm}} (method=Newton)
    are renamed "value" and "par";
 
-  The list returned by \code{modFit} has a method for the generic function \code{\link{summary}} - see note.
+  The list returned by \code{modFit} has a method for the generic functions
+   \code{\link{summary}},\code{\link{deviance}},\code{\link{coef}},
+   \code{\link{residuals}},\code{\link{df.residual}} and \code{print.summary}
+ - see note.
 
 }
 \details{
@@ -113,7 +132,7 @@ This ignores the second derivative terms, but this is reasonable if the method h
 Note that the hessian thus returned by \code{modFit} differs from what is returned by \code{nls.lm}, the original marquardt algorithm.
 which returns 0.5 times the hessian).
 
-The \emph{summary()} method is based on an estimate of the parameter covariance matrix.
+The   \code{\link{summary}} \emph{method} is based on an estimate of the parameter covariance matrix.
 In computing the covariance matrix of the fitted parameters, the problem is treated
 as if it were a linear least squares problem, linearizing around
 the parameter values that minimize Chi\^2.
@@ -134,6 +153,12 @@ worthless if the assumptions behind the covariance computation are invalid.
 
 If you  have doubts about the validity of these computations, use monte carlo fitting instead, or
 run a \code{\link{modMCMC}}.
+
+Other methods included are: \code{\link{deviance}}, which returns the model deviance,
+ \code{\link{coef}}, which extracts the values of the fitted parameters,
+ \code{\link{residuals}},which extracts the model residuals,
+ \code{\link{df.residual}} which returns the residual degrees of freedom
+ and \code{print.summary}, producing a nice printout of the summary.
 
 }
 \seealso{\code{\link{constrOptim}} for constrained optimization}

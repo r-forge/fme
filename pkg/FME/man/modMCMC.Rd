@@ -1,11 +1,18 @@
 \name{modMCMC}
 \alias{modMCMC}
+\alias{summary.modMCMC}
+\alias{plot.modMCMC}
+\alias{pairs.modMCMC}
 \title{Constrained markov chain monte carlo}
 \description{Fitting a model to data, using Markov Chain Monte Carlo simulations}
 \usage{modMCMC(f, p, ..., jump=NULL,  lower=-Inf, upper=+Inf,
 prior=NULL, var0 = NULL, n0 = NULL, niter=1000,
 outputlength = niter, updatecov=niter, covscale = 2.4^2/length(p),
 burninlength=0,verbose=TRUE)
+
+\method{summary}{modMCMC}(object, \dots)
+\method{pairs}{modMCMC}(x, Full=FALSE, \dots)
+\method{plot}{modMCMC}(x, Full=FALSE, \dots)
                      }
 \arguments{
   \item{f }{A function to be minimized, with first argument the vector of parameters
@@ -13,7 +20,7 @@ burninlength=0,verbose=TRUE)
             It should return either -2*log of the model probability (one value), or
             an element of class \emph{modCost} (as returned by a call to \code{\link{modCost}}.}
   \item{p }{Initial values for the parameters to be optimized over}
-  \item{...}{additional arguments passed to function \code{f}}
+  \item{...}{additional arguments passed to function \code{f} (modMCMC) or to the methods}
   \item{jump }{jump length (for bounded parameters, in transformed space), either a \emph{number} or a
   \emph{vector} with length = total number of parameters, or a \emph{function} that takes as input the current
   values of the parameters and produces as output the perturbed parameters. See details}
@@ -32,6 +39,9 @@ burninlength=0,verbose=TRUE)
   \item{covscale }{scale factor for the parameter covariance matrix, used to perform the MCMCjumps}
   \item{burninlength }{number of initial iterations to be removed from output}
   \item{verbose }{if TRUE: prints extra output}
+  \item{object }{an object of class \code{modMCMC}}
+  \item{x }{an object of class \code{modMCMC}}
+  \item{Full }{If TRUE then not only the parameters will be plotted, but also the function value and (if appropriate) the model variance}
                       }
 \value{
   a list of class \emph{modMCMC} containing the results as returned from the markov chain.
@@ -51,10 +61,13 @@ burninlength=0,verbose=TRUE)
 \details{
 Note that arguments after ... must be matched exactly.
 
-R-function \code{f} is called as \code{f(p,...)}. It should return the logarithm
-of the probability of the model, one value. Alternatively, it may return an item of class
-\code{modFit} (as created by function \code{\link{modFit}}, in which case the element \code{logp}
-will be used.
+R-function \code{f} is called as \code{f(p,...)}. It should return either -2 times the log
+likelihood of the model, one value, or an item of class
+\code{modFit} (as created by function \code{\link{modFit}}.
+In the latter case, the model SSR (which is equal to -2*log likelhood for Gaussian distributions)
+or the variable SSR, will be used.
+
+STILL a lot to document...
 
 \code{modMCMC} implements the Metropolis-Hastings method. The proposal distribution, which
 is used to generate new parameter values is the (multidimensional) Gaussian density distribution, with standard
@@ -106,7 +119,8 @@ Starting the MCMC with the best fit parameter set will alleviate the need for \c
 The following methods are provided:
 \item{summary }{produces summary statistics of the MCMC results}
 \item{plot }{plots the MCMC results, for all parameters. Use it to check convergence}
-\item{pairs }{produces a pairs plot of the MCMC results}
+\item{pairs }{produces a pairs plot of the MCMC results; overrides the default
+  \code{gap = 0}, \code{upper.panel = NA}, and \code{diag.panel}}
 
 }
 
@@ -184,19 +198,19 @@ plot(Obs,pch=16,cex=2,xlim=c(0,400),ylim=c(0,0.15),
 
 # the Monod model
 #---------------------
-Model <- function(p,x)   return(p[1]*x/(x+p[2]))
+Model <- function(p,x)   data.frame(x=x,N=p[1]*x/(x+p[2]))
 
 # Fitting the model to the data
 #---------------------
 # define the residual function
-Residuals  <- function(p) (Obs$y-Model(p,Obs$x))  #... model residuals
+Residuals  <- function(p) (Obs$y-Model(p,Obs$x)$N)  #... model residuals
 
 # use modFit to find parameters
 P      <- modFit(f=Residuals,p=c(0.1,1))
 
 # plot best-fit model
 x      <-0:375
-lines(x,y=Model(P$par,x))
+lines(Model(P$par,x))
 
 # summary of fit
 sP    <- summary(P)
@@ -210,7 +224,7 @@ print(sP)
 Covar   <- sP$cov.scaled * 2.4^2/2
 
 # the model variance
-s2prior <- sP$variance
+s2prior <- sP$modVariance
 
 # set nprior = 0 to avoid updating model variance
 MCMC <- modMCMC(f=Residuals,p=P$par,jump=Covar,niter=10000,
@@ -225,14 +239,8 @@ cov(MCMC$pars)   # covariances by MCMC
 sP$cov.scaled    # covariances by hessian of fit
 
 x  <- 1:400
-SR <- sensRange(MCMC$pars,solver=Model,x=x)$summ
-
-plot(Obs,type="n",xlim=c(0,400),ylim=c(0,0.15),
-     xlab="mg COD/l",ylab="1/hr",main="Monod")
-
-polygon(c(x,rev(x)),c(SR$Mean-SR$Sd,rev(SR$Mean+SR$Sd)),
-        col=grey(0.9),border=NA)
-
+SR <- summary(sensRange(parms=MCMC$pars,func=Model,x=x))
+plot(SR, xlab="mg COD/l",ylab="1/hr",main="Monod")
 points(Obs,pch=16,cex=1.5)
 
 }
@@ -240,7 +248,8 @@ points(Obs,pch=16,cex=1.5)
 \references{
 H. Haario, E. Saksman and J. Tamminen, 2001. An adaptive Metropolis algorithm Bernoulli 7, pp. 223-242.
 
-
+A. Gelman, JB Varlin, HS Stern and DB Rubin, 2004. Bayesian Data Analysis, second edition.
+  Chapman and Hall,Boca Raton.
 }
 \keyword{utilities}
 

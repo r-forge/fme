@@ -4,6 +4,12 @@ modFit <- function(f,p,...,lower=-Inf,upper=Inf,
                    "L-BFGS-B", "SANN","Pseudo"),
                    control=list(),hessian=TRUE)
 { # check if valid input...
+ np <- length(p)
+ if (length(lower)!= np & length(lower)!=1)
+   stop("length of 'lower' should be either 1 or equal to number of parameters")
+ if (length(upper)!= np & length(upper)!=1)
+   stop("length of 'upper' should be either 1 or equal to number of parameters")
+
   method <- match.arg(method)
 
   pnames <- names(p)
@@ -23,12 +29,12 @@ modFit <- function(f,p,...,lower=-Inf,upper=Inf,
      cM      <- class(FF) == "modCost"
 
      if (cM && useCost ) return(FF$model)
-     if (cM)             return(FF$residual$res)
+     if (cM)             return(FF$residuals$res)
      if (useCost) return (sum(FF^2)) else return(FF)
 
    }
   Pars <- p
-
+  estHess <- FALSE
 # Adapt function call if necessary
   if (bounds)                            # no need to change parameters
    Fun <- function(p,...) Func(p,...)
@@ -59,7 +65,7 @@ modFit <- function(f,p,...,lower=-Inf,upper=Inf,
       Func(PP,...)
      }
     }
-
+    limits <- (! bounds && length(c(lu,l,u))>0)
 # optimise...
    if (method %in% c("Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN"))
    {
@@ -76,12 +82,13 @@ modFit <- function(f,p,...,lower=-Inf,upper=Inf,
       names(res)[2] <- "ssr"  #is called "objective" here
       names(res)[6] <- "counts"
       # hessian not estimated...
-      if(hessian) res$hessian <- hessian(Fun,res$par,centered=TRUE,...)
+      if(hessian) estHess<-TRUE
    }
    else if (method == "Marq")
    {
       Contr <- nls.lm.control()
       nmsC <- names(Contr)
+      if (! "maxiter" %in% names(control)) control$maxiter <- 100 # override too low default  (50)
       Contr[(namc <- names(control))]<-control
       if (length(noNms <- namc[!namc %in% nmsC]) > 0)
         warning("unknown names in control: ", paste(noNms, collapse = ", "))
@@ -97,8 +104,24 @@ modFit <- function(f,p,...,lower=-Inf,upper=Inf,
       res$diag<-Diag
    }
    else if (method == "Newton")
-   {
-      res <- nlm(p=Pars,f=Fun,hessian=hessian,...)
+   {  # there probably exists a more efficient way to do this!
+      nmsC <- c("typsize","fscale","print.level","ndigit",
+                 "gradtol","stepmax","steptol","iterlim","check.analyticals")
+      namc <- names(control)
+      if (length(noNms <- namc[!namc %in% nmsC]) > 0)
+              warning("unknown names in control: ", paste(noNms, collapse = ", "))
+      overrule <- function(ini,new) if(is.null(new)) ini else new
+      typsize <- overrule( rep(1, length(p)),control$typsize)
+      res <- nlm(p=Pars,f=Fun,...,hessian=hessian,
+                 typsize=typsize,
+                 fscale = overrule(1,control$fscale),
+                 print.level = overrule(0, control$print.level),
+                 ndigit = overrule(12,control$ndigit),
+                 gradtol = overrule(1e-6,control$gradtol),
+                 stepmax = overrule(max(1000 * sqrt(sum((p/typsize)^2)), 1000),control$stepmax),
+                 steptol = overrule(1e-6,control$steptol),
+                 iterlim = overrule(100,control$iterlim),
+                 check.analyticals = overrule(TRUE,control$check.analyticals))
       names(res)[1] <- "ssr"  #is called "minimum" here
       names(res)[2] <- "par"  #is called "estimate" here
    }
@@ -107,42 +130,67 @@ modFit <- function(f,p,...,lower=-Inf,upper=Inf,
       res <- pseudoOptim(p=Pars,f=Fun,lower=lower,upper=upper,
                          control=control,...)
       names(res)[2] <- "ssr"  #is called "cost" here
-      if(hessian) res$hessian <- hessian(Fun,res$par,centered=TRUE,...)
+      if(hessian) estHess<-TRUE
    }
-  if (! bounds && length(c(lu,l,u))>0)
+  if (limits)
   {
     respar <- res$par
     res$par[lu]<-Lower[lu]+(Upper[lu]-Lower[lu])*(atan(respar[lu])/pi + 0.5)
     res$par[l] <-Lower[l]+exp(respar[l])
     res$par[u] <-Upper[u]-exp(respar[u])
-    # hessian re-estimated using backtransformed parameter values...
-    useCost <- TRUE
-    if(hessian) res$hessian <- hessian(Func,res$par,centered=TRUE,...)
-
+    if (! bounds) estHess<-TRUE
   }
+  if (estHess)           # hessian re-estimated using backtransformed parameter values...
+  {
+      useCost <- FALSE
+      Fun <- function(p,...) Func(p,...)
+      Jac <- gradient(Fun,res$par,centered=TRUE,...)
+      res$hessian <- 2 * t(Jac)%*%Jac
+    }
+
   names(res$par)<-names(p)
   class(res)    <- "modFit"
   if (!method == "Marq")
    if (class(FF) == "modCost") res$residuals <- FF$residuals$res else res$residuals  <- FF
+  if (class(FF) == "modCost") {
+    names(res$residuals) <- FF$residuals$name
+    res$varsigma         <- FF$var$SSR/FF$var$N
+    names(res$varsigma)  <- FF$var$name
+  }
+  res$rank <- np
+  res$df.residual <- length(res$residuals) - res$rank
   res
 }
 
+deviance.modFit <- function(object, ...) object$ssr
+coef.modFit <- function(object, ...) unlist(object$par)
+residuals.modFit <- function(object, ...) object$residuals
+df.residual.modFit <- function(object, ...) object$df.residual
+# anova.modFit <- function(object, ...) anova.lm(object,...) does not work...
+
+
 summary.modFit <- function (object, ...)  #inspired by summary.nls.lm
 {
+
     param  <- object$par
     pnames <- names(param)
     p      <- length(param)
     covar  <- solve(0.5*object$hessian)   # unscaled covariance
-
-    rdf <- length(object$residuals) - p
+    rownames(covar) <- colnames(covar) <-pnames
+    rdf <- object$df.residual
     resvar <- object$ssr / rdf
     se     <- sqrt(diag(covar) * resvar)
     names(se) <- pnames
-    tval <- param/se
+    tval      <- param/se
+    modVariance <- object$ssr / length(object$residuals)
+
 
     param <- cbind(param, se, tval, 2 * pt(abs(tval), rdf, lower.tail = FALSE))
     dimnames(param) <- list(pnames, c("Estimate", "Std. Error", "t value", "Pr(>|t|)"))
-    ans <- list(residuals = object$residuals, variance=resvar, sigma = sqrt(resvar),
+    ans <- list(residuals = object$residuals,
+                residualVariance=resvar,
+                sigma = sqrt(resvar),
+                modVariance=modVariance,
                 df = c(p, rdf), cov.unscaled = covar,
                 cov.scaled=covar * resvar,
                 info = object$info, niter = object$iterations,

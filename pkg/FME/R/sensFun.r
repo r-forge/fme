@@ -18,49 +18,20 @@ findvar <- function(var1,
 # Sensitivity functions
 ###############################
 
-sensFun <- function(parms, # model parameters
+sensFun <- function(func,
+                    parms, # model parameters
                     sensvar=NULL,        # sensitivity variables, default = ALL output variables
                     senspar=names(parms), # sensitivity parameters, default = ALL parameters
                     varscale = NULL, # weighing factor of sensitivity variables, NA = variable value
                     parscale = NULL, # weighing factor of sensitivity parameters, NA = parameter value
                     tiny=1e-8,     # numerical difference factor, perturbation factor
-                    solver="ode",  # numerical solution method, one of "ode" or "steady"
+                    map = 1,
                     ...)
 {
 #----------------------------
 # 1. The solver
 #----------------------------
-if (is.function(solver))
-  Solve <- function(parms) solver(parms,...) else
-if (solver == "ode")
-  Solve <- function(parms) ode(parms=parms,...) else
-if (solver == "ode.band")
-  Solve <- function(parms) ode.band(parms=parms,...) else
-if (solver == "ode.1D")
-  Solve <- function(parms) ode.1D(parms=parms,...) else
-if (solver == "ode.2D")
-  Solve <- function(parms) ode.2D(parms=parms,...) else
-if (solver == "steady")   # 1 row, keep variable names...
-  Solve <- function(parms)
-   { res<-unlist(steady(parms=parms,...))
-    cn <- names(res)
-    matrix(nr=1,data=res,dimnames=list(NULL,cn))}      else
-if (solver == "steady.1D")
-  Solve <- function(parms)
-   {res <- unlist(steady.1D(parms=parms,...))
-    cn <- names(res)
-    matrix(nr=1,data=res,dimnames=list(NULL,cn))} else
-if (solver == "steady.band")
-  Solve <- function(parms)
-   { res <- unlist(steady.band(parms=parms,...))
-    cn <- names(res)
-    matrix(nr=1,data=res,dimnames=list(NULL,cn))} else
-if (solver == "steady.2D")
-  Solve <- function(parms)
-  { res<- unlist(steady.2D(parms=parms,...))
-    cn <- names(res)
-    matrix(nr=1,data=res,dimnames=list(NULL,cn))} else
-stop("Cannot proceed: solver not known ")
+Solve <- function(parms) func(parms,...)
 
 yRef  <- Solve(parms)
 
@@ -68,19 +39,14 @@ yRef  <- Solve(parms)
 if (is.data.frame(yRef)) yRef <- as.matrix(yRef)
 if (is.vector(yRef)) yRef<- matrix(nr=1,yRef)
 
-map   <- 1:nrow(yRef)    # e.g. time, the descriptor (x)-variable
-
 #----------------------------
 # 2. sensitivity variables
 #----------------------------
+# check sensitivity variables
 if (is.null(sensvar))
  {
   ivar    <- 1:ncol(yRef)
-  if (is.character(solver))
-    if (solver %in% c("ode","ode.band","ode.1D","ode.2D"))
-    { ivar <- ivar[-1]
-      map  <- yRef[,1]
-    }
+    if (! is.null(map)) ivar <- ivar[-map]
   sensvar <- colnames(yRef)[ivar]
   if(is.null(sensvar))  sensvar <- ivar
  } else {
@@ -91,6 +57,7 @@ if (is.null(sensvar))
    if (is.null(sensvar)) sensvar<-sv
   }
  }
+if (is.null(map)) map   <- 1:nrow(yRef) else map <- yRef[,map]
 
 nout  <- length(ivar)
 ndim  <- nrow(yRef)
@@ -100,7 +67,7 @@ if (ndim ==1) svar <- sensvar else svar <- paste(grvar[,2],grvar[,1],sep="")
 yRef  <- as.vector(yRef[,ivar])
 
 #----------------------------
-# 3. sensitivity parameters/initial conditions
+# 3. sensitivity parameters/
 #----------------------------
 # check sensitivity parameters and stop if not all known
 npar  <- length(senspar)
@@ -133,34 +100,88 @@ for (i in 1:length(ipar))
   Sens[,i]<- (yPert-yRef)/dp[i] *parscale[i] /varscale
   parms[ipar[i]] <- pp[i]
 }
+colnames(Sens) <- names(pp)
 
+Sens <- data.frame(x=grvar[,1],var=as.character(grvar[,2]),Sens)
+attr(Sens,"class") <- c("sensFun","data.frame")
+attr(Sens,"pars") <- pp
+attr(Sens,"parscale") <- parscale
+attr(Sens,"varscale") <- varscale
+attr(Sens,"var") <- sensvar
+attr(Sens,"nx") <- length(map)
+attr(Sens,"x")   <- map
+
+return(Sens)
+}
+
+
+#S3 methods of sensitivity functions
+
+
+summary.sensFun <- function(object,vars=FALSE,...)
+{
+pp       <- attributes(object)$pars
+parscale <-  attributes(object)$parscale
+Sens <- object[,-(1:2)]
+nout <- nrow(Sens)
+if (vars){
+Vars <- object[,2]
+out <- data.frame(
+           L1  =unlist(aggregate(abs(Sens),by=list(Vars),FUN=mean)[,-1]),
+           L2  =unlist(aggregate(Sens*Sens,by=list(Vars),FUN=sum)[,-1]),
+           Mean=unlist(aggregate(Sens,by=list(Vars),FUN=mean)[,-1]),
+           Min =unlist(aggregate(Sens,by=list(Vars),FUN=min)[,-1]),
+           Max =unlist(aggregate(Sens,by=list(Vars),FUN=max)[,-1]),
+           N   =unlist(aggregate(Sens,by=list(Vars),FUN=length)[,-1])
+           )
+out$L2 <- sqrt(out$L2)/out$N
+out$var <- unique(Vars)
+} else {
 # global summaries
 L1   <- colMeans(abs(Sens))
 L2   <- sqrt(colSums(Sens*Sens))/nout
 Mean <- colMeans(Sens)
 Min  <- apply(Sens,2,min)
 Max  <- apply(Sens,2,max)
-Sns      <- data.frame(cbind(value=pp,scale=parscale,L1,L2,Mean,Min,Max))
-rownames(Sns) <- names(pp)
-
-Fun <- NULL
-summvar<-NULL
-colnames(Sens) <- names(pp)
-Sens <- data.frame(x=grvar[,1],var=as.character(grvar[,2]),Sens)
-    
-# summaries per variable, only if there are more instances of one variable
-if (ndim > 1){
-summvar <- data.frame(
-           L1=unlist(aggregate(abs(Sens[,-(1:2)]),by=list(Sens[,2]),FUN=mean)[,-1]),
-           L2=unlist(aggregate(Sens[,-(1:2)]*Sens[,-(1:2)],by=list(Sens[,2]),FUN=sum)[,-1]),
-           Mean=unlist(aggregate(Sens[,-(1:2)],by=list(Sens[,2]),FUN=mean)[,-1]),
-           Min=unlist(aggregate(Sens[,-(1:2)],by=list(Sens[,2]),FUN=min)[,-1]),
-           Max=unlist(aggregate(Sens[,-(1:2)],by=list(Sens[,2]),FUN=max)[,-1]),
-           N=unlist(aggregate(Sens[,-(1:2)],by=list(Sens[,2]),FUN=length)[,-1])
-           )
-summvar$L2 <- sqrt(summvar$L2)/summvar$N
-#summvar <- cbind(var=unlist(aggregate(Sens[,-(1:2)],by=list(Sens[,2]),FUN=length)[,1]),summvar)
+out  <- data.frame(cbind(value=pp,scale=parscale,L1,L2,Mean,Min,Max))
+rownames(out) <- names(pp)
 }
-return(list(model=Sns,var=summvar,fun=Sens))
+class(out) <- c("summary.sensFun","data.frame")
+return(out)
 }
 
+print.summary.sensFun<-function(x,...)
+  {
+  print(format(x,digits=2))
+  }
+
+
+pairs.sensFun <- function (x, ...)
+{
+    if (colnames(x)[1]=="x" && colnames(x)[2] == "var")
+    X <- x[,-(1:2)] else X<-x
+
+    panel.cor <- function(x, y) text(x = mean(range(x)), y = mean(range(y)),
+        labels = format(cor(x, y), digits = 2))
+    pairs(as.matrix(X), diag.panel = NULL, gap = 0,
+        upper.panel = panel.cor, ...)
+}
+
+plot.sensFun<- function(x,main=NULL,legpos="topleft",...)
+{
+  nx  <-attr(x,"nx")
+  var <-attr(x,"var")
+  Main <- main
+
+ for (i in 1:length(var))
+ {
+ ii <- ((i-1)*nx):(i*nx)
+ if (is.null(main)) Main <- var[i]
+ sens<- x[ii,]
+ matplot(sens$x,as.matrix( sens[,-(1:2)]),type="l",ylab="-",
+        main=Main,...)
+ }
+  nc <- ncol(x) - 2
+  if (! is.na(legpos)) legend(legpos,names(x[,-(1:2)]),col=1:nc,lty=1:nc)
+
+}

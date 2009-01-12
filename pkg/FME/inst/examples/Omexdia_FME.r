@@ -91,8 +91,8 @@ isel <- 1:Npts
 
 # 3. Solve the model 100 times, select only summary statistics ($summ)
 print(system.time(
-Sens<-sensRange(solver=sFun,parms=Parms[pselect],dist="latin",
-                parRange=parRange, isel=isel)$summ
+Sens<-summary(sensRange(solver=sFun,parms=Parms[pselect],dist="latin",
+                parRange=parRange, isel=isel))
 ))
 
 head (Sens)
@@ -166,11 +166,10 @@ sFun2 <- function(P)
 # 3. Solve the model 100 times, parameter values regularly spaced
 # keep full model output
 print(system.time(
-Sens<-sensRange(solver=sFun2,parms=Parms["MeanFlux"],dist="grid",
-                parRange=parRange, Full=TRUE)
+Response<-sensRange(solver=sFun2,parms=Parms["MeanFlux"],dist="grid",
+                parRange=parRange)
 ))
 # first column is parameter value, next columns: variables
-Response <- as.data.frame(Sens$sens)
 head(Response)
 
 # 4. Plot the results...
@@ -224,25 +223,21 @@ Depth[isel]
 Sens <- sensFun( solver=sFun3,parms=Parms[pselect])
 
 # 4. univariate sensitivity
-format(Sens$model,digits=2)
+summary(Sens)
 
 # 5. bivariate sensitivity
-panel.cor <- function(x, y)
-             text(x=mean(range(x)),y=mean(range(y)),
-             labels=format(cor(x,y),digits=2))
-pairs(Sens$fun[,-(1:2)],upper.panel=panel.cor)
+pairs(Sens)
 mtext(outer=TRUE,side=3,
       "Sensitivity functions",cex=1.5)
 
-cor(Sens$fun[,-(1:2)])
+cor(Sens[,-(1:2)])
 
 # 6. multivariate sensitivity
-Coll <- collin(Sens$fun[,-(1:2)])
+Coll <- collin(Sens[,-(1:2)])
 head(Coll)
 tail(Coll)
 
-plot(Coll$N,Coll$collinearity,xlab="N",ylab="collinearity",
-     main="identifiability",log="y")
+plot(Coll,log="y")
 abline(h=20,col="red")
 
 # 'identifiable parameter combinations' (>2 parameters)
@@ -250,7 +245,7 @@ Coll[which(Coll$N>2 & Coll$collinearity < 20),]
 
 ##===============================================================##
 ##===============================================================##
-##         Fitting the model to the data - using nlminb          ##
+##                 Fitting the model to the data                 ##
 ##===============================================================##
 ##===============================================================##
 
@@ -258,7 +253,7 @@ Coll[which(Coll$N>2 & Coll$collinearity < 20),]
 
 # 1. Define an objective function (to be minimised); the model cost
 
-Objective <- function(X)
+Residual <- function(X)
 {
  parms(myOmexDia)["MeanFlux"]<-X               # set parameter values
  Out <- out(sim(myOmexDia))
@@ -275,43 +270,17 @@ Objective <- function(X)
  Cost<- modCost(model=ModProf,obs=O2data,x="x",cost=Cost)
 
  # return SSR between model and data
- Cost<- modCost(model=ModProf,obs=Ndata,x="x",cost=Cost)$model
+ Cost<- modCost(model=ModProf,obs=Ndata,x="x",cost=Cost)
 
  return(Cost)
 }
 
-# 2. nlminb finds the minimum; parameters constrained to be > 0
-print(system.time(Fit<-nlminb(start=100,
-                  obj=Objective,lower=c(0))))
-Fit
-
-##===============================================================##
-##===============================================================##
-## Fit the model to data using the Levenberg-Marquardt algorithm ##
-##===============================================================##
-##===============================================================##
-
-# 1. Define the model residuals
-require(minpack.lm)
-Residual <- function(X)     # X have to be positive -> the log-transformed X's are fitted
-{
- parms(myOmexDia)["MeanFlux"]<-X                # set parameter values
- Out <- out(sim(myOmexDia))
- O2flux <- Out$O2flux                          # modeled oxygen flux
- ModProf <-cbind(x=Depth,Out$y)                # vertical profiles
-
- Cost<- modCost(model=c(O2flux=O2flux),obs=Flux,x=NULL)      # compare to first set of data
- Cost<- modCost(model=ModProf,obs=O2data,x="x",cost=Cost) # update with second
- res <- modCost(model=ModProf,obs=Ndata,x="x",cost=Cost)$residual$res
- res            # return residuals between model and data
-}
-
-# 2. nls.lm fits the model to the data
-FitMrq <- nls.lm(par=100,fn=Residual)
-FitMrq[]
+# 2. Find the minimum; parameters constrained to be > 0
+print(system.time(Fit<-modFit(p=100,f=Residual,lower=c(0))))
+summary(Fit)
 
 # 3. run with best parameter value and show model cost
-parms(myOmexDia)["MeanFlux"]<-FitMrq$par
+parms(myOmexDia)["MeanFlux"]<-Fit$par
 
 Out <- out(sim(myOmexDia))
 

@@ -2,7 +2,7 @@
 \alias{modCost}
 \title{Calculates the discrepancy of a model solution with observations}
 \description{Given a solution of a model and
-observed data, estimates the residuals and the model cost (sum of squared residuals)}
+observed data, estimates the residuals, and the variable and model costs (sum of squared residuals)}
 \usage{modCost(model, obs, x="time", y=NULL, err=NULL,
                weight="none", scaleVar=FALSE, cost=NULL,  ...)}
 \arguments{
@@ -15,7 +15,7 @@ observed data, estimates the residuals and the model cost (sum of squared residu
            or an index to the dependent variable values; if NULL then the observations are assumed to be
            in crosstable (matrix) format, and the names of the independent variables are given by the column names of this matrix}
   \item{err }{either \code{NULL}, or the name of the column with the \emph{error} estimates, used to weigh the residuals (see details); if \code{NULL}, then the residuals are not weighed}
-  \item{cost }{if not \code{NULL}, the output of a previous call to modCost; in this case, the new output will combine both}
+  \item{cost }{if not \code{NULL}, the output of a previous call to \code{modCost}; in this case, the new output will combine both}
   \item{weight}{only if \code{err}=\code{NULL}: how to weigh the residuals, one of "none","std","mean", see details}
   \item{scaleVar}{if \code{TRUE}, then the residuals of one observed variable are scaled respectively to the number of observations (see details)}
   \item{...}{additional arguments passed to function approx}
@@ -28,10 +28,11 @@ observed data, estimates the residuals and the model cost (sum of squared residu
 
    \item{name}{ the name of the observed variable}
    \item{scale}{, the scale-factor used to weigh the variable cost, either 1 or 1/(number observations), defaults to 1}
+   \item{N}{ the number of data points per observed variable}
    \item{SSR.unweighted}{ the sum of squared residuals per observed variable, unweighted}
    \item{SSR}{ the sum of weighted squared residuals per observed variable(see details)}
 
-  \item{residual }{a data.frame with several columns}
+  \item{residuals }{a data.frame with several columns}
 
 \item{name}{, the name of the observed variable}
 \item{x}{, the value of the independent variable (if present)}
@@ -46,10 +47,12 @@ observed data, estimates the residuals and the model cost (sum of squared residu
 \details{
 This function compares model output with observed data.
 
-It computes (1) the weighted \emph{residuals} (2) the \emph{variable costs}, i.e. the sum of squared weight residuals per variable
+It computes (1) the weighted \emph{residuals}, one for each data point (2) the \emph{variable costs}, i.e. the sum of squared weight residuals per variable
 and (3) the \emph{model cost}, the scaled sum of variable costs .
 
-For any observed data point, i, the \emph{weighted residuals} are estimated as:
+There are three steps:
+
+\emph{1.} For any observed data point, i, the \emph{weighted residuals} are estimated as:
 \deqn{res_i=\frac{Mod_i-Obs_i}{error_i}=(Mod_i-Obs_i)*Weight_i}{res_i=(mod_i-obs_i)/err_i=(mod_i-obs_i)*weight_i}
 and where \eqn{Mod_i}{Mod_i} and \eqn{Obs_i}{Obs_i} are the modeled,
 respectively observed value of data point i.
@@ -62,13 +65,12 @@ When \code{err} is not inputted, then the weights are specified via argument \co
 \item \code{"std"}, which sets the weights equal to the standard deviation of the observed data (can only be used if there is more than 1 data point)
 \item \code{"mean"}, which uses the mean of the absolute value of the observed data (can only be used if not 0).
 
-The model cost is estimated in two steps:
-First, for each observed variable, j, a \emph{variable cost} is estimated as the sum of squared weighted residuals for this variable:
+\emph{2.} Then for each observed variable, j, a \emph{variable cost} is estimated as the sum of squared weighted residuals for this variable:
 \deqn{Cost_{var_j}= \sum \limits_{i = 1}^{n_j} {res_i}^2}{Cost_varj=sum(for i=1,n_j) (res_i^2)}
 
 where \eqn{n_j}{n_j} is the number of observations for observed variable j.
 
-Then the \emph{model Cost} is estimated as the scaled sum of variable costs:
+\emph{3.} Finally, the \emph{model Cost} is estimated as the scaled sum of variable costs:
 \deqn{ModCost=\sum \limits_{j = 1}^{n_v} {\frac{Cost_{var_j}}{scale_{var_j}}}}{sum(Cost_varj/scale_j)}
 
 and where \eqn{scale_{var_j}}{scale_j} allows to scale the variable costs relative to the number of observations.
@@ -112,6 +114,8 @@ for the long format and
 for the crosstab format. Note, that in the latter case it is not possible to
 provide separate errors per data point.
 
+By calling modCost several consecutive times (using the \code{cost} argument), it is possible
+to combine both types of data files.
 }
 \note{
 In the future, it should be possible to have more than one independent variable present.
@@ -235,6 +239,9 @@ fitted <-  ode(x, time, logist, parms)
 lines (fitted,lwd=2,col="blue")
 
 legend("right",c("initial","fitted"),col=c("green","blue"),lwd=2)
+
+Cost(Fit$par)
+
 }
 \author{Karline Soetaert <k.soetaert@nioo.knaw.nl>}
 \keyword{utilities}
