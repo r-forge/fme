@@ -134,7 +134,7 @@ if (! is.null(err))    # weighing
     Cost     <- Cost + cost$model
     CostVar  <- rbind(CostVar,cost$var)
     Residual <- rbind(Residual,cost$residuals)
-    Lprob    <- Lprob + cost$Lprob
+    Lprob    <- Lprob + cost$minlogp
   }
   out <- list(model=Cost,minlogp=Lprob,var=CostVar,residuals=Residual)
   class(out) <- "modCost"

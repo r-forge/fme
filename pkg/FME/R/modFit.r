@@ -157,9 +157,14 @@ modFit <- function(f,p,...,lower=-Inf,upper=Inf,
     res$varsigma         <- FF$var$SSR/FF$var$N
     names(res$varsigma)  <- FF$var$name
   }
+  
   res$rank <- np
   res$df.residual <- length(res$residuals) - res$rank
+  if(!useCost & length(res$residuals)<=1)
+  stop ("Levenberg-Marquardt algorithm requires residuals - only one value is returned")
+
   res
+
 }
 
 deviance.modFit <- function(object, ...) object$ssr
@@ -175,7 +180,13 @@ summary.modFit <- function (object, ...)  #inspired by summary.nls.lm
     param  <- object$par
     pnames <- names(param)
     p      <- length(param)
-    covar  <- solve(0.5*object$hessian)   # unscaled covariance
+    covar  <- try(solve(0.5*object$hessian),silent=TRUE)   # unscaled covariance
+    if (!is.numeric(covar))
+    {message <- "Cannot estimate covariance; system is singular"
+    warning(message)
+    covar <- matrix(nr=p,nc=p,NA)
+    } else message <- "ok"
+
     rownames(covar) <- colnames(covar) <-pnames
     rdf <- object$df.residual
     resvar <- object$ssr / rdf
@@ -194,7 +205,7 @@ summary.modFit <- function (object, ...)  #inspired by summary.nls.lm
                 df = c(p, rdf), cov.unscaled = covar,
                 cov.scaled=covar * resvar,
                 info = object$info, niter = object$iterations,
-                stopmess = object$message,
+                stopmess = message,
                 par = param)
     class(ans) <- "summary.modFit"
     ans
@@ -209,9 +220,11 @@ print.summary.modFit <-
   printCoefmat(x$par, digits = digits, ...)
   cat("\nResidual standard error:",
       format(signif(x$sigma, digits)), "on", rdf, "degrees of freedom\n")
+  Corr <- cov2cor(x$cov.unscaled)
+  rownames(Corr)<- colnames(Corr) <- rownames(x$par)
 
   cat("\nParameter correlation:\n")
-  printCoefmat(cov2cor(x$cov.unscaled), digits = digits, ...)
+  print(Corr, digits = digits, ...)
 
   invisible(x)
 }

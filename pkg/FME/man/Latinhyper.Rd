@@ -22,7 +22,7 @@ In the latin hypercube sampling, the space for each parameter is sub divided int
 }
 \note{
 The latin hypercube distributed parameter sets give better coverage in parameter space
-than the uniform random design (\item \code{\link{Unif}}).
+than the uniform random design (\code{\link{Unif}}).
 It is a reasonable choice in case the number of parameter sets is limited.
 }
 \examples{
@@ -40,9 +40,11 @@ pairs(Latinhyper(parRange,100),main="Latin hypercube")
   University Press.
 }
 \seealso{
-\item \code{\link{Norm}} for (multi)normally distributed random parameter sets.
-\item \code{\link{Unif}} for uniformally distributed random parameter sets.
-\item \code{\link{Grid}} to generate random parameter sets arranged on a regular grid
+\code{\link{Norm}} for (multi)normally distributed random parameter sets.
+
+\code{\link{Unif}} for uniformally distributed random parameter sets.
+
+\code{\link{Grid}} to generate random parameter sets arranged on a regular grid
 }
 \author{Karline Soetaert <k.soetaert@nioo.knaw.nl>}
 \keyword{utilities}

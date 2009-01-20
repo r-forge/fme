@@ -37,8 +37,13 @@ yRef  <- Solve(parms)
 
 # if a data.frame or a vector is returned, make it a matrix
 if (is.data.frame(yRef)) yRef <- as.matrix(yRef)
-if (is.vector(yRef)) yRef<- matrix(nr=1,yRef)
-
+if (is.vector(yRef))
+  {
+    ynames <- names(yRef)
+    yRef <- matrix(nr=1,yRef)
+    colnames(yRef) <- ynames
+  }
+  
 #----------------------------
 # 2. sensitivity variables
 #----------------------------
@@ -164,7 +169,7 @@ pairs.sensFun <- function (x, ...)
     panel.cor <- function(x, y) text(x = mean(range(x)), y = mean(range(y)),
         labels = format(cor(x, y), digits = 2))
     pairs(as.matrix(X), diag.panel = NULL, gap = 0,
-        upper.panel = panel.cor, ...)
+        lower.panel = panel.cor, ...)
 }
 
 plot.sensFun<- function(x,main=NULL,legpos="topleft",...)

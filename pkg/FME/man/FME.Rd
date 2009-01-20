@@ -12,7 +12,7 @@ ordinary differential equations (ODE), partial differential equations (PDE) or
 differential algebraic equations (DAE).
 
 It contains:
-
+\itemize{
 \item Functions to allow fitting of the model to data. Function \code{modCost}
 estimates the residuals between model output and data, (where the data are
 represented as a function of one or more independent variables) and estimates, a.o.
@@ -37,7 +37,7 @@ simple "what-if" scenarios
 
 \item Functions to generate multiple parameter values arranged according to a grid (\code{Grid}),
 latin hypercube (\code{Latinhyper}), multinormal (\code{Normal}) or uniform (\code{Uniform}) design.
-
+}
 }
 \details{
   \tabular{ll}{

@@ -16,20 +16,23 @@ This function thus produces 'envelopes' around the sensitivity variables.
 
 }
 \usage{
-sensRange(func,parms,sensvar=NULL,dist="unif",
- parRange=NULL, parMean=NULL, parCovar=NULL, map=1,
- num=100,  ...)
+sensRange(func,parms=NULL,sensvar=NULL,dist="unif",
+ parInput=NULL, parRange=NULL, parMean=NULL, parCovar=NULL,
+ map=1, num=100,  ...)
 
 \method{summary}{sensRange}(object,  \dots)
-\method{plot}{summary.sensRange}(x, main=NULL, legpos="topleft", \dots)
-\method{plot}{sensRange}(x, main=NULL, \dots)
+\method{plot}{summary.sensRange}(x, main=NULL, xyswap =FALSE,
+              what=NULL, legpos="topleft", \dots)
+\method{plot}{sensRange}(x, main=NULL, xyswap =FALSE,
+              what=NULL,\dots)
 
  }
 \arguments{
-  \item{func }{An R-function that has as first argument \code{parms} and that returns a matrix with
+  \item{func }{An R-function that has as first argument \code{parms} and that returns a matrix
+  or data.frame with
   the values of the output variables (columns), and -optionally- a mapping variable (by default the first column)}
-  \item{parms }{parameters passed to \code{func}; should be either a vector, or a list with named elements
-    or a matrix of dimension (num, npar) with the values of the sensitivity parameters}
+  \item{parms }{parameters passed to \code{func}; should be either a vector, or a list with named elements.
+  If \code{NULL}, then the first element of \code{parInput} is taken}
   \item{sensvar }{the output variables for which the sensitivity needs to be estimated. Either \code{NULL}, the default=all output variables,
   or a vector with output variable \code{names} (which should be present in the matrix returned by \code{func}),
   or a vector with \code{indices} to output variables as present in the output matrix
@@ -48,6 +51,7 @@ sensRange(func,parms,sensvar=NULL,dist="unif",
   The rownames of \code{parRange} should be parameter names that are known in argument \code{parms}
   Ignored if \code{parms} is a matrix
   }
+  \item{parInput }{a matrix with dimension (*, npar) with the values of the sensitivity parameters }
   \item{parMean }{only when \code{dist} is \code{"norm"}: the mean value of each parameter   }
   \item{parCovar }{only when \code{dist} is \code{"norm"}: the parameters variance-covariance matrix  }
   \item{num }{the number of times the model has to be run. Set large enough. If \code{parms} is a matrix,
@@ -60,6 +64,8 @@ sensRange(func,parms,sensvar=NULL,dist="unif",
   \item{x }{an object of class \code{sensRange}}
   \item{legpos }{position of the legend; set to NULL to avoid legend}
   \item{main }{a main title for the plot}
+  \item{xyswap }{if TRUE, then x-and y-values are swapped and y-axis is from top to bottom. Useful for drawing vertical profiles}
+  \item{what }{the name of the variables that should be plotted}
   \item{... }{additional arguments passed to function \code{func} or to the methods}
   }
 \value{

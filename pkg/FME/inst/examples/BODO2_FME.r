@@ -215,3 +215,30 @@ summary(FitMrq)
 
 Cost <- Objective(FitMrq$par)
 plot(Cost,main="residuals")
+
+
+##===============================================================##
+##===============================================================##
+## MCMC                                                          ##
+##===============================================================##
+##===============================================================##
+
+# estimate of parameter covariances (to update parameters) and the model variance
+sP <-summary(FitMrq)
+Covar   <- sP$cov.scaled * 2.4^2/2
+s2prior <- sP$modVariance
+
+# set nprior = 0 to avoid updating model variance
+MCMC <- modMCMC(f=Objective,p=FitMrq$par,jump=Covar,niter=1000,
+                var0=s2prior,n0=3,updatecov=100)
+
+plot(MCMC,Full=TRUE)
+pairs(MCMC,Full=TRUE)
+hist(MCMC,Full=TRUE)
+
+cor(MCMC$pars)
+cov(MCMC$pars)
+sP$cov.scaled
+
+sR<-sensRange(parms=pars,parInput=MCMC$pars,func=O2BOD)
+plot(summary(sR))

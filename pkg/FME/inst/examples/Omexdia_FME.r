@@ -80,9 +80,8 @@ sFun <- function(P, isel)
 
   Out <- out(sim(myOmexDia))       # solve model
 
-  # Sensitivity for O2, NO3, NH3, TOC  and O2 flux
-  matrix(nr=1,c(Out$y$O2[isel],Out$y$NO3[isel],Out$y$NH3[isel],
-       (Out$y$FDET[isel]+Out$y$SDET[isel])*1200/10^9/2.5,Out$O2flux))
+  # Sensitivity for O2, NO3, NH3, TOC
+  data.frame(Depth=Depth[isel],Out$y[isel,])
 }
 
 # only upper 100 grid cells selected...
@@ -91,49 +90,14 @@ isel <- 1:Npts
 
 # 3. Solve the model 100 times, select only summary statistics ($summ)
 print(system.time(
-Sens<-summary(sensRange(solver=sFun,parms=Parms[pselect],dist="latin",
+Sens<-summary(sensRange(func=sFun,parms=Parms[pselect],dist="latin",
                 parRange=parRange, isel=isel))
 ))
 
+plot(Sens,what=c("O2","NO3","NH3","ODU"),xyswap=TRUE,legpos="topright")
 head (Sens)
 
-# 4. Plot the results...
-# Split in separate profiles; names of output variables are not known...
-O2  <- Sens[isel,]
-NO3 <- Sens[Npts+isel,]
-NH3 <- Sens[2*Npts+isel,]
-TOC <- Sens[3*Npts+isel,]
-O2fl<- Sens[nrow(Sens),]
-
-# function to plot the ranges...
-plotrange <- function(Conc,main="O2",xlab="conc",
-                      ylab="depth,cm",Legend=FALSE)
-{
- crange<-range(cbind(Conc$Min,Conc$Max))
- X <- Depth[isel]
- plot(0,ylim=rev(range(X)),xlim=crange,xlab= xlab,
-     ylab=ylab,main=main,type="n")
-
- polygon(c(Conc$Min,rev(Conc$Max)),c(X,rev(X)),
-        col=grey(0.9),border=NA)
- polygon(c(Conc$Mean-Conc$Sd,rev(Conc$Mean+Conc$Sd)),
-         c(X,rev(X)),col=grey(0.8),border=NA)
- lines(Conc$Mean,X,lwd=2)
- if (Legend){
-   legend("bottomright",fill=c(grey(0.9),grey(0.8)),
-       legend=c("Min-Max","Mean+-sd"),bty="n")
-   legend("right",lty=1,lwd=2,legend="Mean",bty="n")
- }
-}
-
-# plot for all
-par(oma=c(0,0,2,0))
-plotrange(O2,main="O2",Legend=TRUE)
-plotrange(NO3,main="NO3")
-plotrange(NH3,main="NH3")
-plotrange(TOC,main="TOC")
-
-mtext(side=3,outer=TRUE,"Sensitivity to bioturbation and mixing depth",cex=1.25)
+mtext(side=3,line=-1,outer=TRUE,"Sensitivity to bioturbation and mixing depth",cex=1.15)
 
 ##===============================================================##
 ##===============================================================##
@@ -150,30 +114,34 @@ rownames(parRange) <- "MeanFlux"
 parRange
 
 # 2. Define a function that takes as input the current parameter value (P)
-# and generates as output the fluxes and integrated rates,
-# a matrix with one row
+# and generates as output the fluxes and integrated rates, as a vector
+
 sFun2 <- function(P)
 {
   parms(myOmexDia)["MeanFlux"] <- P   # current parameter
 
   Out <- out(sim(myOmexDia))          # solve model
-  matrix(nr=1,c(Out$O2flux,Out$NH3flux,Out$NO3flux,Out$ODUflux,
-                Out$TotMin,Out$OxicMin,Out$Denitri,Out$Nitri),
-                dimnames=list(NULL,c("O2flux","NH3flux","NO3flux",
-                "ODUflux","TotMin","OxicMin","Denitri","Nitri")))
+
+  c(O2flux=Out$O2flux,   NH3flux=Out$NH3flux,
+    NO3flux=Out$NO3flux, ODUflux=Out$ODUflux,
+
+    TotMin=Out$TotMin,OxicMin=Out$OxicMin,
+    Denitri=Out$Denitri,Nitri=Out$Nitri)
 }
 
 # 3. Solve the model 100 times, parameter values regularly spaced
 # keep full model output
 print(system.time(
-Response<-sensRange(solver=sFun2,parms=Parms["MeanFlux"],dist="grid",
+Response<-sensRange(func=sFun2,parms=Parms["MeanFlux"],dist="grid",
                 parRange=parRange)
 ))
 # first column is parameter value, next columns: variables
 head(Response)
 
-# 4. Plot the results...
 
+plot(Response)
+
+# 4. Plot the results as a function of parameter value...
 par (mfrow=c(2,2))
 
 plot(Response$MeanFlux,y=Response$O2flux,xlab="C flux",ylab="nmol/cm2/d",
@@ -187,7 +155,7 @@ pOxic <- Response$OxicMin/Response$TotMin   # part denitrified
 plot(Response$MeanFlux,y=pOxic,xlab="C flux", ylab="-",
      main="fraction oxic mineralisation",type="l",lwd=2)
 
-mtext(side=3,outer=TRUE,"Sensitivity to C deposition",cex=1.25)
+mtext(side=3,line=-1,outer=TRUE,"Sensitivity to C deposition",cex=1.25)
 
 par(mfrow=c(1,1))
 
@@ -203,7 +171,7 @@ pselect<- c("dB0","mixdepth","MeanFlux","pFast","rFast","rSlow")
 
 # 2. Define a function that takes as input the current parameter values (P)
 # and generates as output profiles, and fluxes
-# a matrix with one row
+
 sFun3 <- function(P)
 {
   parms(myOmexDia)[pselect] <- P   # current parameter
@@ -211,29 +179,28 @@ sFun3 <- function(P)
   Out <- out(sim(myOmexDia))       # solve model
   Out <- out(sim(myOmexDia))          # solve model
   # Sensitivity for O2, NO3, NH3, TOC  and O2 flux
-  matrix(nr=1,c(Out$y$O2[isel],Out$y$NO3[isel],Out$y$NH3[isel],
+  c(Out$y$O2[isel],Out$y$NO3[isel],Out$y$NH3[isel],
        (Out$y$FDET[isel]+Out$y$SDET[isel])*1200/10^9/2.5,
-        Out$O2flux,Out$NH3flux,Out$NO3flux,Out$ODUflux))
+        Out$O2flux,Out$NH3flux,Out$NO3flux,Out$ODUflux)
 }
-
 # 3. Sensitivity functions
 isel<-seq(3,by=5,to=200)  # assume we have measured concentrations every 0.5 cm
 Depth[isel]
 
-Sens <- sensFun( solver=sFun3,parms=Parms[pselect])
+Sens <- sensFun( func=sFun3,parms=Parms[pselect])
 
 # 4. univariate sensitivity
 summary(Sens)
 
 # 5. bivariate sensitivity
 pairs(Sens)
-mtext(outer=TRUE,side=3,
+mtext(outer=TRUE,side=3,line=-1,
       "Sensitivity functions",cex=1.5)
 
 cor(Sens[,-(1:2)])
 
 # 6. multivariate sensitivity
-Coll <- collin(Sens[,-(1:2)])
+Coll <- collin(Sens)
 head(Coll)
 tail(Coll)
 
@@ -290,11 +257,11 @@ ModProf <-cbind(x=Depth,Out$y)                # vertical profiles
 
 Cost<- modCost(model=c(O2flux=O2flux),obs=Flux,x=NULL)
 Cost<- modCost(model=ModProf,obs=O2data,x="x",cost=Cost)
-Cost<- modCost(model=ModProf,obs=Ndata,x="x",cCost=Cost)
+Cost<- modCost(model=ModProf,obs=Ndata,x="x",cost=Cost)
 Cost
 
 # plot residuals...
-plot(Cost$residual$res,main="residuals")
+plot(Cost)
 
 # 4. show best-fit
 sol    <- Out$y

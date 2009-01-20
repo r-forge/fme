@@ -34,9 +34,11 @@ rownames(parRange) <- c("par1","par2","par3","par4")
 pairs(Unif(parRange,100),main="Uniformly random")
 }
 \seealso{
-\item \code{\link{Norm}} for (multi)normally distributed random parameter sets.
-\item \code{\link{Latinhyper}} to generate random parameter sets according to a latin hypercube distribution.
-\item \code{\link{Grid}} to generate random parameter sets arranged on a regular grid
+ \code{\link{Norm}} for (multi)normally distributed random parameter sets.
+
+\code{\link{Latinhyper}} to generate random parameter sets according to a latin hypercube distribution.
+
+ \code{\link{Grid}} to generate random parameter sets arranged on a regular grid
 }
 \author{Karline Soetaert <k.soetaert@nioo.knaw.nl>}
 \keyword{utilities}

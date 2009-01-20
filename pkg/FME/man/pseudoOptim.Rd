@@ -46,6 +46,7 @@ curve(p3$par[1]*sin(2*pi*x/p3$par[2]+p3$par[3]),lty=1,add=TRUE)
 legend ("bottomright",lty=c(1,2,3),c("Price","Mathematical","Simulated annealing"))}
 \details{
 The \code{control} argument is a list that can supply any of the following components:
+\itemize{
  \item{npop }{number of elements in the population. Defaults to max(5*length(p),50)}
   \item{numiter }{maximal number of iterations to be performed. Defaults to 10000. The algorithm
   either stops when numiter iterations has been performed or when the remaining variation is less than \code{varleft} }
@@ -53,7 +54,7 @@ The \code{control} argument is a list that can supply any of the following compo
   \item{varleft }{relative variation remaining; if below this value algorithm stops; defaults to 1e-8}
   \item{verbose }{if TRUE, more verbose output will contain the parameters in final population,
   their respective population costs and the cost at each succesful interation. Defaults to FALSE}
-
+}
 see the book of Soetaert and Herman (2009) for a description of the algorithm AND for a line to line explanation of the function code.
 }
 \references{

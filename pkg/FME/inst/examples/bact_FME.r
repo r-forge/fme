@@ -117,16 +117,16 @@ plot(Sens2,xlab="time, hour",ylab="molC/m3",
 
 ##===============================================================##
 ##===============================================================##
-##         Fitting the model to the data - using nlminb          ##
+##                Fitting the model to the data                  ##
 ##===============================================================##
 ##===============================================================##
 
 # the "data"
 Data <- matrix (nc=2,byrow=TRUE,data=
-c(  2,  0.14,    4,  0.21,    6,  0.31,    8,  0.40,
-   10,  0.69,   12,  0.97,   14,  1.42,   16,  2.0,
-   18,  3.0,    20,  4.5,    22,  6.5,    24,  9.5,
-   26, 13.5,    28, 20.5,    30,  29 , 35, 65, 40, 61)
+c(  2,  0.14,    4,  0.2,     6,  0.38,    8,  0.42,
+   10,  0.6,    12,  0.107,  14,  1.3,    16,  2.0,
+   18,  3.0,    20,  4.5,    22,  6.15,   24,  11,
+   26, 13.8,    28, 20.0,    30,  31 ,    35, 65, 40, 61)
 )
 colnames(Data) <- c("time","Bact")
 head(Data)
@@ -172,3 +172,28 @@ plot(out$time,out$Bact,ylim=range(out$Bact),
      xlab="time, hour",ylab="molC/m3",type="l",lwd=2)
 points(Data,cex=2,pch=18)
 
+
+##===============================================================##
+##===============================================================##
+##                        MCMC application                       ##
+##===============================================================##
+##===============================================================##
+
+# estimate of parameter covariances (to update parameters) and the model variance
+sP <- summary(Fit)
+Covar   <- sP$cov.scaled * 2.4^2/2
+s2prior <- sP$modVariance
+
+# set nprior = 0 to avoid updating model variance
+MCMC <- modMCMC(f=Objective,p=Fit$par,jump=Covar,niter=1000,
+                var0=s2prior,n0=2,updatecov=10)
+
+plot(MCMC,Full=TRUE)
+pairs(MCMC)
+cor(MCMC$pars)
+cov(MCMC$pars)
+sP$cov.scaled
+
+sR<-sensRange(parInput=MCMC$pars,func=Run)
+plot(summary(sR))
+points(Data2)

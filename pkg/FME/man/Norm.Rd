@@ -51,9 +51,11 @@ pairs(Norm(parCovar=parCovar,parMean=parMean,parRange=Ranges,num=500),
       main="truncated normal")
 }
 \seealso{
-\item \code{\link{Unif}} for uniformly distributed random parameter sets.
-\item \code{\link{Latinhyper}} to generates random parameter sets according to a latin hypercube distribution.
-\item \code{\link{Grid}} to generate random parameter sets arranged on a regular grid
+ \code{\link{Unif}} for uniformly distributed random parameter sets.
+
+ \code{\link{Latinhyper}} to generates random parameter sets according to a latin hypercube distribution.
+
+ \code{\link{Grid}} to generate random parameter sets arranged on a regular grid
 }
 \author{Karline Soetaert <k.soetaert@nioo.knaw.nl>}
 \keyword{utilities}

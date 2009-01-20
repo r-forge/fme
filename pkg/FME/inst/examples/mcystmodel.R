@@ -151,7 +151,7 @@ diag(FitMrq$hessian) <- diag(FitMrq$hessian) + 1e-11
 summary(FitMrq)
 
 BestPar <- FitMrq$par
-Cost(Fit$par)
+plot(Cost(Fit$par))
 Cost(FitMrq$par)
 Cost(Oderes$par)
 
@@ -162,12 +162,38 @@ Cost(Oderes$par)
 idFun <- function (p) Cost(p)$residual$mod
 
 # Sensitivity functions at "best" values
-sF<-sensFun( solver=idFun,parms=BestPar)
-sF$model
+sF<-sensFun( func=idFun,parms=BestPar)
+summary(sF)
 
-pairs(sF$fun[,-(1:2)])
+pairs(sF)
 
-collin(sF$fun[,-(1:2)])
+collin(sF)
 
-minmax <- data.frame(min=BestPar*0.8,max=BestPar*1.2)
-sR<-sensRange(parms=BestPar,solver=Solver,parRange=minmax)
+#=====================
+# 4. MCMC application
+#=====================
+
+# does not work...
+
+CM <- Cost(FitMrq$par)
+
+# The true variance of the observed data are used.
+s2prior <- CM$var$SSR.unweighted/9
+
+# using the estimated covariance does not work...
+sP <- summary(FitMrq)
+Covar  <- sP$cov.unscaled * (sum(s2prior))/2 * (2.4^2)/6
+
+# so, 20% of parameter value is used for initial jump length
+MCMC <- modMCMC(f=Cost,p=FitMrq$par,jump=FitMrq$par*0.2,niter=5000,
+                var0=s2prior,n0=5,updatecov=10,lower=c(0,0,0,0,0,0),
+                upper = c(1e8,1e9,500,2,1e9,1))
+
+plot(MCMC,Full=TRUE)     # not quite converged
+hist(MCMC,Full=TRUE)
+pairs(MCMC)
+cor(MCMC$pars)
+
+
+sR<-sensRange(parInput=MCMC$pars,func=Solver)
+plot(summary(sR))

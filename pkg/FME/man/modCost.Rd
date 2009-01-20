@@ -22,18 +22,20 @@ observed data, estimates the residuals, and the variable and model costs (sum of
   }
 \value{
   a list of type \code{modCost} containing:
+\itemize{
   \item{model }{one value, the model cost, which equals the sum of scaled variable costs (see details)}
   \item{minlogp }{one value, -log(model probablity), where it is assumed that the data are normally distributed, with standard deviation = \code{error}}
-  \item{var}{ the variable costs, a data.frame with, for each observed variable the following (see details)}
-
+  \item{var}{ the variable costs, a data.frame with, for each observed variable the following (see details):
+   \itemize{
    \item{name}{ the name of the observed variable}
    \item{scale}{, the scale-factor used to weigh the variable cost, either 1 or 1/(number observations), defaults to 1}
    \item{N}{ the number of data points per observed variable}
    \item{SSR.unweighted}{ the sum of squared residuals per observed variable, unweighted}
    \item{SSR}{ the sum of weighted squared residuals per observed variable(see details)}
-
-  \item{residuals }{a data.frame with several columns}
-
+   }
+}
+  \item{residuals }{a data.frame with several columns:
+\itemize{
 \item{name}{, the name of the observed variable}
 \item{x}{, the value of the independent variable (if present)}
 \item{obs}{, the observed variable value}
@@ -41,8 +43,9 @@ observed data, estimates the residuals, and the variable and model costs (sum of
 \item{weight}{, the factor used to weigh the residuals, 1/error, defaults to 1}
 \item{res}{, the weighted residuals between model and observations (mod-obs)*weight}
 \item{res.unweighted}{, the residuals between model and observations (mod-obs)}
-
-
+}
+}
+}
 }
 \details{
 This function compares model output with observed data.
@@ -61,10 +64,11 @@ The weights are equal to 1/error, where the latter can be inputted, one for each
 This can only be done when the data input is in long (database) format.
 
 When \code{err} is not inputted, then the weights are specified via argument \code{weight} which is either:
+\itemize{
 \item \code{"none"}, which sets the weight equal to 1 (the default)
 \item \code{"std"}, which sets the weights equal to the standard deviation of the observed data (can only be used if there is more than 1 data point)
 \item \code{"mean"}, which uses the mean of the absolute value of the observed data (can only be used if not 0).
-
+}
 \emph{2.} Then for each observed variable, j, a \emph{variable cost} is estimated as the sum of squared weighted residuals for this variable:
 \deqn{Cost_{var_j}= \sum \limits_{i = 1}^{n_j} {res_i}^2}{Cost_varj=sum(for i=1,n_j) (res_i^2)}
 
@@ -78,10 +82,12 @@ This is set by specifying argument \code{scaleVar}. If \code{TRUE}, then the var
 rescaled. The default is NOT to rescale (i.e. \eqn{scale_{var_j}}{scale_j}=1).
 
 The models typically consist of (a system of) differential equations, which are either solved by
+\itemize{
 \item integration routines, e.g. the routines from package \code{deSolve}, or
 \item steady-state estimators, as from package \code{rootSolve}.
-
+}
 The data can be presented in two formats:
+\itemize{
 \item \emph{data table (long) format}; this is a two to four column data.frame that contains the
 \code{name} of the observed variable (always the FIRST column),
 the (optional) \code{value of the independent variable} (default column name = "time"), the
@@ -94,7 +100,7 @@ and the name of the column that has the value of the dependent variable \code{y}
 dependent (or independent) variable; the column name is the name of the observed variable.
 When using this format, only the name of the column that contains the dependent variable must be
 specified (\code{x}).
-
+}
 As an example of both formats consider the data, called \code{Dat} consisting of two observed variables, called
 "Obs1" and "Obs2", both containing two observations, at time 1 and 2:
        \tabular{llll}{

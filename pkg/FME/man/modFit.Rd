@@ -99,23 +99,20 @@ The method to be used is specified by argument \code{method} which can be
 
 One of the methods from function \code{\link{optim}}:
 
-\item{Nelder-Mead}{the default from \code{optim}}
-
-\item{BFGS}{a quasi-Newton method}
-
-\item{CG}{a conjugate-gradient method}
-
-\item{L-BFGS-B}{constrained quasi-Newton method}
-
-\item{SANN}{method of simulated annealing}
-
+\itemize{
+\item Nelder-Mead, the default from \code{optim}
+\item BFGS, a quasi-Newton method
+\item CG, a conjugate-gradient method
+\item L-BFGS-B, constrained quasi-Newton method
+\item SANN, method of simulated annealing
+}
 Or one of the following:
-\item{Marq}{The Levenberg-Marquardt algorithm (from  \code{\link[minpack.lm]{nls.lm}} - the default.
-Note that this method is the only least squares method.}
-
-\item{Newton}{A Newton-type algorithm (from  \code{\link{nlm}})}
-
-\item{Port}{The Port algorithm (from  \code{\link{nlminb}})}
+\itemize{
+\item Marq, the Levenberg-Marquardt algorithm (from  \code{\link[minpack.lm]{nls.lm}} - the default.
+Note that this method is the only least squares method.
+\item Newton, a Newton-type algorithm (from  \code{\link{nlm}})
+\item Port, the Port algorithm (from  \code{\link{nlminb}})
+}
 
 The implementation for the routines from  \code{\link{optim}} differs from  \code{\link{constrOptim}} which implements an adaptive
 barrier algorithm and which allows a more flexible implementation of linear constraints
@@ -234,7 +231,8 @@ legend("right",c("data","original","fitted analytical","fitted numerical"),
 summary(Fit)
 
 }
-\author{Karline Soetaert <k.soetaert@nioo.knaw.nl>, Thomas Petzoldt <thomas.petzoldt@tu-dresden.de>}
+\author{Karline Soetaert <k.soetaert@nioo.knaw.nl>,
+Thomas Petzoldt <thomas.petzoldt@tu-dresden.de>}
 \references{
   Press, W. H.,  Teukolsky, S. A., Vetterling, W. T. and
   Flannery, B. P. (2007) Numerical Recipes in C. Cambridge

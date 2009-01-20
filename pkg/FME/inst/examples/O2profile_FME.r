@@ -15,18 +15,6 @@ require(FME)
 ##===============================================================##
 ##===============================================================##
 
-
-O2fun <- function(t,O2,pars)
-{
-with (as.list(pars),{
-
-  Flux <- -diff(c(upO2,O2,lowO2))/dX
-  dO2  <- -diff(Flux)/dx-cons*O2/(O2+ks)
-
-  return(list(dO2,UpFlux = Flux[1],LowFlux = Flux[n+1]))
-})
-}
-
 # The model parameters
 pars <- c(upO2=360,  # concentration at upper boundary, mmolO2/m3
           lowO2=10,  # concentration at lower boundary, mmolO2/m3
@@ -39,11 +27,28 @@ dx <- 0.05   #cm
 dX <- c(dx/2,rep(dx,n-1),dx/2)  # dispersion distances; half the grid size near boundaries
 X  <- seq(dx/2,len=n,by=dx)     # distance from upper interface at middle of box
 
-# Solve the steady-state conditions of the model
-ox <- steady.band(y=runif(n),func=O2fun,parms=pars,nspec=1)
 
+O2fun <- function(pars)
+{
+  derivs<-function(t,O2,pars)
+  {
+  with (as.list(pars),{
+
+    Flux <- -diff(c(upO2,O2,lowO2))/dX
+    dO2  <- -diff(Flux)/dx-cons*O2/(O2+ks)
+
+    return(list(dO2,UpFlux = Flux[1],LowFlux = Flux[n+1]))
+  })
+ }
+
+ # Solve the steady-state conditions of the model
+ ox <- steady.band(y=runif(n),func=derivs,parms=pars,nspec=1,positive=TRUE)
+ data.frame(X=X,O2=ox$y)
+}
+
+ox<-O2fun(pars)
 # Plot results
-plot(ox$y,X,ylim=rev(range(X)),xlab="mmol/m3",
+plot(ox$O2,ox$X,ylim=rev(range(X)),xlab="mmol/m3",
      main="Oxygen", ylab="depth, cm",type="l",lwd=2)
 
 ##===============================================================##
@@ -58,30 +63,16 @@ rownames(pRange) <- "cons"
 
 # 2. Calculate sensitivity ranges for O2
 #    model is solved 100 times, uniform parameter distribution (default)
-
-Sens <- summary(sensRange(parms=pars,y=runif(n),func=O2fun,nspec=1,num=100,
-                  solver="steady.band",parRange=pRange,time=0))
+Sens <- summary(sensRange(parms=pars,func=O2fun,num=100,
+                parRange=pRange))
 
 # same, now with normal distribution of consumption (mean = 80, variance=100)
-Sens2 <- sensRange(parms=pars,y=runif(n),func=O2fun,nspec=1,dist="norm",time=0,
-           num=100,solver="steady.band",parMean=c(cons=80),parCovar=100)
+Sens2 <- sensRange(parms=pars,func=O2fun,dist="norm",
+           num=100,parMean=c(cons=80),parCovar=100)
 
 # 3. Plot results
-O2 <- summary(Sens2)[1:100,]    # first 100 rows are O2
-o2range<-range(cbind(O2$Min,O2$Max))
-
-plot(0,ylim=rev(range(X)),xlim=o2range,xlab= "O2",
-     ylab="depth, cm",main="Sensitivity O2 model",type="n")
-
-polygon(c(O2$Min,rev(O2$Max)),c(X,rev(X)),
-        col=grey(0.9),border=NA)
-polygon(c(O2$Mean-O2$Sd,rev(O2$Mean+O2$Sd)),
-         c(X,rev(X)),col=grey(0.8),border=NA)
-lines(O2$Mean,X,lwd=2)
-legend("bottomright",fill=c(grey(0.9),grey(0.8)),
-       legend=c("Min-Max","Mean+-sd"),bty="n")
-legend("right",lty=1,lwd=2,legend="Mean",bty="n")
-
+plot(summary(Sens2),xyswap=TRUE,xlab= "O2",
+     ylab="depth, cm",main="Sensitivity O2 model")
 
 ##===============================================================##
 ##===============================================================##
@@ -90,11 +81,10 @@ legend("right",lty=1,lwd=2,legend="Mean",bty="n")
 ##===============================================================##
 
 # Sensitivity functions
-O2sens <- sensFun(func=O2fun,y=runif(n),parms=pars,
-                  nspec=1,solver="steady.band")
+O2sens <- sensFun(func=O2fun,parms=pars)
 
 # univariate sensitivity
-O2sens
+summary(O2sens)
 
 # bivariate sensitivity
 pairs(O2sens)
@@ -105,13 +95,32 @@ cor(O2sens[,-(1:2)])
 Coll <- collin(O2sens)
 Coll
 plot(Coll,log="y")
-abline(h=20,col="red")
 
 ##===============================================================##
 ##===============================================================##
-##         Fitting the model to the data - using nlminb          ##
+##   Fitting the model to the data - using Levenberg-Marquardt   ##
 ##===============================================================##
 ##===============================================================##
+
+O2fun2 <- function(pars)
+{
+  derivs<-function(t,O2,pars)
+  {
+  with (as.list(pars),{
+
+    Flux <- -diff(c(upO2,O2,lowO2))/dX
+    dO2  <- -diff(Flux)/dx-cons*O2/(O2+ks)
+
+    return(list(dO2,UpFlux = Flux[1],LowFlux = Flux[n+1]))
+    })
+  }
+
+ # Solve the steady-state conditions of the model
+ ox <- steady.band(y=runif(n),func=derivs,parms=pars,nspec=1,positive=TRUE)
+ # return both the oxygen profile AND the fluxes at both ends
+ list(data.frame(x=X,O2=ox$y),UpFlux=ox$UpFlux,LowFlux=ox$LowFlux)
+
+}
 
 # The data
 O2dat <- data.frame(x=seq(0.1,3.5,by=0.1),
@@ -121,85 +130,75 @@ O2depth <- cbind(name="O2",O2dat)        # oxygen versus depth
 O2flux  <- c(UpFlux=170,LowFlux=0)       # measured fluxes
 
 # 1. Objective function to minimise; all parameters are fitted
-
 Objective <- function (x)
 {
  pars[]<- x
 
  # Solve the steady-state conditions of the model
- ox <- steady.band(y=runif(n),func=O2fun,parms=pars,nspec=1)
+ modO2 <- O2fun2(pars)
 
  # Model cost: first the oxygen profile
- modO2 <- data.frame(x=X,O2=ox$y)
- Cost  <- modCost(obs=O2depth,model=modO2,x="x",y="y")
+ Cost  <- modCost(obs=O2depth,model=modO2[[1]],x="x",y="y")
 
  # then the fluxes
- modFl <- c(UpFlux=ox$UpFlux,LowFlux=ox$LowFlux)
- Cost <- modCost(obs=O2flux,model=modFl,x=NULL,cost=Cost)
+ modFl <- c(UpFlux=modO2$UpFlux,LowFlux=modO2$LowFlux)
+ Cost  <- modCost(obs=O2flux,model=modFl,x=NULL,cost=Cost)
 
- return(Cost$model)
+ return(Cost)
 }
 
-# 2. nlminb finds the minimum; parameters constrained to be > 0
-print(system.time(Fit<-nlminb(start=c(360,10,80,1),
-                  obj=Objective,lower=c(0,0,0,0))))
-
+# 2. find the minimum; parameters constrained to be > 0
+print(system.time(Fit<-modFit(p=c(upO2=360,lowO2=10,cons=80,ks=1),
+                  f=Objective,lower=c(0,0,0,0))))
 Fit
+(SFit<-summary(Fit))
 
-##===============================================================##
-##===============================================================##
-## Fit the model to data using the Levenberg-Marquardt algorithm ##
-##===============================================================##
-##===============================================================##
+# 3. plot the residuals
+plot(Objective(Fit$par),xlab="depth",ylab="",main="residual",legpos="top")
 
-# 1. Define the model residuals
-Cost <- function(xx)     # X have to be positive -> the log-transformed X's are fitted
-{
-  pars[]<-exp(xx)                    # parameter values
- # Solve the steady-state conditions of the model
- ox <- steady.band(y=runif(n),func=O2fun,parms=pars,nspec=1)
- # Model cost:
- modO2 <- data.frame(x=X,O2=ox$y)
- Cost  <- modCost(obs=O2depth,model=modO2,x="x",y="y")
-
- modFl <- c(UpFlux=ox$UpFlux,LowFlux=ox$LowFlux)
- Cost <- modCost(obs=O2flux,model=modFl,x=NULL,cost=Cost)
-
- return(Cost)        # model cost
-}
-
-
-Residual <- function(xx)  return(Cost(xx)$residual$res)
-
-# 2. nls.lm fits the model to the data - note the transformation to ensure positivity
-# This algorithm also requires better initial conditions...
-FitMrq <- nls.lm(par=log(c(360,10,80,1)),fn=Residual)
-
-summary(FitMrq)
-
-# 3. the best parameter values...
-(Bestpar <- exp(FitMrq$par))
-
-pars[]<-Bestpar                   # parameter values
-
-# Solve the steady-state conditions of the model
-ox <- steady.band(y=runif(n),func=O2fun,parms=pars,nspec=1)
+# 4. Show best-fit
+modO2 <- O2fun(Fit$par)
 
 plot(O2depth$y,O2depth$x,ylim=rev(range(O2depth$x)),pch=18,
      main="Oxygen-fitted", xlab="mmol/m3",ylab="depth, cm")
-lines(ox$y,X)
+lines(modO2$O2,modO2$X)
 
-# Model cost:
-modO2 <- data.frame(x=X,O2=ox$y)
-Cost  <- modCost(obs=O2depth,model=modO2,x="x",y="y",scaleVar=TRUE)
+##===============================================================##
+##===============================================================##
+##  Run MCMC
+##===============================================================##
+##===============================================================##
 
-modFl <- c(UpFlux=ox$UpFlux,LowFlux=ox$LowFlux)
-Cost <- modCost(obs=O2flux,model=modFl,x=NULL,cost=Cost,scaleVar=TRUE)
+# 1. use parameter covariances of fit to update parameters
+Covar   <- SFit$cov.scaled * 2.4^2/4
 
-Cost
+# mean variance of fit = prior for model variance
+s2prior <- SFit$modVariance
 
-# Plot residuals
-plot(Cost$residual$x, Cost$residual$res,xlab="depth",ylab="",main="residual")
+# set nprior = 0 to avoid updating model variance
+MCMC <- modMCMC(f=Objective,p=Fit$par,jump=Covar,niter=1000,
+                var0=s2prior,n0=3,updatecov=10,lower=c(NA,0,NA,0))
+
+plot(MCMC,Full=TRUE)
+hist(MCMC,Full=TRUE)
+
+pairs(MCMC,Full=TRUE)
+summary(MCMC)
+cor(MCMC$pars)
 
 
+# 2. mean variance of separate fitted variables are prior for model variance
+s2priorvar <- Fit$varsigma
+# set nprior = 0 to avoid updating model variance
+MCMC2<- modMCMC(f=Objective,p=Fit$par,jump=Covar,niter=1000,
+                var0=s2priorvar,n0=1,updatecov=10,lower=c(NA,0,NA,0))
+plot(MCMC2,Full=TRUE)
+hist(MCMC2,Full=TRUE)
+pairs(MCMC2,Full=TRUE)
 
+
+sR <- sensRange(func=O2fun,parInput=MCMC$pars,num=100)
+plot(summary(sR),xyswap=TRUE)
+
+sR <- sensRange(func=O2fun,parInput=MCMC2$pars,num=100)
+plot(summary(sR),xyswap=TRUE)

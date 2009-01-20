@@ -1,0 +1,72 @@
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# example : the logistic growth model
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+require(FME)
+
+# 1. the analytical solution
+#---------------------
+
+model <- function(parms,time)
+  with (as.list(parms),return(data.frame(time=time,N=K/(1+(K/N0-1)*exp(-r*time)))))
+
+# logistic growth model parameters
+TT    <- seq(0,40,by=10)
+N0    <- 0.1
+
+# 2. the observations
+#---------------------
+N     <- c(0.1,12,93,96,100)
+Obs<-data.frame(time=seq(0,40,by=10), N=N,err=0.1*N)
+
+# show results, compared with "observations"
+plot(Obs$time,Obs$N,  col="red", pch=16,cex=2,
+     main = "logistic growth", xlab="time", ylab="N")
+
+# initial "guess" of parameters
+parms <- c(r = 2, K = 10)
+
+# run the model with initial guess and plot results
+lines (model(parms,TT) ,lwd=2,col="green")
+
+# 3. Model fitting
+#---------------------
+# cost function
+ModelCost <- function(P)
+{
+ out  <-model(P,TT)
+ return(modCost(mod=out,obs=Obs,err="err"))
+}
+
+# Fit in two steps: pseudo-random search finds vicinity of minimum
+(Fita <- modFit(f=ModelCost,p=parms,method="Pseudo",
+                lower=c(0,0.1),upper=c(50,200),control=c(numiter=500)))
+
+# Levenberg-Marquardt locates the minimum
+Fit <- modFit(f=ModelCost,p=Fita$par,
+                lower=c(0,0.1),upper=c(10,200))
+
+# plot best-fit model
+times <- 0:40
+lines(model(Fit$par,times),lwd=2, col="blue")
+legend("right",c("initial","fitted"),col=c("green","blue"),lwd=2)
+
+# plot residuals
+MC   <- ModelCost(Fit$par)
+plot(MC,main="residuals")
+
+# 4. Markov chain monte carlo
+#---------------------
+#
+MCMC <- modMCMC(f=ModelCost,p=Fit$par,jump=c(0.1,5))
+plot(MCMC) # check convergence
+pairs(MCMC)
+summary(MCMC)
+
+var0 <- MC$var$SSR.unweighted
+
+MCMC2<- modMCMC(f=ModelCost,p=Fit$par,jump=c(0.1,5),var0=var0,updatecov=1)
+plot(MCMC2,Full=TRUE)
+
+SR <- summary(sensRange(parInput=MCMC2$pars,func=model,time=0:40,sensvar="N"))
+plot(SR,xlab="time",ylab="N",main="MCMC ranges")
+points(Obs)

@@ -65,7 +65,7 @@ pseudoOptim <- function (
    newpar    <- pmin( pmax(newpar,lower) ,upper)
 
    newcost   <- cost(newpar)
-   if(is.nan(newcost) || is.na(newcost)) cycle
+   if(!is.nan(newcost) & !is.na(newcost) & !is.null(newcost)) {
     if (newcost < worstcost)
      {
        populationcost[iworst] <-newcost
@@ -77,7 +77,7 @@ pseudoOptim <- function (
          rsstrace  <- rbind(rsstrace,c(iter,min(populationcost)))
        lastbest<-bestcost
 
-     }
+     }  }
   } # end j loop
 
 

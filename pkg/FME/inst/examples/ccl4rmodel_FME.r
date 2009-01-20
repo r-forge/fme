@@ -49,18 +49,6 @@ require(FME)
    )
 
 ##====================================
-## state variables
-##====================================
-  y <- c(AI = 21,   # total mass , mg
-         AAM = 0,
-         AT = 0,
-         AF = 0,
-         AL = 0,
-         CLT = 0, ### area under the conc.-time curve in the liver
-         AM = 0   ### the amount metabolized (AM)
-         )
-
-##====================================
 ## the observations
 ##====================================
 
@@ -72,15 +60,33 @@ plot(ChamberConc ~ time,data=Obs,xlab="Time (hours)",
 
 Pm["CONC"] <-1000
 
-VCH <- Pm[["VCHC"]] - Pm[["RATS"]]*Pm[["BW"]]
-AI0 <- VCH * Pm[["CONC"]]*Pm[["MW"]]/24450
-y["AI"] <- AI0
 
 ##====================================
-## run the model:
+## The model run
 ##====================================
-times<-unique(Obs$time)
-out <- as.data.frame(ccl4model(times,y,Pm))
+
+ccl4run <- function(pars,times=unique(Obs$time))
+   {
+## state variables
+  y <- c(AI = 21,   # total mass , mg
+         AAM = 0,
+         AT = 0,
+         AF = 0,
+         AL = 0,
+         CLT = 0, ### area under the conc.-time curve in the liver
+         AM = 0   ### the amount metabolized (AM)
+         )
+
+   VCH <- Pm[["VCHC"]] - Pm[["RATS"]]*Pm[["BW"]]
+   AI0 <- VCH * Pm[["CONC"]]*Pm[["MW"]]/24450
+   y["AI"] <- AI0
+
+## run the model:
+
+  as.data.frame(ccl4model(times,y,pars))
+}
+
+out <- ccl4run(Pm)
 lines(out$time,out$CP,lwd=2)
 
 ##===============================================================##
@@ -91,7 +97,7 @@ lines(out$time,out$CP,lwd=2)
 
 # 1. Sensitivity functions
 # All parameters are sensitivity parameters, all variables selected
-Sens <- sensFun(solver=ccl4model,times=times,y=y,parms=Pm,varscale=1)
+Sens <- sensFun(func=ccl4run,parms=Pm,varscale=1)
 
 ##====================================
 ## univariate sensitivity
@@ -135,7 +141,7 @@ rownames(parRange) <- names(Pm[pselect])
 
 parRange
 # sensitivity range for sensitivity variable CP
-Sr <- summary(sensRange(solver=ccl4model,times=times,y=y,parms=Pm,
+Sr <- summary(sensRange(func=ccl4run,parms=Pm,
                 sensvar="CP",parRange=parRange[1,],num=100))
 plot(Sr,xlab="time, hour",
      ylab="Chamber Concentration (ppm)",main="Sensitivity BW")
@@ -155,29 +161,17 @@ fitPAR <- c("VMAX","CONC","KM")
 Residuals <- function(P)
 {
  Pm[fitPAR]<-P
- VCH <- Pm[["VCHC"]] - Pm[["RATS"]]*Pm[["BW"]]
- AI0 <- VCH * Pm[["CONC"]]*Pm[["MW"]]/24450
- y["AI"] <- AI0
-
- out <- as.data.frame(ccl4model(times,y,Pm))
+ out <- as.data.frame(ccl4run(Pm))
  return(out$CP-Obs$ChamberConc)
 }
-# this one does not work
-(Fit<-modFit(p=c(VMAX=0.04,CONC=1000,KM=0.4),
-             lower=c(0,0,0),f=Residuals,method="Port"))
 
-# this one (the default) does work...
 (MrqFit<-modFit(p=c(VMAX=0.04,CONC=1000,KM=0.4),
              lower=c(0,0,0),f=Residuals))
 summary(MrqFit)
 
 # run model with the optimized value:
  Pm[fitPAR]<-MrqFit$par
- VCH <- Pm[["VCHC"]] - Pm[["RATS"]]*Pm[["BW"]]
- AI0 <- VCH * Pm[["CONC"]]*Pm[["MW"]]/24450
- y["AI"] <- AI0
-
- fitted <- as.data.frame(ccl4model(times,y,Pm))
+ fitted <- ccl4run(Pm)
 
 plot(ChamberConc ~ time,data=Obs,xlab="Time (hours)",
          xlim=range(c(0,ccl4data$time)),
@@ -188,6 +182,28 @@ lines(fitted$time,fitted$CP,lwd=2)
 
 ##===============================================================##
 ##===============================================================##
-## MCMC application -still to try                                ##
+## MCMC application                                              ##
 ##===============================================================##
 ##===============================================================##
+
+# estimate of parameter covariances (to update parameters) and the model variance
+(sP <- summary(MrqFit))
+s2prior<-3000
+
+
+# set nprior = 0 to avoid updating model variance
+MCMC <- modMCMC(f=Residuals,p=MrqFit$par,jump=c(0.1,1.,0.1),niter=1000,
+                var0=s2prior,n0=5,updatecov=10,lower=c(0,0,0),upper=c(2,2000,2))
+
+plot(MCMC,Full=TRUE)
+pairs(MCMC)
+cor(MCMC$pars)
+cov(MCMC$pars)
+sP$cov.scaled
+
+sR<-sensRange(parms=Pm,parInput=MCMC$pars,func=ccl4run)
+plot(SUMM<-summary(sR))
+points(Obs)
+
+plot(SUMM, what ="CP")
+points(ChamberConc ~ time,data=Obs)

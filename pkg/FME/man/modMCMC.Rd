@@ -3,22 +3,26 @@
 \alias{summary.modMCMC}
 \alias{plot.modMCMC}
 \alias{pairs.modMCMC}
+\alias{hist.modMCMC}
 \title{Constrained markov chain monte carlo}
-\description{Fitting a model to data, using Markov Chain Monte Carlo simulations}
+\description{performs a Markov Chain Monte Carlo simulation,
+according to the adaptive metropolis (AM) algorithm and including a delayed rejection (DR) procedure}
 \usage{modMCMC(f, p, ..., jump=NULL,  lower=-Inf, upper=+Inf,
-prior=NULL, var0 = NULL, n0 = NULL, niter=1000,
-outputlength = niter, updatecov=niter, covscale = 2.4^2/length(p),
-burninlength=0,verbose=TRUE)
+prior=NULL, var0 = NULL, n0 = NULL,
+niter=1000, outputlength = niter, burninlength=0,
+updatecov=niter, covscale = 2.4^2/length(p),
+ntrydr=1, drscale=NULL, verbose=TRUE)
 
 \method{summary}{modMCMC}(object, \dots)
 \method{pairs}{modMCMC}(x, Full=FALSE, \dots)
+\method{hist}{modMCMC}(x, Full=FALSE, breaks=100, \dots)
 \method{plot}{modMCMC}(x, Full=FALSE, \dots)
                      }
 \arguments{
   \item{f }{A function to be minimized, with first argument the vector of parameters
             which should be varied,
-            It should return either -2*log of the model probability (one value), or
-            an element of class \emph{modCost} (as returned by a call to \code{\link{modCost}}.}
+            It should return either -2*log of the model probability (one value),
+            the model residuals, or an element of class \emph{modCost} (as returned by a call to \code{\link{modCost}}.}
   \item{p }{Initial values for the parameters to be optimized over}
   \item{...}{additional arguments passed to function \code{f} (modMCMC) or to the methods}
   \item{jump }{jump length (for bounded parameters, in transformed space), either a \emph{number} or a
@@ -29,7 +33,7 @@ burninlength=0,verbose=TRUE)
   \item{var0 }{Initial model variance; if \code{NULL},
   it is assumed that initial model variance is 1, and the return element from \code{f} is -2*log (probability),
   else it is assumed that the return element from \code{f} is the sum of squared residuals. - see details}
-  \item{n0 }{"acuracy" for the initial model variance - see details}
+  \item{n0 }{"accuracy" for the initial model variance - see details}
   \item{lower }{Lower bounds on the parameters; if unbounded set equal to \code{-Inf}}
   \item{upper }{Upper bounds on the parameters; if unbounded set equal to \code{Inf}}
   \item{niter }{number of iterations for MCMC}
@@ -38,10 +42,14 @@ burninlength=0,verbose=TRUE)
   the parameters kept thus far, and used to update the MCMCjumps}
   \item{covscale }{scale factor for the parameter covariance matrix, used to perform the MCMCjumps}
   \item{burninlength }{number of initial iterations to be removed from output}
+  \item{ntrydr }{number of tries for the delayed rejection procedure}
+  \item{drscale }{for each try during delayed rejection, the cholesky decomposition of the
+  proposal matrix is scaled with this amount; if NULL, it is assumed to be c(0.2,0.25, 0.333, 0.333,...)}
   \item{verbose }{if TRUE: prints extra output}
   \item{object }{an object of class \code{modMCMC}}
   \item{x }{an object of class \code{modMCMC}}
-  \item{Full }{If TRUE then not only the parameters will be plotted, but also the function value and (if appropriate) the model variance}
+  \item{Full }{If TRUE then not only the parameters will be plotted, but also the function value and (if appropriate) the model variance(s)}
+  \item{breaks }{the number of cells for the histogram}
                       }
 \value{
   a list of class \emph{modMCMC} containing the results as returned from the markov chain.
@@ -67,7 +75,19 @@ likelihood of the model, one value, or an item of class
 In the latter case, the model SSR (which is equal to -2*log likelhood for Gaussian distributions)
 or the variable SSR, will be used.
 
-STILL a lot to document...
+\code{var0} gives the variance of the measured components. It is either one value, or one value for each
+observed variable, or one for each observed value.
+When \code{var0} is not NULL, then \code{f} is assumed to return the model residuals OR an instance of
+class \code{modCost}. When not NULL, then \code{f} should return either -2*log(probability of the model) an instance of
+class \code{modCost}.
+
+If \code{n0} is 0 (the default) then the variances are
+assumed to be fixed. Typically, these variances can be estimated from the sum of squares of
+fitted residuals. (e.g. as reported in \code{modFit}).
+
+If \code{n0} is >0, then the variances are sampled as conjugate priors from the inverse
+gamma distribution with parameters \code{var0} and \code{n0}. Larger values of \code{n0} keep
+these samples closer to \code{var0}.
 
 \code{modMCMC} implements the Metropolis-Hastings method. The proposal distribution, which
 is used to generate new parameter values is the (multidimensional) Gaussian density distribution, with standard
@@ -76,26 +96,42 @@ deviation given by \code{jump}.
 \code{jump} can be either one value, a vector of length = number of parameters or a
 parameter covariance matrix (nrow=ncol=number parameters).
 
-The jump length, \code{jump} thus determines how much the new parameter set will deviate from the old one.
+The jump parameter, \code{jump} thus determines how much the new parameter set will deviate from the old one.
+It can be either one value, a vector or a matrix.
+
+If \code{jump} is one value, or a vector, then the new parameter values are generated
+by sampling a normal distribution with standard deviation equal to \code{jump}.
 A larger value will lead to larger jumps in the parameter space, but acceptance of new points
 can get very low. Smaller jump lengths increase the acceptance rate,
 but the algorithm may move too slowly, and too many runs may be needed to scan the parameter space.
 
-As a rule of fist, an adequate jump length, is one for which the number of points accepted,
-is somewhere between 5\% and 40\%, depending on \code{niter}. For \code{niter} very large,
-5 \% can be acceptable, for small values of \code{niter}, a higher acceptance rate should be reached
+If \code{jump} is NULL, then the jump length is taken as 10\% of the parameter value.
 
-Some preliminary runs with small value of \code{iter} and tuning \code{jump} may be necessary.
+\code{jump} can also be a proposal covariance matrix. In this case, the new parameter
+values are generated by sampling a multidimensional normal distribution.
 
-To increase the number of accepted runs, the new parameters can be generated with a
+Finally, \code{jump} can also be an R-function that takes as input the current values
+of the parameters and returns the new parameter values.
+
+Two methods are implemented to increase the number of accepted runs.
+
+1. In the "adaptive metropolis" method, new parameters are generated with a
 covariance matrix that is estimated from the parameters generated (and saved) thus far.
-Thus the MCMC method is an adaptive Metropolis method.
-The jump covariance matrix is estimated for every \code{updatecov} saved parameter values.
-Thus, \eqn{C= ( cov(p1,p2,....pn) \cdot diag(np,+1e^{-16}) /(2.4^2/npar)} where the small number 1e-16 is added
+Setting \code{updatecov} smaller to \code{niter} will trigger this function.
+In this case, every \code{updatecov} iterations, the jump covariance matrix will be estimated
+from the covariance matrix of the saved parameter values. The covariance matrix is scaled
+with $(2.4^2/npar)$ where npar is the number of parameters, unless \code{covscal} has
+been given a different value.
+Thus, \eqn{Jump= ( cov(p1,p2,....pn) \cdot diag(np,+1e^{-16}) /(2.4^2/npar)} where the small number $1e^{-16}$ is added
 on the diagonal of the covariance matrix to prevent it from becoming singular.
 
-When using the adapative Metropolis method, it is best to start with a small value of the
+When using the adaptive Metropolis method, it is best to start with a small value of the
 jump length.
+
+2. In the "delayed rejection" method, new parameter values are tried upon rejection.
+The number of tries is set with \code{ntry}. Setting this equal to 1 toggles off delayed rejection.
+New parameters are generated by scaling the jump covariance matrix with a factor as specified in
+\code{drscale}.
 
 Convergence can be checked via \code{plot}, which plots the values of all parameters.
 There should be no visible drift.
@@ -117,11 +153,12 @@ Starting the MCMC with the best fit parameter set will alleviate the need for \c
 
 \note{
 The following methods are provided:
+\itemize{
 \item{summary }{produces summary statistics of the MCMC results}
 \item{plot }{plots the MCMC results, for all parameters. Use it to check convergence}
 \item{pairs }{produces a pairs plot of the MCMC results; overrides the default
   \code{gap = 0}, \code{upper.panel = NA}, and \code{diag.panel}}
-
+}
 }
 
 \seealso{\code{\link{modFit}} for constrained model fitting}
@@ -239,7 +276,7 @@ cov(MCMC$pars)   # covariances by MCMC
 sP$cov.scaled    # covariances by hessian of fit
 
 x  <- 1:400
-SR <- summary(sensRange(parms=MCMC$pars,func=Model,x=x))
+SR <- summary(sensRange(parInput=MCMC$pars,func=Model,x=x))
 plot(SR, xlab="mg COD/l",ylab="1/hr",main="Monod")
 points(Obs,pch=16,cex=1.5)
 
@@ -247,6 +284,9 @@ points(Obs,pch=16,cex=1.5)
 \author{Karline Soetaert <k.soetaert@nioo.knaw.nl>}
 \references{
 H. Haario, E. Saksman and J. Tamminen, 2001. An adaptive Metropolis algorithm Bernoulli 7, pp. 223-242.
+
+H. Haario, E. Saksman and J. Tamminen, 2005. Componentwise adaptation for high dimensional MCMC.
+Computational Statistics 20(2), 265-274.
 
 A. Gelman, JB Varlin, HS Stern and DB Rubin, 2004. Bayesian Data Analysis, second edition.
   Chapman and Hall,Boca Raton.

@@ -75,28 +75,28 @@ each parameter value \eqn{\Theta_j}{par_j} is perturbed as \eqn{\max{(tiny,\Thet
 }
 \note{
 The following methods are provided:
-
+\itemize{
 \item \emph{summary}. Produces summary statistics of the sensitivity functions, a data.frame with:
  one row for each parameter and the following columns:
+  \itemize{
+    \item L1: the L1-norm \eqn{\frac{1}{n} \cdot \sum{|S_{ij}|}}{sum(abs(Sij))/n}
 
-    \code{L1}: the L1-norm \eqn{\frac{1}{n} \cdot \sum{|S_{ij}|}}{sum(abs(Sij))/n}
+    \item L2: the L2-norm \eqn{\frac{1}{n} \cdot \sqrt{\sum{S_{ij} \cdot S_{ij}}}}{sqrt(sum(Sij^2))/n}
 
-    \code{L2}: the L2-norm \eqn{\frac{1}{n} \cdot \sqrt{\sum{S_{ij} \cdot S_{ij}}}}{sqrt(sum(Sij^2))/n}
+    \item Mean: the mean of the sensitivity functions
 
-    \code{Mean}: the mean of the sensitivity functions
+    \item Min: the minimal value of the sensitivity functions
 
-    \code{Min}: the minimal value of the sensitivity functions
-
-    \code{Max}: the maximal value of the sensitivity functions
-
-  \item{var }{the summary of the variables sensitivity functions, a data.frame with the same columns as \code{model}
+    \item Max: the maximal value of the sensitivity functions
+  }
+ \item{var }{the summary of the variables sensitivity functions, a data.frame with the same columns as \code{model}
   and one row for each parameter + variable combination. This is only outputted if the variable names are effectively known}
 
 \item \emph{plot } plots the sensitivity functions for each parameter
 
 \item \emph{pairs } produces a pairs plot of the sensitivity results; overrides the default
   \code{gap = 0}, \code{upper.panel = NA}, and \code{diag.panel}
-
+}
 }
 \examples{
 

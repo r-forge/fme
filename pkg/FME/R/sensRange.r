@@ -4,9 +4,10 @@
 ###############################
 
 sensRange <- function(  func,
-                        parms, # model parameters
+                        parms=NULL, # model parameters
                         sensvar=NULL,   # sensitivity variables, default = ALL output variables
                         dist="unif",    # type of distribution, one of "norm", "unif", "latin", "grid"
+                        parInput=NULL,  # random parameter values
                         parRange=NULL,  # if unif: parameter ranges (min, max)
                         parMean=NULL,   # if normal / multinormal: mean value of parameters
                         parCovar=NULL,  # if normal / multinormal: parameter covariances
@@ -14,23 +15,35 @@ sensRange <- function(  func,
                         num = 100,      # number of runs (approximate if dist="grid"...
                         ...)
 {
-  Solve <- function(parms) func(parms,...)
+if (is.null(parms) & ! is.null(parInput))
+  parms <- parInput[1,]
+if (is.null(parms)) parms <- parMean
+if (is.null(parms)) stop ("'parms' not known")
+if (is.matrix(parms) && nrow(parms)>1) stop ("'parms' should be a vector")
 
-if (is.matrix(parms))
+Solve <- function(parms) func(parms,...)
+
+if (! is.null(parInput))
   {
   dist<-"input"
-  nr <- nrow(parms)
+  nr <- nrow(parInput)
   if (num >= nr) ii <- 1: num else
                  ii <- sample(1:nr,size=num,replace=FALSE)
-  parset <-parms[ii,]
-  Parms <- parset[1,]
-   } else Parms <- parms
+  parset <-parInput[ii,]
+  if(is.null(parms)) parms <- parInput[1,]
+  }
+
+ Parms <- parms
 
 # reference run
 yRef  <- Solve(Parms)
 
-if (is.vector(yRef)) yRef<- matrix(nr=1,yRef)
-if (is.data.frame(yRef)) yRef <- as.matrix(yRef)
+if (is.vector(yRef))
+  {
+    ynames <- names(yRef)
+    yRef <- matrix(nr=1,yRef)
+    colnames(yRef) <- ynames
+  } else if (is.data.frame(yRef)) yRef <- as.matrix(yRef)
 
 # check sensitivity variables
 if (is.null(sensvar))
@@ -63,6 +76,7 @@ senspar <- names(parMean)
 if (is.null(senspar)) senspar <- rownames(parRange)
 if (is.null(senspar)) senspar <- rownames(parCovar)
 if (is.null(senspar)) senspar <- colnames(parCovar)
+if (is.null(senspar)) senspar <- colnames(parInput)
 if (is.null(senspar)) senspar <- names(Parms)
 #if (is.null(senspar)) stop("parameter names are not known")
 
@@ -112,7 +126,11 @@ summary.sensRange<-function(object,...)
 {
 npar<-attr(object,"npar")
 sens<- as.matrix(object[,-(1:npar)])
-x  <- attr(object,"x")
+x   <- attr(object,"x")
+names(x) <- NULL
+nx  <-attr(object,"nx")
+var <-attr(object,"var")
+
 SumSens <- data.frame(
 x    = x,
 Mean = apply(sens,2,FUN=mean),
@@ -123,6 +141,8 @@ q25  = apply(sens,2,FUN=function(x)quantile(x,probs=0.25)),
 q50  = apply(sens,2,FUN=function(x)quantile(x,probs=0.5)),
 q75  = apply(sens,2,FUN=function(x)quantile(x,probs=0.75))
 )
+
+rownames(SumSens) <- colnames(sens)
 attr(SumSens,"var") <- attr(object,"var")
 attr(SumSens,"nx")  <- attr(object,"nx")
 class(SumSens)<-c("summary.sensRange","data.frame")
@@ -130,35 +150,54 @@ class(SumSens)<-c("summary.sensRange","data.frame")
 return(SumSens)
 }
 
-plot.sensRange<-function(x,main=NULL,...)
+
+plot.sensRange<-function(x,main=NULL,xyswap=FALSE,what=NULL,...)
 {
 npar <- attr(x,"npar")
 nx  <-attr(x,"nx")
 var <-attr(x,"var")
+X  <-attr(x,"x")
 Main <- main
+sens<- x[,-(1:npar)]
 
-for (i in 1:length(var)){
-  if (is.null(main)) Main <- var[i]
-  ii <- ((i-1)*nx):(i*nx)
-  sens<- x[ii,-(1:npar)]
-  matplot(x[ii,2],t(sens),type="l",main=Main,...)
-}
+if (!is.null(what)) Select <- which (var %in% what) else Select <- 1:length(var)
+
+if (nx > 1)
+  for (i in Select){
+    if (is.null(main)) Main <- var[i]
+    ii <- ((i-1)*nx+1):(i*nx)
+    if (!xyswap) matplot(X,t(sens[,ii]),type="l",main=Main,...)
+    else matplot(t(sens[,ii]),X,type="l",main=Main,ylim=rev(range(X)),...)
+  }
+else
+ boxplot(sens[,Select])
 }
 
-plot.summary.sensRange<-function(x,main=NULL,legpos="topleft",...)
+plot.summary.sensRange<-function(x,main=NULL,xyswap=FALSE,what=NULL,legpos="topleft",...)
 {
 nx  <-attr(x,"nx")
 var <-attr(x,"var")
 Main <- main
-for (i in 1:length(var)){
+
+if (!is.null(what)) Select <- which (var %in% what) else Select <- 1:length(var)
+
+for (i in Select){
   ii <- ((i-1)*nx+1):(i*nx)
   X<- x[ii,]
   yrange<-(range(cbind(X$Min,X$Max)))
+  xrange<-range(X$x)
   if (is.null(main)) Main <- var[i]
-  plot(X$x,X$Mean,ylim=yrange,type="n",main=Main,...)
-  polygon(c(X$x,rev(X$x)),c(X$Min,rev(X$Max)),col=grey(0.8),border=NA)
-  polygon(c(X$x,rev(X$x)),c(X$Mean-X$Sd,rev(X$Mean+X$Sd)),col=grey(0.7),border=NA)
-  lines(X$x,X$Mean,lwd=2)
+  if (!xyswap) {
+    plot(X$x,X$Mean,ylim=yrange,type="n",main=Main,...)
+    polygon(c(X$x,rev(X$x)),c(X$Min,rev(X$Max)),col=grey(0.8),border=NA)
+    polygon(c(X$x,rev(X$x)),c(X$Mean-X$Sd,rev(X$Mean+X$Sd)),col=grey(0.7),border=NA)
+    lines(X$x,X$Mean,lwd=2) }
+  else {
+    plot(X$Mean,X$x,xlim=yrange,type="n",main=Main,ylim=rev(xrange),...)
+    polygon(c(X$Min,rev(X$Max)),c(X$x,rev(X$x)),col=grey(0.8),border=NA)
+    polygon(c(X$Mean-X$Sd,rev(X$Mean+X$Sd)),c(X$x,rev(X$x)),col=grey(0.7),border=NA)
+    lines(X$Mean,X$x,lwd=2)
+  }
  }
 if (! is.null(legpos))
 legend(legpos,fill=c(grey(0.9),grey(0.8)),

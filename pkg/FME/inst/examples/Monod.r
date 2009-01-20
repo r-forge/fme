@@ -9,32 +9,34 @@ plot(Obs,pch=16,cex=2,xlim=c(0,400),ylim=c(0,0.15),
 
 # 2. the Monod model
 #---------------------
-Model <- function(p,x)   return(p[1]*x/(x+p[2]))
+Model <- function(p,x)   return(data.frame(x=x,y=p[1]*x/(x+p[2])))
 
 # 3. Fitting the model to the data
 #---------------------
 # define the residual function
-Residuals  <- function(p) (Obs$y-Model(p,Obs$x))  #... model residuals
+Residuals  <- function(p) (Obs$y-Model(p,Obs$x)$y)  #... model residuals
 
 # fit the model to data
 P      <- modFit(f=Residuals,p=c(0.1,1))
 
 # plot best-fit model
 x      <-0:375
-lines(x,y=Model(P$par,x))
+lines(Model(P$par,x))
 
 # summary of fit
 sP    <- summary(P)
 sP[]
 print(sP)
 
+# 4. MCMC analysis
+#---------------------
 # estimate of parameter covariances (to update parameters) and the model variance
 Covar   <- sP$cov.scaled * 2.4^2/2
 s2prior <- sP$modVariance
 
-# set nprior = 0 to avoid updating model variance
+# set nprior = 2 to avoid too much updating model variance
 MCMC <- modMCMC(f=Residuals,p=P$par,jump=Covar,niter=10000,
-                var0=s2prior,n0=NULL,updatecov=100)
+                var0=s2prior,n0=2,updatecov=100)
 
 plot(MCMC,Full=TRUE)
 pairs(MCMC)
@@ -42,3 +44,6 @@ cor(MCMC$pars)
 cov(MCMC$pars)
 sP$cov.scaled
 
+sR<-sensRange(parInput=MCMC$pars,func=Model,x=1:375)
+plot(summary(sR))
+points(Obs)
