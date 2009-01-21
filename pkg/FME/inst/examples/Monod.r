@@ -34,9 +34,9 @@ print(sP)
 Covar   <- sP$cov.scaled * 2.4^2/2
 s2prior <- sP$modVariance
 
-# set nprior = 2 to avoid too much updating model variance
-MCMC <- modMCMC(f=Residuals,p=P$par,jump=Covar,niter=10000,
-                var0=s2prior,n0=2,updatecov=100)
+# set n0 = 2 to avoid too much updating model variance
+MCMC <- modMCMC(f=Residuals,p=P$par,jump=Covar,niter=3000,
+                var0=s2prior,n0=2,updatecov=100,lower=c(0,0))
 
 plot(MCMC,Full=TRUE)
 pairs(MCMC)
@@ -47,3 +47,12 @@ sP$cov.scaled
 sR<-sensRange(parInput=MCMC$pars,func=Model,x=1:375)
 plot(summary(sR))
 points(Obs)
+
+
+# increase acceptance rate with delayed rejection
+MCMC2 <- modMCMC(f=Residuals,p=P$par,jump=Covar,niter=3000, ntrydr=3,
+                var0=s2prior,n0=2,updatecov=100,lower=c(0,0))
+plot(MCMC2,Full=TRUE)
+pairs(MCMC2)
+MCMC2$count
+

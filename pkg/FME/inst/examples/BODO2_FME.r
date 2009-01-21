@@ -228,7 +228,7 @@ sP <-summary(FitMrq)
 Covar   <- sP$cov.scaled * 2.4^2/2
 s2prior <- sP$modVariance
 
-# set nprior = 0 to avoid updating model variance
+# adaptive metropolis
 MCMC <- modMCMC(f=Objective,p=FitMrq$par,jump=Covar,niter=1000,
                 var0=s2prior,n0=3,updatecov=100)
 
@@ -242,3 +242,11 @@ sP$cov.scaled
 
 sR<-sensRange(parms=pars,parInput=MCMC$pars,func=O2BOD)
 plot(summary(sR))
+
+# adaptive metropolis + delayed rejection
+MCMC2 <- modMCMC(f=Objective,p=FitMrq$par,jump=Covar*2,niter=1000,
+                var0=s2prior,n0=3,updatecov=100, ntrydr=3)
+
+plot(MCMC2,Full=TRUE)
+summary(MCMC2)
+summary(MCMC)

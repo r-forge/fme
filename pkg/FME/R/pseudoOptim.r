@@ -51,7 +51,7 @@ pseudoOptim <- function (
  # Hybridisation phase
  iter<-0
  lastbest  <- -Inf
- while (iter<numiter & (max(populationcost)-min(populationcost))
+ while (iter<numiter && (max(populationcost)-min(populationcost))
                                   >(min(populationcost)*varleft))
  {
    iter<-iter+1

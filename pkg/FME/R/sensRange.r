@@ -108,8 +108,10 @@ colnames(Sens) <- svar
 
 for (i in 1:num)
 {
-  Parms[ipar]  <- parset[i,]
-  yRef <- Solve(Parms)
+  if(prod(Parms[ipar] == parset[i,])==0) { # no need to run model again if same parameter value (e.g. MCMCrun!)
+    Parms[ipar]  <- parset[i,]
+    yRef <- Solve(Parms)
+  }
   if (is.vector(yRef)) Sens[i,] <- yRef[ivar] else
                        Sens[i,] <- as.vector(unlist(yRef[,ivar]))   # unlist in case it is a data.frame
 }
@@ -181,7 +183,8 @@ Main <- main
 
 if (!is.null(what)) Select <- which (var %in% what) else Select <- 1:length(var)
 
-for (i in Select){
+if (nx > 1)  {    # summary of a times series or a profile...
+ for (i in Select){
   ii <- ((i-1)*nx+1):(i*nx)
   X<- x[ii,]
   yrange<-(range(cbind(X$Min,X$Max)))
@@ -202,5 +205,22 @@ for (i in Select){
 if (! is.null(legpos))
 legend(legpos,fill=c(grey(0.9),grey(0.8)),
        legend=c("Min-Max","Mean+-sd"),bty="n")
+} else             # one summary per variable
+{
+ X <- x[Select,]
+ dotchart(X$Mean,labels=rownames(X),xlim=range(c(X$Min,X$Max)),...)
+# add ranges
+ nr <- nrow(X)
+
+for (i in 1:nr)
+ {
+ segments(X$Min[i],i,X$Max[i],i,lty=1)
+ segments(X$q25[i],i,X$q75[i],i,lwd=3)
+ }
+
+ if (! is.null(legpos))
+ legend(legpos,lwd=c(1,3),legend=c("Min-Max","q25-q75"),bty="n")
+
+}
 
 }

@@ -285,3 +285,22 @@ points(Ndata$NH3,Ndata$x,cex=2,pch=18)
 mtext(side=3,outer=TRUE,"OmexDia-fitted",line=-1.5,cex=1.5)
 
 
+##===============================================================##
+##===============================================================##
+##                             MCMC run                          ##
+##===============================================================##
+##===============================================================##
+
+# data set mean variance = prior for model variance
+s2prior <- Cost$var$SSR.unweighted / Cost$var$N
+
+# adaptive metropolis
+MCMC <- modMCMC(f=Residual,p=Fit$par,jump=1,niter=1000, ntrydr=3,
+                var0=s2prior,n0=3,updatecov=10,lower=0)
+
+plot(MCMC,Full=TRUE)
+hist(MCMC,Full=TRUE)
+
+pairs(MCMC,Full=TRUE)
+summary(MCMC)
+cor(MCMC$pars)

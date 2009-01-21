@@ -39,12 +39,14 @@ ModelCost <- function(P)
 
 # Fit in two steps: pseudo-random search finds vicinity of minimum
 (Fita <- modFit(f=ModelCost,p=parms,method="Pseudo",
-                lower=c(0,0.1),upper=c(50,200),control=c(numiter=500)))
+                lower=c(0,0.1),upper=c(10,150),control=c(numiter=500)))
 
 # Levenberg-Marquardt locates the minimum
 Fit <- modFit(f=ModelCost,p=Fita$par,
                 lower=c(0,0.1),upper=c(10,200))
 
+summary(Fit)
+                
 # plot best-fit model
 times <- 0:40
 lines(model(Fit$par,times),lwd=2, col="blue")
@@ -57,16 +59,23 @@ plot(MC,main="residuals")
 # 4. Markov chain monte carlo
 #---------------------
 #
-MCMC <- modMCMC(f=ModelCost,p=Fit$par,jump=c(0.1,5))
-plot(MCMC) # check convergence
+MCMC <- modMCMC(f=ModelCost,p=Fit$par,jump=c(0.1,5),
+                lower=c(0,0),updatecov=10)
+plot(MCMC,Full=TRUE) # check convergence
 pairs(MCMC)
 summary(MCMC)
 
 var0 <- MC$var$SSR.unweighted
 
-MCMC2<- modMCMC(f=ModelCost,p=Fit$par,jump=c(0.1,5),var0=var0,updatecov=1)
+MCMC2<- modMCMC(f=ModelCost,p=Fit$par,jump=c(0.1,5),var0=var0,n0=4,updatecov=1)
 plot(MCMC2,Full=TRUE)
+pairs(MCMC2)
 
 SR <- summary(sensRange(parInput=MCMC2$pars,func=model,time=0:40,sensvar="N"))
 plot(SR,xlab="time",ylab="N",main="MCMC ranges")
 points(Obs)
+
+
+
+MCMC2<- modMCMC(f=ModelCost,p=Fit$par,jump=c(0.1,5),var0=var0,
+                n0=4,updatecov=10,ntrydr=5)

@@ -184,7 +184,7 @@ sP <- summary(Fit)
 Covar   <- sP$cov.scaled * 2.4^2/2
 s2prior <- sP$modVariance
 
-# set nprior = 0 to avoid updating model variance
+# set nprior = 2 to avoid too much updating model variance
 MCMC <- modMCMC(f=Objective,p=Fit$par,jump=Covar,niter=1000,
                 var0=s2prior,n0=2,updatecov=10)
 
@@ -197,3 +197,8 @@ sP$cov.scaled
 sR<-sensRange(parInput=MCMC$pars,func=Run)
 plot(summary(sR))
 points(Data2)
+
+# Use delayed rejection
+MCMC2 <- modMCMC(f=Objective,p=Fit$par,jump=Covar,niter=1000,
+                var0=s2prior,n0=2,updatecov=10, ntrydr=3)
+pairs(MCMC2)

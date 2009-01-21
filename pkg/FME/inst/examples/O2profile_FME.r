@@ -175,7 +175,7 @@ Covar   <- SFit$cov.scaled * 2.4^2/4
 # mean variance of fit = prior for model variance
 s2prior <- SFit$modVariance
 
-# set nprior = 0 to avoid updating model variance
+# adaptive metropolis
 MCMC <- modMCMC(f=Objective,p=Fit$par,jump=Covar,niter=1000,
                 var0=s2prior,n0=3,updatecov=10,lower=c(NA,0,NA,0))
 
@@ -189,13 +189,21 @@ cor(MCMC$pars)
 
 # 2. mean variance of separate fitted variables are prior for model variance
 s2priorvar <- Fit$varsigma
-# set nprior = 0 to avoid updating model variance
+
 MCMC2<- modMCMC(f=Objective,p=Fit$par,jump=Covar,niter=1000,
                 var0=s2priorvar,n0=1,updatecov=10,lower=c(NA,0,NA,0))
 plot(MCMC2,Full=TRUE)
 hist(MCMC2,Full=TRUE)
 pairs(MCMC2,Full=TRUE)
 
+# 3. idem 2 but with delayed rejection
+s2priorvar <- Fit$varsigma
+
+MCMC3<- modMCMC(f=Objective,p=Fit$par,jump=Covar*5,niter=1000,ntrydr=3,
+                var0=s2priorvar,n0=1,updatecov=10,lower=c(NA,0,NA,0))
+plot(MCMC3,Full=TRUE)
+hist(MCMC3,Full=TRUE)
+pairs(MCMC3,Full=TRUE)
 
 sR <- sensRange(func=O2fun,parInput=MCMC$pars,num=100)
 plot(summary(sR),xyswap=TRUE)
