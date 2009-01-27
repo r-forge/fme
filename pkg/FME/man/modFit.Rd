@@ -14,31 +14,42 @@ method=c("Marq","Port","Newton",
          "Pseudo"),
 control=list(),hessian=TRUE)
 
-\method{summary}{modFit}(object, \dots)
+\method{summary}{modFit}(object, cov=TRUE,\dots)
+
 \method{deviance}{modFit}(object,  \dots)
+
 \method{coef}{modFit}(object, \dots)
+
 \method{residuals}{modFit}(object, \dots)
+
 \method{df.residual}{modFit}(object, \dots)
-\method{print}{summary.modFit}(x, digits = max(3, getOption("digits") - 3), \dots)
+
+\method{print}{summary.modFit}(x, digits = max(3, getOption("digits") - 3),
+               \dots)
 
                      }
 \arguments{
-  \item{f }{A function to be minimized, with first argument the vector of parameters over which minimization is to take place.
-              It should return either a vector of \emph{residuals} (of model versus data) or
-              an element of class \emph{modCost} (as returned by a call to \code{\link{modCost}}.}
+  \item{f }{A function to be minimized, with first argument the vector of
+   parameters over which minimization is to take place.
+   It should return either a vector of \emph{residuals} (of model versus data) or
+   an element of class \emph{modCost} (as returned by a call to \code{\link{modCost}}.}
   \item{p }{Initial values for the parameters to be optimized over}
-  \item{...}{additional arguments passed to function \code{f} (modFit) or passed to the methods}
+  \item{...}{additional arguments passed to function \code{f} (modFit) or passed
+  to the methods}
   \item{lower }{Lower bounds on the parameters; if unbounded set equal to \code{-Inf}}
   \item{upper }{Upper bounds on the parameters; if unbounded set equal to \code{Inf}}
   \item{method }{The method to be used, one of "Marq","Port","Newton","Nelder-Mead",
         "BFGS", "CG", "L-BFGS-B", "SANN", "Pseudo" - see details}
-  \item{hessian }{TRUE if hessian is to be estimated. If FALSE, then a summary cannot be estimated}
+  \item{hessian }{TRUE if hessian is to be estimated. Note that, if set to FALSE,
+  then a summary cannot be estimated}
   \item{control }{additional control arguments passed to the optimisation routine -
-             see details of \code{\link[minpack.lm]{nls.lm}} ("Marq"), \code{\link{nlminb}} ("Port"),
-                      \code{\link{optim}} ("Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN"), \code{\link{nlm}} ("Newton")}
+     see details of \code{\link[minpack.lm]{nls.lm}} ("Marq"), \code{\link{nlminb}} ("Port"),
+     \code{\link{optim}} ("Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN"),
+     \code{\link{nlm}} ("Newton")} or \code{\link{pseudoOptim}}("Pseudo")
   \item{object }{an object of class \code{modFit}}
   \item{x }{an object of class \code{modFit}}
   \item{digits }{number of significant digits in printout}
+  \item{cov }{when TRUE also calculates the parameter covariation}
                       }
 \value{
   a list of class \emph{modFit} containing the results as returned from the called optimisation routines.
@@ -68,10 +79,37 @@ control=list(),hessian=TRUE)
 \details{
 Note that arguments after ... must be matched exactly.
 
-This function provides a solution to impose bounds on parameters for use in optimisation routines
-that do not allow bounds.
+The method to be used is specified by argument \code{method} which can be
 
-This is achieved by a transformation of the parameters to be fitted.
+One of the methods from function \code{\link{optim}}:
+
+\itemize{
+\item Nelder-Mead, the default from \code{optim}
+\item BFGS, a quasi-Newton method
+\item CG, a conjugate-gradient method
+\item L-BFGS-B, constrained quasi-Newton method
+\item SANN, method of simulated annealing
+}
+Or one of the following:
+\itemize{
+\item Marq, the Levenberg-Marquardt algorithm (\code{\link[minpack.lm]{nls.lm}}
+from package \code{minpack}) - the default.
+Note that this method is the only least squares method.
+\item Newton, a Newton-type algorithm (see \code{\link{nlm}})
+\item Port, the Port algorithm (see \code{\link{nlminb}})
+\item Pseudo, the pseudorandom-search algorithm (see \code{\link{pseudoOptim}}).
+}
+
+For difficult problems it may be efficient to perform some iterations with
+\code{Pseudo}, which will bring the algorithm near the vicinity of a (the) minimum,
+after which the default algorithm (\code{Marq}) is used to locate the exact minimum.
+
+The implementation for the routines from \code{\link{optim}} differs from
+\code{\link{constrOptim}} which implements an adaptive barrier algorithm and
+which allows a more flexible implementation of linear constraints.
+
+In \code{modFit}, bounds on parameters are imposed by a transformation of the
+parameters to be fitted.
 
 In case \emph{both lower and upper bounds} are specified, this is achieved by
 by a tangents and arc tangents transformation.
@@ -94,62 +132,46 @@ given by argument \code{p} are mapped from [lower,upper] to [-Inf,Inf] by:
 In case \emph{only lower or upper bounds} are specified, this is achieved by a log transformation
 (and a corresponding exponential transformation)
 
+In case parameters are transformed, (all methods), or in case method the method
+\code{Port}, \code{Pseudo} or \code{Marq} is selected, the \emph{hessian} is
+approximated as \eqn{2*J^T*J}, where J is the Jacobian, estimated by finite differences.
 
-The method to be used is specified by argument \code{method} which can be
+This ignores the second derivative terms, but this is reasonable if the method
+has truly converged to the minimum.
 
-One of the methods from function \code{\link{optim}}:
+Note that finite differences are not extremely precise.
 
-\itemize{
-\item Nelder-Mead, the default from \code{optim}
-\item BFGS, a quasi-Newton method
-\item CG, a conjugate-gradient method
-\item L-BFGS-B, constrained quasi-Newton method
-\item SANN, method of simulated annealing
-}
-Or one of the following:
-\itemize{
-\item Marq, the Levenberg-Marquardt algorithm (from  \code{\link[minpack.lm]{nls.lm}} - the default.
-Note that this method is the only least squares method.
-\item Newton, a Newton-type algorithm (from  \code{\link{nlm}})
-\item Port, the Port algorithm (from  \code{\link{nlminb}})
-}
+In case the Levenberg-Marquard method (\code{Marq}) is used, and parameters are
+not transformed, 0.5 times the Hessian of the least squares problem is returned by
+\code{nls.lm}, the original marquardt algorithm. To make it compatible, this
+value is multiplied with 2 and the TRUE hessian is thus returned by \code{modFit}.
 
-The implementation for the routines from  \code{\link{optim}} differs from  \code{\link{constrOptim}} which implements an adaptive
-barrier algorithm and which allows a more flexible implementation of linear constraints
 }
 \note{
-In case parameters are transformed, the \emph{hessian} is estimated by finite differences (of gradient differences),
-using centred differences (using \code{\link[rootSolve]{hessian}} from package \code{rootSolve}).
-Note that this is not extremely precise.
 
-In case the Levenberg-Marquard method is used, and parameters are not transformed, the Hessian of the least
-squares problem is approximated as 2*J'*J, where J is the Jacobian.
-This ignores the second derivative terms, but this is reasonable if the method has truly converged to the minimum.
-
-Note that the hessian thus returned by \code{modFit} differs from what is returned by \code{nls.lm}, the original marquardt algorithm.
-which returns 0.5 times the hessian).
-
-The   \code{\link{summary}} \emph{method} is based on an estimate of the parameter covariance matrix.
+The   \code{\link{summary}} \emph{method} is based on an estimate of the parameter
+covariance matrix.
 In computing the covariance matrix of the fitted parameters, the problem is treated
 as if it were a linear least squares problem, linearizing around
-the parameter values that minimize Chi\^2.
+the parameter values that minimize \eqn{Chi^2}.
 
 The covariance matrix is estimated as 1/(0.5*hessian)
 
 This computation relies on several things, i.e.
 
-(1) the parameter values are located at the minimum (i.e. the fitting algorithm has converged).
-
-(2) the observations yj are subject to independent errors whose
+\enumerate{
+\item the parameter values are located at the minimum (i.e. the fitting algorithm has converged).
+\item the observations yj are subject to independent errors whose
 variances are well estimated by 1 / (n - p) times the residual sum of squares
+(and where n= number of data points, p = number of parameters).
+\item the model is not too nonlinear
+}
+Note that the estimated covariance (correlation) matrix and the confidence
+intervals derived from it may be worthless if the assumptions behind the
+covariance computation are invalid.
 
-(3) the model is not too nonlinear
-
-Note that the estimated covariance (correlation) matrix and the confidence intervals derived from it may be
-worthless if the assumptions behind the covariance computation are invalid.
-
-If you  have doubts about the validity of these computations, use monte carlo fitting instead, or
-run a \code{\link{modMCMC}}.
+If in doubt about the validity of the summary computations, use monte carlo fitting
+instead, or run a \code{\link{modMCMC}}.
 
 Other methods included are: \code{\link{deviance}}, which returns the model deviance,
  \code{\link{coef}}, which extracts the values of the fitted parameters,
@@ -229,7 +251,7 @@ legend("right",c("data","original","fitted analytical","fitted numerical"),
        lty=c(NA,1,1,2),lwd=c(NA,2,2,1),col=c("red","green","blue","red"),
        pch=c(16,NA,NA,NA))
 summary(Fit)
-
+plot(residuals(Fit))
 }
 \author{Karline Soetaert <k.soetaert@nioo.knaw.nl>,
 Thomas Petzoldt <thomas.petzoldt@tu-dresden.de>}

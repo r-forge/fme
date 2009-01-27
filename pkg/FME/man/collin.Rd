@@ -2,9 +2,10 @@
 \alias{collin}
 \alias{plot.collin}
 \alias{print.collin}
-\title{Given the sensitivity functions of a model, estimates the collinearity of parameter sets}
-\description{Based on the sensitivity functions of model variables to a selection of parameters,
-calculates the "identifiability" of sets of parameter.
+\title{Given the sensitivity functions of a model, estimates the collinearity of
+parameter sets}
+\description{Based on the sensitivity functions of model variables to a selection
+of parameters, calculates the "identifiability" of sets of parameter.
 
 The sensitivity functions are a matrix whose(i,j)-th element contains
 \deqn{ \frac{\partial y_i}{\partial \Theta _j}\cdot \frac{\Delta \Theta _j}{\Delta y_i}}{dy_i/dpar_j*parscale_j/varscale_i}
@@ -25,43 +26,44 @@ In general a collinearity value less than about 20 is "identifiable"
 }
 \arguments{
   \item{sensfun }{Model sensitivity functions as estimated by \code{SensFun}}
-  \item{parset }{One selected parameter combination, a vector with indices to the parameters }
+  \item{parset }{One selected parameter combination, a vector with indices to
+  the parameters }
   \item{x }{an object of class \code{collin}}
   \item{... }{additional arguments passed to the methods}
   }
 \value{
-  a matrix of clas \code{collin} with one row for each parameter combination (parameters as in \code{sensfun})
+  a data.frame of clas \code{collin} with one row for each parameter combination
+  (parameters as in \code{sensfun})
 
   Each row contains:
+  \item{... }{for each parameter whether it is present (1) or absent (0) in the set}
+  \item{N}{ the number of parameters in the set}
+  \item{collinearity}{ the collinearity value}
 
-  *for each parameter whether it is present (1) or absent (0) in the set,
-
-  *the number of parameters in the set and
-
-  *the collinearity value.
-
-  The matrix returned by \code{collin} has methods for the generic functions
+  The data.frame returned by \code{collin} has methods for the generic functions
    \code{\link{print}} and \code{\link{plot}}
 }
 
 \details{
 The collinearity is a measure of approximate linear dependence
 between sets of parameters. The higher its value, the more the parameters are related.
-With "related" is meant that several paraemter combinations may produce similar values of the output variables.
+With "related" is meant that several paraemter combinations may produce similar
+values of the output variables.
 }
 \note{
 It is possible to use \code{collin} for selecting
 parameter sets that can be fine-tuned based on a data set.
 Thus it is a powerful technique to make model calibration routines more robust,
 because calibration routines often fail when parameters are strongly related.
-In general, when the collinearity index exceeds 20, the linear dependence is assumed to be critical
-(i.e. it will not be possible or easy to estimate all the parameters in the combination together).
+In general, when the collinearity index exceeds 20, the linear dependence is
+assumed to be critical (i.e. it will not be possible or easy to estimate all the
+parameters in the combination together).
 
 The procedure is explained in Omlin et al. (2001).
 
 1. First the function \code{collin} is used to test how far a dataset
  can be used for estimating certain (combinations of) parameters.
- After selection of these 'identifiable parameter set' (which have a low "collinearity")
+ After selection of an 'identifiable parameter set' (which has a low "collinearity")
  they are fine-tuned by calibration.
  
 2. As the sensitivity analysis is a \emph{local} analysis (i.e. its outcome depends on the current

@@ -186,14 +186,19 @@ Covar  <- sP$cov.unscaled * (sum(s2prior))/2 * (2.4^2)/6
 
 # so, 20% of parameter value is used for initial jump length
 MCMC <- modMCMC(f=Cost,p=FitMrq$par,jump=FitMrq$par*0.2,niter=5000,
-                var0=s2prior,n0=5,updatecov=10,lower=c(0,0,0,0,0,0),
+                var0=s2prior,wvar0=1,updatecov=10,lower=c(0,0,0,0,0,0),
                 upper = c(1e8,1e9,500,2,1e9,1))
 
 plot(MCMC,Full=TRUE)     # not quite converged
-hist(MCMC,Full=TRUE)
+hist(MCMC,Full=TRUE,col="blue")
 pairs(MCMC)
 cor(MCMC$pars)
 
 
 sR<-sensRange(parInput=MCMC$pars,func=Solver)
-plot(summary(sR))
+plot(summary(sR),what="cells",legpos="bottomright")
+points(dat$time,dat$cells)
+
+plot(summary(sR),what="mcyst",legpos=NULL)
+points(dat$time,dat$mcyst)
+

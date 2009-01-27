@@ -21,9 +21,9 @@ sensRange(func,parms=NULL,sensvar=NULL,dist="unif",
  map=1, num=100,  ...)
 
 \method{summary}{sensRange}(object,  \dots)
-\method{plot}{summary.sensRange}(x, main=NULL, xyswap =FALSE,
-              what=NULL, legpos="topleft", \dots)
-\method{plot}{sensRange}(x, main=NULL, xyswap =FALSE,
+\method{plot}{summary.sensRange}(x, xyswap =FALSE,
+              what=NULL, legpos="topleft",col=c(grey(0.8),grey(0.7)), \dots)
+\method{plot}{sensRange}(x, xyswap =FALSE,
               what=NULL,\dots)
 
  }
@@ -63,9 +63,9 @@ sensRange(func,parms=NULL,sensvar=NULL,dist="unif",
   \item{object }{an object of class \code{sensRange}}
   \item{x }{an object of class \code{sensRange}}
   \item{legpos }{position of the legend; set to NULL to avoid legend}
-  \item{main }{a main title for the plot}
   \item{xyswap }{if TRUE, then x-and y-values are swapped and y-axis is from top to bottom. Useful for drawing vertical profiles}
-  \item{what }{the name of the variables that should be plotted}
+  \item{what }{the name or the number of the variables that should be plotted}
+  \item{col }{the two colors of the polygons that should be plotted}
   \item{... }{additional arguments passed to function \code{func} or to the methods}
   }
 \value{

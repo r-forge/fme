@@ -473,20 +473,35 @@ Finally, model residuals are plotted
 \label{fig:res}
 \end{figure}
 
-\section{Markov chain monte carlo}n
-We can use the results of the fit to run a MCMC (\citep{Gelman})
+\section{Markov chain monte carlo}
+We can use the results of the fit to run a MCMC (\citep{Gelman}).
 
-The summary returns the model variance, which can be used as the model error
-variance, and the parameter covariance which is ideally suited for generating
-new parameter values.
+Function \code{modMCMC} implements the delayed rejection (DR) adaptive
+metropolis (AM) algorithm (\citep{Haario05})
+
+The \code{summary} method of the best fit returns several usefull values:
+\begin{itemize}
+\item the model variance \code{modVarianc} is used as the initial model error variance
+(\code{var0}).
+In each MCMC step, 1/model variance is drawn from a gamma function with parameters
+shape=0.5*N*(1+pvar0), and the rate=0.5*(pvar0*N*var0+SSnew)) and where SS is the current
+sum of squared residals, N is the number of data points and \code{pVar0} is a weighing parameter,
+input to \code{modMCMC}.
+
+\item The best-fit
+parameters are used as initial parameter values for the MCMC (\code{p}).
+
+\item The parameter covariance returned by the \code{summary} method, scaled with
+$2.4^2/length(p)$, gives a suitable covariance matrix, for generating new parameter values (\code{jump}.
+\end{itemize}
 <<>>=
 SF<-summary(Fit)
 SF
 SF[]
 Var0<- SF$modVariance
-covIni <-SF$cov.scaled
+covIni <-SF$cov.scaled *2.4^2/2
 MCMC<-modMCMC(p=coef(Fit),f=Objective,jump=covIni,
-              var0=Var0,updatecov=10)
+              var0=Var0,wvar0=1)
 @
 The \code{plot} method shows the trace of the parameters and, in \code{Full} is
 \code{TRUE}, also the model function.
@@ -518,6 +533,26 @@ The \code{pairs} method plots both parameters as a function of one another.
 \caption{Pairs plot of MCMC results. See text for \R-code}
 \label{fig:mcmc2}
 \end{figure}
+The MCMC output can be used in the functions from the \pkg{coda} package:
+<<>>=
+MC <- as.mcmc(MCMC$pars)
+@
+
+<<label=cumuplot, include=FALSE>>=
+cumuplot(MC)
+@
+\setkeys{Gin}{width=0.4\textwidth}
+\begin{figure}
+\begin{center}
+<<label=cumuplot,fig=TRUE,echo=FALSE>>=
+<<cumuplot>>
+@
+\end{center}
+\caption{cumulative quantile plot from the MCMC run as from package \pkg{coda} - see text for \R-code}
+\label{fig:mcmccum}
+\end{figure}
+
+
 Finally, we compare the covariances based on generated parameters with the ones
 from the fit.
 <<>>=

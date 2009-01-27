@@ -18,39 +18,38 @@ observed data, estimates the residuals, and the variable and model costs (sum of
   \item{cost }{if not \code{NULL}, the output of a previous call to \code{modCost}; in this case, the new output will combine both}
   \item{weight}{only if \code{err}=\code{NULL}: how to weigh the residuals, one of "none","std","mean", see details}
   \item{scaleVar}{if \code{TRUE}, then the residuals of one observed variable are scaled respectively to the number of observations (see details)}
-  \item{...}{additional arguments passed to function approx}
+  \item{...}{additional arguments passed to \R-function \code{approx}}
   }
 \value{
   a list of type \code{modCost} containing:
-\itemize{
   \item{model }{one value, the model cost, which equals the sum of scaled variable costs (see details)}
   \item{minlogp }{one value, -log(model probablity), where it is assumed that the data are normally distributed, with standard deviation = \code{error}}
   \item{var}{ the variable costs, a data.frame with, for each observed variable the following (see details):
    \itemize{
-   \item{name}{ the name of the observed variable}
-   \item{scale}{, the scale-factor used to weigh the variable cost, either 1 or 1/(number observations), defaults to 1}
-   \item{N}{ the number of data points per observed variable}
-   \item{SSR.unweighted}{ the sum of squared residuals per observed variable, unweighted}
-   \item{SSR}{ the sum of weighted squared residuals per observed variable(see details)}
+   \item{name }{ the name of the observed variable}
+   \item{scale }{, the scale-factor used to weigh the variable cost, either 1 or 1/(number observations), defaults to 1}
+   \item{N }{ the number of data points per observed variable}
+   \item{SSR.unweighted }{ the sum of squared residuals per observed variable, unweighted}
+   \item{SSR }{ the sum of weighted squared residuals per observed variable(see details)}
    }
 }
-  \item{residuals }{a data.frame with several columns:
+  \item{residuals }{the data residual, a data.frame with several columns:
 \itemize{
-\item{name}{, the name of the observed variable}
-\item{x}{, the value of the independent variable (if present)}
-\item{obs}{, the observed variable value}
-\item{mod}{, the corresponding modeled value}
-\item{weight}{, the factor used to weigh the residuals, 1/error, defaults to 1}
-\item{res}{, the weighted residuals between model and observations (mod-obs)*weight}
-\item{res.unweighted}{, the residuals between model and observations (mod-obs)}
-}
+\item{name }{, the name of the observed variable}
+\item{x }{, the value of the independent variable (if present)}
+\item{obs }{, the observed variable value}
+\item{mod }{, the corresponding modeled value}
+\item{weight }{, the factor used to weigh the residuals, 1/error, defaults to 1}
+\item{res }{, the weighted residuals between model and observations (mod-obs)*weight}
+\item{res.unweighted }{, the residuals between model and observations (mod-obs)}
 }
 }
 }
 \details{
 This function compares model output with observed data.
 
-It computes (1) the weighted \emph{residuals}, one for each data point (2) the \emph{variable costs}, i.e. the sum of squared weight residuals per variable
+It computes (1) the weighted \emph{residuals}, one for each data point
+(2) the \emph{variable costs}, i.e. the sum of squared weight residuals per variable
 and (3) the \emph{model cost}, the scaled sum of variable costs .
 
 There are three steps:
@@ -60,16 +59,21 @@ There are three steps:
 and where \eqn{Mod_i}{Mod_i} and \eqn{Obs_i}{Obs_i} are the modeled,
 respectively observed value of data point i.
 
-The weights are equal to 1/error, where the latter can be inputted, one for each data point by specifying \code{err} as an extra column in the observed data.
+The weights are equal to 1/error, where the latter can be inputted, one for each
+data point by specifying \code{err} as an extra column in the observed data.
 This can only be done when the data input is in long (database) format.
 
-When \code{err} is not inputted, then the weights are specified via argument \code{weight} which is either:
+When \code{err} is not inputted, then the weights are specified via argument
+\code{weight} which is either:
 \itemize{
 \item \code{"none"}, which sets the weight equal to 1 (the default)
-\item \code{"std"}, which sets the weights equal to the standard deviation of the observed data (can only be used if there is more than 1 data point)
-\item \code{"mean"}, which uses the mean of the absolute value of the observed data (can only be used if not 0).
+\item \code{"std"}, which sets the weights equal to the standard deviation of
+the observed data (can only be used if there is more than 1 data point)
+\item \code{"mean"}, which uses the mean of the absolute value of the observed
+data (can only be used if not 0).
 }
-\emph{2.} Then for each observed variable, j, a \emph{variable cost} is estimated as the sum of squared weighted residuals for this variable:
+\emph{2.} Then for each observed variable, j, a \emph{variable cost} is estimated
+as the sum of squared weighted residuals for this variable:
 \deqn{Cost_{var_j}= \sum \limits_{i = 1}^{n_j} {res_i}^2}{Cost_varj=sum(for i=1,n_j) (res_i^2)}
 
 where \eqn{n_j}{n_j} is the number of observations for observed variable j.
@@ -77,9 +81,11 @@ where \eqn{n_j}{n_j} is the number of observations for observed variable j.
 \emph{3.} Finally, the \emph{model Cost} is estimated as the scaled sum of variable costs:
 \deqn{ModCost=\sum \limits_{j = 1}^{n_v} {\frac{Cost_{var_j}}{scale_{var_j}}}}{sum(Cost_varj/scale_j)}
 
-and where \eqn{scale_{var_j}}{scale_j} allows to scale the variable costs relative to the number of observations.
-This is set by specifying argument \code{scaleVar}. If \code{TRUE}, then the variable costs are
-rescaled. The default is NOT to rescale (i.e. \eqn{scale_{var_j}}{scale_j}=1).
+and where \eqn{scale_{var_j}}{scale_j} allows to scale the variable costs relative
+to the number of observations.
+This is set by specifying argument \code{scaleVar}. If \code{TRUE}, then the
+variable costs are rescaled. The default is NOT to rescale
+(i.e. \eqn{scale_{var_j}}{scale_j}=1).
 
 The models typically consist of (a system of) differential equations, which are either solved by
 \itemize{
@@ -88,12 +94,13 @@ The models typically consist of (a system of) differential equations, which are 
 }
 The data can be presented in two formats:
 \itemize{
-\item \emph{data table (long) format}; this is a two to four column data.frame that contains the
-\code{name} of the observed variable (always the FIRST column),
+\item \emph{data table (long) format}; this is a two to four column data.frame
+that contains the \code{name} of the observed variable (always the FIRST column),
 the (optional) \code{value of the independent variable} (default column name = "time"), the
 \code{value of the observation} and the (optional) \code{value of the error}.
-For data presented in this format, the names of the column(s) with the independent variable (\code{x})
-and the name of the column that has the value of the dependent variable \code{y} must be passed to function \code{costMod}.
+For data presented in this format, the names of the column(s) with the independent
+variable (\code{x}) and the name of the column that has the value of the dependent
+variable \code{y} must be passed to function \code{costMod}.
 
 
 \item \emph{crosstable (wide) format}; this is a matrix, where each column denotes one
@@ -101,8 +108,9 @@ dependent (or independent) variable; the column name is the name of the observed
 When using this format, only the name of the column that contains the dependent variable must be
 specified (\code{x}).
 }
-As an example of both formats consider the data, called \code{Dat} consisting of two observed variables, called
-"Obs1" and "Obs2", both containing two observations, at time 1 and 2:
+As an example of both formats consider the data, called \code{Dat} consisting of
+two observed variables, called "Obs1" and "Obs2", both containing two observations,
+at time 1 and 2:
        \tabular{llll}{
   name    \tab time   \tab   val \tab err \cr
   Obs1    \tab 1      \tab   50  \tab 5  \cr
@@ -120,12 +128,14 @@ for the long format and
 for the crosstab format. Note, that in the latter case it is not possible to
 provide separate errors per data point.
 
-By calling modCost several consecutive times (using the \code{cost} argument), it is possible
+By calling modCost several consecutive times (using the \code{cost} argument),
+it is possible
 to combine both types of data files.
 }
 \note{
 In the future, it should be possible to have more than one independent variable present.
-This is not yet implemented, but it should allow e.g. to fit time series of spatially dependent variables.
+This is not yet implemented, but it should allow e.g. to fit time series of
+spatially dependent variables.
 
 }
 \examples{

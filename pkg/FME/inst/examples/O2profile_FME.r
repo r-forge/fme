@@ -124,8 +124,8 @@ O2fun2 <- function(pars)
 
 # The data
 O2dat <- data.frame(x=seq(0.1,3.5,by=0.1),
-    y = c(279,262,246,230,217,203,189,175,162,150,138,127,116,
-          106,96,87,78,70,62,55,47,41,35,30,25,20,16,13,10,8,5,3,2,1,0))
+    y = c(279,260,256,220,200,203,189,179,165,140,138,127,116,
+          109,92,87,78,72,62,55,49,43,35,32,27,20,15,15,10,8,5,3,2,1,0))
 O2depth <- cbind(name="O2",O2dat)        # oxygen versus depth
 O2flux  <- c(UpFlux=170,LowFlux=0)       # measured fluxes
 
@@ -177,7 +177,7 @@ s2prior <- SFit$modVariance
 
 # adaptive metropolis
 MCMC <- modMCMC(f=Objective,p=Fit$par,jump=Covar,niter=1000,
-                var0=s2prior,n0=3,updatecov=10,lower=c(NA,0,NA,0))
+                var0=s2prior,wvar0=1,updatecov=10,lower=c(NA,0,NA,0))
 
 plot(MCMC,Full=TRUE)
 hist(MCMC,Full=TRUE)
@@ -185,28 +185,31 @@ hist(MCMC,Full=TRUE)
 pairs(MCMC,Full=TRUE)
 summary(MCMC)
 cor(MCMC$pars)
-
+plot(summary(sensRange(parInput=MCMC$par,f=O2fun,num=500)),xyswap=TRUE)
 
 # 2. mean variance of separate fitted variables are prior for model variance
+# This does not work so well...
 s2priorvar <- Fit$varsigma
 
+# artificially increase varaiance for low O2 flux
+s2priorvar[2]<-0.01
+
+
 MCMC2<- modMCMC(f=Objective,p=Fit$par,jump=Covar,niter=1000,
-                var0=s2priorvar,n0=1,updatecov=10,lower=c(NA,0,NA,0))
+                var0=s2priorvar,wvar0=1,updatecov=10,lower=c(NA,0,NA,0))
 plot(MCMC2,Full=TRUE)
 hist(MCMC2,Full=TRUE)
 pairs(MCMC2,Full=TRUE)
+plot(summary(sensRange(parInput=MCMC2$par,f=O2fun,num=500)),xyswap=TRUE)
 
 # 3. idem 2 but with delayed rejection
-s2priorvar <- Fit$varsigma
-
-MCMC3<- modMCMC(f=Objective,p=Fit$par,jump=Covar*5,niter=1000,ntrydr=3,
-                var0=s2priorvar,n0=1,updatecov=10,lower=c(NA,0,NA,0))
+MCMC3<- modMCMC(f=Objective,p=Fit$par,jump=Covar,niter=1000,ntrydr=3,
+                var0=s2priorvar,wvar0=1,updatecov=10,lower=c(NA,0,NA,0))
 plot(MCMC3,Full=TRUE)
 hist(MCMC3,Full=TRUE)
 pairs(MCMC3,Full=TRUE)
 
-sR <- sensRange(func=O2fun,parInput=MCMC$pars,num=100)
+sR <- sensRange(func=O2fun,parInput=MCMC3$pars,num=100)
 plot(summary(sR),xyswap=TRUE)
 
-sR <- sensRange(func=O2fun,parInput=MCMC2$pars,num=100)
-plot(summary(sR),xyswap=TRUE)
+points(O2depth$y,O2depth$x)

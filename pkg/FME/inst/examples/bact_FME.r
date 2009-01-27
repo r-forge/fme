@@ -30,6 +30,7 @@ solveBact <- function(pars)
 
  state   <- c(Bact=0.1,Sub = 100)
  tout    <- seq(0,50,by=0.5)
+
  # ode solves the model by integration...
  return(as.data.frame(ode(y=state,times=tout,func=derivs,parms=pars)))
 }
@@ -61,6 +62,7 @@ SF<- sensFun(func=solveBact,parms=pars,
              sensvar=c("Bact","Sub"),varscale=1)
 head(SF)
 tail(SF)
+plot(SF,legpos="bottomright")
 
 summary(SF,var=TRUE)
 
@@ -143,9 +145,8 @@ Run <- function(x)
 }
 
 
-Objective <- function (x)      # Model cost
+Objective <- function (x,out=Run(x))      # Model cost
 {
- out     <- Run(x)
  Cost <- modCost(obs=Data2,model=out)    # observed data in 2 data.frames
  return(modCost(obs=Data,model=out,cost=Cost))
 }
@@ -160,8 +161,7 @@ summary(Fit)
 out <- Run(Fit$par)
 
 # Model cost
-Cost <- modCost(obs=Data2,model=out)    # observed data in 2 data.frames
-Cost  <- modCost(obs=Data,model=out,cost=Cost)
+Cost <- Objective(Fit$par,out)    # observed data in 2 data.frames
 
 # Plot residuals
 plot(Cost,xlab="time, hour",ylab="molC/m3",main="residuals",cex=1.5)
@@ -186,7 +186,7 @@ s2prior <- sP$modVariance
 
 # set nprior = 2 to avoid too much updating model variance
 MCMC <- modMCMC(f=Objective,p=Fit$par,jump=Covar,niter=1000,
-                var0=s2prior,n0=2,updatecov=10)
+                var0=s2prior,wvar0=1,updatecov=10)
 
 plot(MCMC,Full=TRUE)
 pairs(MCMC)
@@ -200,5 +200,16 @@ points(Data2)
 
 # Use delayed rejection
 MCMC2 <- modMCMC(f=Objective,p=Fit$par,jump=Covar,niter=1000,
-                var0=s2prior,n0=2,updatecov=10, ntrydr=3)
+                var0=s2prior,wvar0=1,updatecov=10, ntrydr=3)
 pairs(MCMC2)
+cor(MCMC2$pars)
+
+
+# use functions from the coda package
+MC <-as.mcmc(MCMC$pars)
+MC2<-as.mcmc(MCMC2$pars)
+
+MClist <- as.mcmc.list(list(MC,MC2))
+gelman.diag(MClist)
+
+cumuplot(MC)

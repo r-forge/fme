@@ -292,11 +292,11 @@ mtext(side=3,outer=TRUE,"OmexDia-fitted",line=-1.5,cex=1.5)
 ##===============================================================##
 
 # data set mean variance = prior for model variance
-s2prior <- Cost$var$SSR.unweighted / Cost$var$N
+s2prior <- Cost$var$SSR / Cost$var$N
 
 # adaptive metropolis
-MCMC <- modMCMC(f=Residual,p=Fit$par,jump=1,niter=1000, ntrydr=3,
-                var0=s2prior,n0=3,updatecov=10,lower=0)
+MCMC <- modMCMC(f=Residual,p=Fit$par,jump=1,niter=1000, ntrydr=2,
+                var0=s2prior,wvar0=0.2,updatecov=10,lower=0)
 
 plot(MCMC,Full=TRUE)
 hist(MCMC,Full=TRUE)
@@ -304,3 +304,16 @@ hist(MCMC,Full=TRUE)
 pairs(MCMC,Full=TRUE)
 summary(MCMC)
 cor(MCMC$pars)
+
+pselect <- "MeanFlux"
+isel <- 1:100
+
+sR<-summary(sensRange(f=sFun,parInput=MCMC$pars,isel=isel))
+par(mfrow=c(2,2))
+plot(sR,what="O2",xyswap=TRUE,legpos="bottomright")
+points(O2data$O2,O2data$x,cex=2,pch=18)
+plot(sR,what="NO3",xyswap=TRUE,legpos="bottomright")
+points(Ndata$NO3,Ndata$x,cex=2,pch=18)
+plot(sR,what="NH3",xyswap=TRUE,legpos=NULL)
+points(Ndata$NH3,Ndata$x,cex=2,pch=18)
+plot(sR,what="SDET",xyswap=TRUE,legpos=NULL)

@@ -172,20 +172,20 @@ pairs.sensFun <- function (x, ...)
         lower.panel = panel.cor, ...)
 }
 
-plot.sensFun<- function(x,main=NULL,legpos="topleft",...)
+plot.sensFun<- function(x,legpos="topleft",...)
 {
   nx  <-attr(x,"nx")
   var <-attr(x,"var")
-  Main <- main
+  dots <- list(...)
+  nmdots <- names(dots)
 
- for (i in 1:length(var))
- {
- ii <- ((i-1)*nx):(i*nx)
- if (is.null(main)) Main <- var[i]
- sens<- x[ii,]
- matplot(sens$x,as.matrix( sens[,-(1:2)]),type="l",ylab="-",
+  for (i in 1:length(var)){
+   ii <- ((i-1)*nx):(i*nx)
+   Main  <- if ("main" %in% nmdots) dots$main else var[i]
+   sens<- x[ii,]
+   matplot(sens$x,as.matrix( sens[,-(1:2)]),type="l",ylab="-",
         main=Main,...)
- }
+  }
   nc <- ncol(x) - 2
   if (! is.na(legpos)) legend(legpos,names(x[,-(1:2)]),col=1:nc,lty=1:nc)
 

@@ -16,6 +16,9 @@ modFit <- function(f,p,...,lower=-Inf,upper=Inf,
 
   Lower <- rep(lower,len=length(p))
   Upper <- rep(upper,len=length(p))
+  if (any(p < lower) | any(p > upper))
+   stop("values of 'p' should be inbetween 'lower' and 'upper'")
+
 
 # are boundaries allowed in the method?
   bounds <- method %in% c("L-BFGS-B", "Port", "Pseudo")
@@ -174,7 +177,7 @@ df.residual.modFit <- function(object, ...) object$df.residual
 # anova.modFit <- function(object, ...) anova.lm(object,...) does not work...
 
 
-summary.modFit <- function (object, ...)  #inspired by summary.nls.lm
+summary.modFit <- function (object, cov=TRUE,...)  #inspired by summary.nls.lm
 {
 
     param  <- object$par
@@ -198,7 +201,7 @@ summary.modFit <- function (object, ...)  #inspired by summary.nls.lm
 
     param <- cbind(param, se, tval, 2 * pt(abs(tval), rdf, lower.tail = FALSE))
     dimnames(param) <- list(pnames, c("Estimate", "Std. Error", "t value", "Pr(>|t|)"))
-    ans <- list(residuals = object$residuals,
+    if(cov) ans <- list(residuals = object$residuals,
                 residualVariance=resvar,
                 sigma = sqrt(resvar),
                 modVariance=modVariance,
@@ -207,11 +210,20 @@ summary.modFit <- function (object, ...)  #inspired by summary.nls.lm
                 info = object$info, niter = object$iterations,
                 stopmess = message,
                 par = param)
+    else  ans <- list(residuals = object$residuals,
+                residualVariance=resvar,
+                sigma = sqrt(resvar),
+                modVariance=modVariance,
+                df = c(p, rdf),
+                info = object$info, niter = object$iterations,
+                stopmess = message,
+                par = param)
+
     class(ans) <- "summary.modFit"
     ans
 }
 print.summary.modFit <-
-  function (x, digits = max(3, getOption("digits") - 3), ...)
+  function (x, digits = max(3, getOption("digits") - 3),  ...)
 
 {
   df <- x$df
@@ -220,11 +232,13 @@ print.summary.modFit <-
   printCoefmat(x$par, digits = digits, ...)
   cat("\nResidual standard error:",
       format(signif(x$sigma, digits)), "on", rdf, "degrees of freedom\n")
+  printcor <- !is.null(x$cov.unscaled)
+  if (printcor){
   Corr <- cov2cor(x$cov.unscaled)
   rownames(Corr)<- colnames(Corr) <- rownames(x$par)
 
   cat("\nParameter correlation:\n")
   print(Corr, digits = digits, ...)
-
+  }
   invisible(x)
 }

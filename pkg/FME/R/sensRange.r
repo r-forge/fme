@@ -29,7 +29,7 @@ if (! is.null(parInput))
   nr <- nrow(parInput)
   if (num >= nr) ii <- 1: num else
                  ii <- sample(1:nr,size=num,replace=FALSE)
-  parset <-parInput[ii,]
+  parset <-as.matrix(parInput[ii,])
   if(is.null(parms)) parms <- parInput[1,]
   }
 
@@ -153,33 +153,46 @@ return(SumSens)
 }
 
 
-plot.sensRange<-function(x,main=NULL,xyswap=FALSE,what=NULL,...)
+plot.sensRange<-function(x,xyswap=FALSE,what=NULL,...)
 {
 npar <- attr(x,"npar")
 nx  <-attr(x,"nx")
 var <-attr(x,"var")
 X  <-attr(x,"x")
-Main <- main
+dots <- list(...)
+nmdots <- names(dots)
+
 sens<- x[,-(1:npar)]
 
 if (!is.null(what)) Select <- which (var %in% what) else Select <- 1:length(var)
 
 if (nx > 1)
   for (i in Select){
-    if (is.null(main)) Main <- var[i]
+    yrange<- if ("ylim" %in% nmdots) dots$ylim else range(X$x)  # USED for swap!
     ii <- ((i-1)*nx+1):(i*nx)
+
+    if ("main" %in% nmdots) {
+    if (!xyswap) matplot(X,t(sens[,ii]),type="l",...)
+    else matplot(t(sens[,ii]),X,type="l",ylim=rev(yrange))
+    }else {
+    Main  <- var[i]
     if (!xyswap) matplot(X,t(sens[,ii]),type="l",main=Main,...)
-    else matplot(t(sens[,ii]),X,type="l",main=Main,ylim=rev(range(X)),...)
+    else matplot(t(sens[,ii]),X,type="l",main=Main,ylim=rev(yrange))
+    }
   }
 else
  boxplot(sens[,Select])
 }
 
-plot.summary.sensRange<-function(x,main=NULL,xyswap=FALSE,what=NULL,legpos="topleft",...)
+plot.summary.sensRange<-function(x,xyswap=FALSE,
+                                 what=NULL,legpos="topleft",
+                                 col=c(grey(0.8),grey(0.7)),...)
 {
 nx  <-attr(x,"nx")
 var <-attr(x,"var")
-Main <- main
+
+dots <- list(...)
+nmdots <- names(dots)
 
 if (!is.null(what)) Select <- which (var %in% what) else Select <- 1:length(var)
 
@@ -187,19 +200,21 @@ if (nx > 1)  {    # summary of a times series or a profile...
  for (i in Select){
   ii <- ((i-1)*nx+1):(i*nx)
   X<- x[ii,]
-  yrange<-(range(cbind(X$Min,X$Max)))
-  xrange<-range(X$x)
-  if (is.null(main)) Main <- var[i]
+  yrange<- if ("ylim" %in% nmdots) dots$ylim else range(cbind(X$Min,X$Max))
+  xrange<- if ("xlim" %in% nmdots) dots$xlim else range(X$x)
+  Main  <- if ("main" %in% nmdots) dots$main else var[i]
+  xlab  <- if ("xlab" %in% nmdots) dots$xlab else "x"
+  ylab  <- if ("ylab" %in% nmdots) dots$ylab else "y"
   if (!xyswap) {
-    plot(X$x,X$Mean,ylim=yrange,type="n",main=Main,...)
-    polygon(c(X$x,rev(X$x)),c(X$Min,rev(X$Max)),col=grey(0.8),border=NA)
-    polygon(c(X$x,rev(X$x)),c(X$Mean-X$Sd,rev(X$Mean+X$Sd)),col=grey(0.7),border=NA)
-    lines(X$x,X$Mean,lwd=2) }
+    plot(X$x,X$Mean,ylim=yrange,xlim=xrange,type="n",main=Main,xlab=xlab,ylab=ylab)
+    polygon(c(X$x,rev(X$x)),c(X$Min,rev(X$Max)),col=col[1],border=NA)
+    polygon(c(X$x,rev(X$x)),c(X$Mean-X$Sd,rev(X$Mean+X$Sd)),col=col[2],border=NA)
+    lines(X$x,X$Mean,...) }
   else {
-    plot(X$Mean,X$x,xlim=yrange,type="n",main=Main,ylim=rev(xrange),...)
-    polygon(c(X$Min,rev(X$Max)),c(X$x,rev(X$x)),col=grey(0.8),border=NA)
-    polygon(c(X$Mean-X$Sd,rev(X$Mean+X$Sd)),c(X$x,rev(X$x)),col=grey(0.7),border=NA)
-    lines(X$Mean,X$x,lwd=2)
+    plot(X$Mean,X$x,xlim=yrange,type="n",main=Main,ylim=rev(xrange),xlab=xlab,ylab=ylab)
+    polygon(c(X$Min,rev(X$Max)),c(X$x,rev(X$x)),col=col[1],border=NA)
+    polygon(c(X$Mean-X$Sd,rev(X$Mean+X$Sd)),c(X$x,rev(X$x)),col=col[2],border=NA)
+    lines(X$Mean,X$x,...)
   }
  }
 if (! is.null(legpos))

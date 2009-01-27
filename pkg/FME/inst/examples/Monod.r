@@ -1,3 +1,8 @@
+##################################################################
+######           Fitting a Monod function to data           ######
+##################################################################
+# example as in Berthoux and Brown, 2002.
+
 require(FME)
 
 # 1. the observations
@@ -34,9 +39,9 @@ print(sP)
 Covar   <- sP$cov.scaled * 2.4^2/2
 s2prior <- sP$modVariance
 
-# set n0 = 2 to avoid too much updating model variance
+# set wvar0 = 0.2 to avoid too much updating model variance
 MCMC <- modMCMC(f=Residuals,p=P$par,jump=Covar,niter=3000,
-                var0=s2prior,n0=2,updatecov=100,lower=c(0,0))
+                var0=s2prior,wvar0=1,updatecov=100,lower=c(0,0))
 
 plot(MCMC,Full=TRUE)
 pairs(MCMC)
@@ -47,12 +52,14 @@ sP$cov.scaled
 sR<-sensRange(parInput=MCMC$pars,func=Model,x=1:375)
 plot(summary(sR))
 points(Obs)
-
+hist(MCMC,Full=TRUE,col="darkblue")
 
 # increase acceptance rate with delayed rejection
 MCMC2 <- modMCMC(f=Residuals,p=P$par,jump=Covar,niter=3000, ntrydr=3,
-                var0=s2prior,n0=2,updatecov=100,lower=c(0,0))
+                var0=s2prior,wvar0=1,updatecov=100,lower=c(0,0))
 plot(MCMC2,Full=TRUE)
 pairs(MCMC2)
 MCMC2$count
+# show only the posterior model error and the function value
+hist (MCMC,Full=TRUE,what=NULL,col="darkgreen")
 

@@ -20,7 +20,7 @@ sensFun(func,parms,sensvar=NULL,senspar=names(parms),
 
 \method{summary}{sensFun}(object, vars=FALSE, \dots)
 \method{pairs}{sensFun}(x,  \dots)
-\method{plot}{sensFun}(x, main=NULL, legpos="topleft", \dots)
+\method{plot}{sensFun}(x, legpos="topleft", \dots)
 
   }
 \arguments{
@@ -47,7 +47,6 @@ sensFun(func,parms,sensvar=NULL,senspar=names(parms),
   \item{x }{an object of class \code{sensFun}}
   \item{vars }{if FALSE: summaries per parameter are returned; if TRUE: summaries per parameter and per variable are returned.}
   \item{legpos }{position of the legend; set to NULL to avoid legend}
-  \item{main }{a main title for the plot}
   }
 \value{
   a data.frame of class \code{sensFun} containing the sensitivity functions

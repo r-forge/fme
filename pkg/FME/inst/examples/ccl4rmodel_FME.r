@@ -188,11 +188,11 @@ lines(fitted$time,fitted$CP,lwd=2)
 
 # estimate of parameter covariances (to update parameters) and the model variance
 (sP <- summary(MrqFit))
-s2prior<-3000
+s2prior<-sP$modVariance
 
 # adaptive MCMC
-MCMC <- modMCMC(f=Residuals,p=MrqFit$par,jump=c(0.1,1.,0.1),niter=1000,
-                var0=s2prior,n0=5,updatecov=10,lower=c(0,0,0),upper=c(2,2000,2))
+MCMC <- modMCMC(f=Residuals,p=MrqFit$par,niter=1000,
+                var0=s2prior,wvar0=0.1,updatecov=10,lower=c(0,0,0),upper=c(2,2000,2))
 
 plot(MCMC,Full=TRUE)
 pairs(MCMC)
@@ -201,16 +201,15 @@ cov(MCMC$pars)
 sP$cov.scaled
 
 sR<-sensRange(parms=Pm,parInput=MCMC$pars,func=ccl4run)
-plot(SUMM<-summary(sR))
-points(Obs)
+plot(SUMM<-summary(sR), what ="CP")
+points(ChamberConc ~ time,data=Obs)
 
 # DRAM
 MCMC2 <- modMCMC(f=Residuals,p=MrqFit$par,jump=0.5*MrqFit$par,niter=1000,ntrydr=3,
-                var0=s2prior,n0=5,updatecov=10,lower=c(0,0,0),upper=c(2,2000,2))
+                var0=s2prior,wvar0=1,updatecov=10,lower=c(0,0,0),upper=c(2,2000,2))
 plot(MCMC2,Full=TRUE)
 pairs(MCMC2)
 
-plot(SUMM, what ="CP")
-points(ChamberConc ~ time,data=Obs)
+plot(summary(sensRange(parms=Pm,parInput=MCMC2$pars,func=ccl4run)), what ="CP")
 
 

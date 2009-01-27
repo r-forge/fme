@@ -16,7 +16,7 @@ N0    <- 0.1
 # 2. the observations
 #---------------------
 N     <- c(0.1,12,93,96,100)
-Obs<-data.frame(time=seq(0,40,by=10), N=N,err=0.1*N)
+Obs<-data.frame(time=seq(0,40,by=10), N=N)
 
 # show results, compared with "observations"
 plot(Obs$time,Obs$N,  col="red", pch=16,cex=2,
@@ -34,7 +34,7 @@ lines (model(parms,TT) ,lwd=2,col="green")
 ModelCost <- function(P)
 {
  out  <-model(P,TT)
- return(modCost(mod=out,obs=Obs,err="err"))
+ return(modCost(mod=out,obs=Obs))
 }
 
 # Fit in two steps: pseudo-random search finds vicinity of minimum
@@ -58,24 +58,21 @@ plot(MC,main="residuals")
 
 # 4. Markov chain monte carlo
 #---------------------
-#
-MCMC <- modMCMC(f=ModelCost,p=Fit$par,jump=c(0.1,5),
-                lower=c(0,0),updatecov=10)
-plot(MCMC,Full=TRUE) # check convergence
+
+var0 <- summary(Fit)$modVar
+
+MCMC<- modMCMC(f=ModelCost,p=Fit$par,
+                var0=var0,wvar0=1,updatecov=100)
+plot(MCMC,Full=TRUE)
 pairs(MCMC)
-summary(MCMC)
 
-var0 <- MC$var$SSR.unweighted
 
-MCMC2<- modMCMC(f=ModelCost,p=Fit$par,jump=c(0.1,5),var0=var0,n0=4,updatecov=1)
+MCMC2<- modMCMC(f=ModelCost,p=Fit$par,var0=var0,lower=c(0,0),
+                wvar0=1,updatecov=100,ntrydr=2)
 plot(MCMC2,Full=TRUE)
 pairs(MCMC2)
 
+                
 SR <- summary(sensRange(parInput=MCMC2$pars,func=model,time=0:40,sensvar="N"))
 plot(SR,xlab="time",ylab="N",main="MCMC ranges")
 points(Obs)
-
-
-
-MCMC2<- modMCMC(f=ModelCost,p=Fit$par,jump=c(0.1,5),var0=var0,
-                n0=4,updatecov=10,ntrydr=5)
