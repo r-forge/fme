@@ -27,7 +27,8 @@ if (! is.null(parInput))
   {
   dist<-"input"
   nr <- nrow(parInput)
-  if (num >= nr) ii <- 1: num else
+  num <- min(num,nr)
+  if (num == nr) ii <- 1: nr else
                  ii <- sample(1:nr,size=num,replace=FALSE)
   parset <-as.matrix(parInput[ii,])
   if(is.null(parms)) parms <- parInput[1,]
@@ -67,8 +68,8 @@ ndim  <- nrow(yRef)
 grvar <- expand.grid(map,sensvar)
 if (ndim ==1) svar <- sensvar else svar <- paste(grvar[,2],grvar[,1],sep="")
 
-yRef  <- as.vector(yRef[,ivar])
-Sens  <- matrix(ncol=length(yRef),nrow=num,NA)
+YREF  <- as.vector(yRef[,ivar])
+Sens  <- matrix(ncol=length(YREF),nrow=num,NA)
 
 # sensitivity parameters
 senspar <- NULL
@@ -139,9 +140,11 @@ Mean = apply(sens,2,FUN=mean),
 Sd   = apply(sens,2,FUN=sd),
 Min  = apply(sens,2,FUN=min),
 Max  = apply(sens,2,FUN=max),
+q05  = apply(sens,2,FUN=function(x)quantile(x,probs=0.05)),
 q25  = apply(sens,2,FUN=function(x)quantile(x,probs=0.25)),
 q50  = apply(sens,2,FUN=function(x)quantile(x,probs=0.5)),
-q75  = apply(sens,2,FUN=function(x)quantile(x,probs=0.75))
+q75  = apply(sens,2,FUN=function(x)quantile(x,probs=0.75)),
+q95  = apply(sens,2,FUN=function(x)quantile(x,probs=0.95))
 )
 
 rownames(SumSens) <- colnames(sens)
@@ -168,7 +171,7 @@ if (!is.null(what)) Select <- which (var %in% what) else Select <- 1:length(var)
 
 if (nx > 1)
   for (i in Select){
-    yrange<- if ("ylim" %in% nmdots) dots$ylim else range(X$x)  # USED for swap!
+    yrange<- if ("ylim" %in% nmdots) dots$ylim else range(X)  # USED for swap!
     ii <- ((i-1)*nx+1):(i*nx)
 
     if ("main" %in% nmdots) {
@@ -186,7 +189,9 @@ else
 
 plot.summary.sensRange<-function(x,xyswap=FALSE,
                                  what=NULL,legpos="topleft",
-                                 col=c(grey(0.8),grey(0.7)),...)
+                                 col=c(grey(0.8),grey(0.7)),
+                                 quant=FALSE,
+                                 ...)
 {
 nx  <-attr(x,"nx")
 var <-attr(x,"var")
@@ -200,26 +205,43 @@ if (nx > 1)  {    # summary of a times series or a profile...
  for (i in Select){
   ii <- ((i-1)*nx+1):(i*nx)
   X<- x[ii,]
-  yrange<- if ("ylim" %in% nmdots) dots$ylim else range(cbind(X$Min,X$Max))
+  if (quant)
+  {
+  xmin <- X$q05
+  xmax <- X$q95
+  xmean <- X$q50
+  xlow <- X$q25
+  xup  <- X$q75
+  leg  <- c("q05-q95","q25-q75")
+  }else
+  {
+  xmin <- X$Min
+  xmax <- X$Max
+  xmean <- X$Mean
+  xlow <- X$Mean-X$Sd
+  xup  <- X$Mean+X$Sd
+  leg <- c("Min-Max","Mean+-sd")
+  }
+  yrange<- if ("ylim" %in% nmdots) dots$ylim else range(cbind(xmin,xmax))
   xrange<- if ("xlim" %in% nmdots) dots$xlim else range(X$x)
   Main  <- if ("main" %in% nmdots) dots$main else var[i]
   xlab  <- if ("xlab" %in% nmdots) dots$xlab else "x"
   ylab  <- if ("ylab" %in% nmdots) dots$ylab else "y"
   if (!xyswap) {
-    plot(X$x,X$Mean,ylim=yrange,xlim=xrange,type="n",main=Main,xlab=xlab,ylab=ylab)
-    polygon(c(X$x,rev(X$x)),c(X$Min,rev(X$Max)),col=col[1],border=NA)
-    polygon(c(X$x,rev(X$x)),c(X$Mean-X$Sd,rev(X$Mean+X$Sd)),col=col[2],border=NA)
-    lines(X$x,X$Mean,...) }
+    plot(X$x,xmean,ylim=yrange,xlim=xrange,type="n",main=Main,xlab=xlab,ylab=ylab)
+    polygon(c(X$x,rev(X$x)),c(xmin,rev(xmax)),col=col[1],border=NA)
+    polygon(c(X$x,rev(X$x)),c(xlow,rev(xup)),col=col[2],border=NA)
+    lines(X$x,xmean,...) }
   else {
-    plot(X$Mean,X$x,xlim=yrange,type="n",main=Main,ylim=rev(xrange),xlab=xlab,ylab=ylab)
-    polygon(c(X$Min,rev(X$Max)),c(X$x,rev(X$x)),col=col[1],border=NA)
-    polygon(c(X$Mean-X$Sd,rev(X$Mean+X$Sd)),c(X$x,rev(X$x)),col=col[2],border=NA)
-    lines(X$Mean,X$x,...)
+    plot(xmean,X$x,xlim=yrange,type="n",main=Main,ylim=rev(xrange),xlab=xlab,ylab=ylab)
+    polygon(c(xmin,rev(xmax)),c(X$x,rev(X$x)),col=col[1],border=NA)
+    polygon(c(xlow,rev(xup)),c(X$x,rev(X$x)),col=col[2],border=NA)
+    lines(xmean,X$x,...)
   }
  }
 if (! is.null(legpos))
 legend(legpos,fill=c(grey(0.9),grey(0.8)),
-       legend=c("Min-Max","Mean+-sd"),bty="n")
+       legend=leg,bty="n")
 } else             # one summary per variable
 {
  X <- x[Select,]
@@ -230,11 +252,12 @@ legend(legpos,fill=c(grey(0.9),grey(0.8)),
 for (i in 1:nr)
  {
  segments(X$Min[i],i,X$Max[i],i,lty=1)
+ segments(X$q05[i],i,X$q95[i],i,lty=1)
  segments(X$q25[i],i,X$q75[i],i,lwd=3)
  }
 
  if (! is.null(legpos))
- legend(legpos,lwd=c(1,3),legend=c("Min-Max","q25-q75"),bty="n")
+ legend(legpos,lwd=1:3,legend=c("Min-Max","q25-q75","q05-q95"),bty="n")
 
 }
 

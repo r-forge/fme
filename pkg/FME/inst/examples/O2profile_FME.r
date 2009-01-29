@@ -146,17 +146,21 @@ Objective <- function (x)
 
  return(Cost)
 }
+# 2. collinearity of the parameters
+sF<-sensFun(Objective,parms=c(upO2=360,lowO2=10,cons=80,ks=1))
+collin(sF)
 
-# 2. find the minimum; parameters constrained to be > 0
+
+# 3. find the minimum; parameters constrained to be > 0
 print(system.time(Fit<-modFit(p=c(upO2=360,lowO2=10,cons=80,ks=1),
                   f=Objective,lower=c(0,0,0,0))))
 Fit
 (SFit<-summary(Fit))
 
-# 3. plot the residuals
+# 4. plot the residuals
 plot(Objective(Fit$par),xlab="depth",ylab="",main="residual",legpos="top")
 
-# 4. Show best-fit
+# 5. Show best-fit
 modO2 <- O2fun(Fit$par)
 
 plot(O2depth$y,O2depth$x,ylim=rev(range(O2depth$x)),pch=18,
@@ -176,8 +180,8 @@ Covar   <- SFit$cov.scaled * 2.4^2/4
 s2prior <- SFit$modVariance
 
 # adaptive metropolis
-MCMC <- modMCMC(f=Objective,p=Fit$par,jump=Covar,niter=1000,
-                var0=s2prior,wvar0=1,updatecov=10,lower=c(NA,0,NA,0))
+MCMC <- modMCMC(f=Objective,p=Fit$par,jump=Covar,niter=100,ntrydr=3,
+                var0=s2prior,wvar0=1,updatecov=100,lower=c(NA,0,NA,0))
 
 plot(MCMC,Full=TRUE)
 hist(MCMC,Full=TRUE)
@@ -185,7 +189,7 @@ hist(MCMC,Full=TRUE)
 pairs(MCMC,Full=TRUE)
 summary(MCMC)
 cor(MCMC$pars)
-plot(summary(sensRange(parInput=MCMC$par,f=O2fun,num=500)),xyswap=TRUE)
+plot(summary(sensRange(parInput=MCMC$par,f=O2fun,num=100)),xyswap=TRUE)
 
 # 2. mean variance of separate fitted variables are prior for model variance
 # This does not work so well...

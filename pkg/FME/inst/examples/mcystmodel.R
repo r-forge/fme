@@ -162,18 +162,20 @@ Cost(Oderes$par)
 idFun <- function (p) Cost(p)$residual$mod
 
 # Sensitivity functions at "best" values
-sF<-sensFun( func=idFun,parms=BestPar)
+sF<-sensFun( func=idFun,parms=BestPar,map=NULL)
 summary(sF)
 
 pairs(sF)
 
 collin(sF)
 
+# or, equivalently - and quicker!
+sF2 <- sensFun(func=Cost,parms=BestPar)
+collin(sF2,1:6)  # collinearity of all parameters...
+
 #=====================
 # 4. MCMC application
 #=====================
-
-# does not work...
 
 CM <- Cost(FitMrq$par)
 

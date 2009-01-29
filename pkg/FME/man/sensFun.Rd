@@ -24,8 +24,10 @@ sensFun(func,parms,sensvar=NULL,senspar=names(parms),
 
   }
 \arguments{
-  \item{func }{An R-function that has as first argument \code{parms} and that returns a matrix with
-  the values of the output variables (columns), and -optionally- a mapping variable (by default the first column)}
+  \item{func }{An R-function that has as first argument \code{parms} and that either
+     returns a matrix with the values of the output variables (columns), and
+     -optionally- a mapping variable (by default the first column) or an instance
+    of type \code{modCost}. The latter can be used for parameter identifiability}
   \item{parms }{parameters passed as the first argument to \code{solver}} or \code{func}
   \item{sensvar }{the output variables for which the sensitivity needs to be estimated. Either \code{NULL}, the default which will select all output variables,
   or a vector with output variable \code{names} (which should be present in model output matrix),
@@ -63,10 +65,21 @@ sensFun(func,parms,sensvar=NULL,senspar=names(parms),
 
 }
 \details{
-There are essentially three different ways in which the model can be solved.
+There are essentially two ways in which to use function \code{sensFun}.
+
+\itemize{
+\item When \code{func} returns a matrix or data frame with output values,
+\code{sensFun} can be used for sensitivity analysis, estimating the impact of
+parameters on output variables.
+\item When \code{func} returns an instance of class \code{modCost} (as returned
+by a call to function \code{\link{modCost}}), then it can be used for parameter
+identifiability, by using the results from \code{sensFun} as input to function
+\link{collin}. See the help file for collin.
+}
 
 For each sensitivity parameter, the number of sensitivity functions estimated is:
-length(sensvar) * length(mapping variable) and where \code{sensvar} are the selected sensitivity variables.
+length(sensvar) * length(mapping variable) and where \code{sensvar} are the
+selected sensitivity variables.
 
 
 The sensitivity functions are estimated numerically. This means that

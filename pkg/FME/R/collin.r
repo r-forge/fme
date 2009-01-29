@@ -9,9 +9,18 @@ if (colnames(sensfun)[1]=="x" && colnames(sensfun)[2] == "var")
    Sens <- sensfun[,-(1:2)] else Sens<-sensfun
 
 npar <- ncol(Sens)
+L2 <- sqrt(colSums(Sens*Sens))
+
+iNa <- 0
+# Check for non-identifiable parameters
+if (any(L2==0)){
+  iNa<-which(L2==0)
+  warning (paste("Sensitivity of parameter",colnames(Sens)[iNa],"is 0! "))
+}
 if (npar > 14)
     warning ("will reduce collinearity estimates: too many combinations")
-normSens <- t(t(Sens) / sqrt(colSums(Sens*Sens)))
+
+normSens <- t(t(Sens) / L2)
 
 
 Collin <- NULL
@@ -24,7 +33,9 @@ collFun <- function(cc)
   {
    ii    <- cc[i,]
    S     <- normSens[,ii]
-   id    <- 1/sqrt(min(eigen(t(S)%*%S)$value))
+   Nident <- (iNa != 0 & iNa %in% ii)
+   if (Nident) id <- Inf
+   else id    <- 1/sqrt(min(eigen(t(S)%*%S)$value))
    psub     <- rep(0,npar)
    psub[ii] <- 1
    n        <- ncol(cc)

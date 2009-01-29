@@ -15,7 +15,7 @@ require(FME)
 pars <- list(gmax =0.5,eff = 0.5,
               ks =0.5, rB =0.01, dB =0.01)
 
-solveBact <- function(pars)
+solveBact <- function(pars, tout = seq(0,50,by=0.5))
 {
  derivs <- function(t,state,pars)     # returns rate of change
   {
@@ -29,7 +29,6 @@ solveBact <- function(pars)
   }
 
  state   <- c(Bact=0.1,Sub = 100)
- tout    <- seq(0,50,by=0.5)
 
  # ode solves the model by integration...
  return(as.data.frame(ode(y=state,times=tout,func=derivs,parms=pars)))
@@ -151,6 +150,9 @@ Objective <- function (x,out=Run(x))      # Model cost
  return(modCost(obs=Data,model=out,cost=Cost))
 }
 
+sF <- sensFun(func=Objective,parms=pars[c("gmax","eff")],varscale=1)
+collin(sF)
+
 # 2. modFit finds the minimum; parameters constrained to be > 0
 print(system.time(Fit<-modFit(p=c(0.5,0.5),f=Objective)))
 
@@ -212,4 +214,4 @@ MC2<-as.mcmc(MCMC2$pars)
 MClist <- as.mcmc.list(list(MC,MC2))
 gelman.diag(MClist)
 
-cumuplot(MC)
+cumuplot(MC2)

@@ -181,14 +181,16 @@ Objective <- function(X)
 
  modCost(model=out,obs=Data,x="dist")            # return SSR between model and data
 }
+# 2. Are these identifiable?  (collinearity of ~20 is critical)
+collin(sensFun(func=Objective,parms=c(r=0.5,p=0.5,ks=1),varscale=1))
 
-# 2. nlminb finds the minimum; parameters constrained to be > 0
+# 3. nlminb finds the minimum; parameters constrained to be > 0
 print("Port")
-print(system.time(Fit<-modFit(p=c(r=1,p=1,ks=1),
+print(system.time(Fit<-modFit(p=c(r=0.5,p=0.5,ks=1),
                   f=Objective,lower=c(0,0,0),method="Port")))
 summary(Fit)
 
-# 3. run the model with best-fit parameters
+# 4. run the model with best-fit parameters
 pars[c("r","p","ks")]<-Fit$par
 O2new    <- O2BOD(pars)
 
@@ -206,9 +208,9 @@ legend("bottomright",c("initial guess","fitted"),
 ## Fit the model to data using the Levenberg-Marquardt algorithm ##
 ##===============================================================##
 ##===============================================================##
-# needs good initial conditions..
+
 print("Levenberg-Marquardt")
-print(system.time(FitMrq <- modFit(p=c(r=0.1,p=.1,ks=.1),
+print(system.time(FitMrq <- modFit(p=c(r=0.5,p=.5,ks=1),
                  f=Objective,lower=c(0,0,0))))
 
 summary(FitMrq)

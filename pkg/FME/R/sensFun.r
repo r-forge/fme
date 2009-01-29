@@ -34,7 +34,20 @@ sensFun <- function(func,
 Solve <- function(parms) func(parms,...)
 
 yRef  <- Solve(parms)
+Type <- 1
 
+if (class(yRef)=="modCost")
+  { Res    <- yRef$residuals
+    ynames <- Res$name
+    yRef <- cbind(Res$x,Res$mod)
+    names(yRef) <- ynames
+    Type <- 2
+    sensvar <- NULL   # input of sensvar not allowed for modCost type
+    Solve <- function(parms) {
+      Res<- func(parms,...)$residuals
+      cbind(Res$x,Res$mod)
+    }
+  }
 # if a data.frame or a vector is returned, make it a matrix
 if (is.data.frame(yRef)) yRef <- as.matrix(yRef)
 if (is.vector(yRef))
@@ -66,7 +79,8 @@ if (is.null(map)) map   <- 1:nrow(yRef) else map <- yRef[,map]
 
 nout  <- length(ivar)
 ndim  <- nrow(yRef)
-grvar <- expand.grid(map,sensvar)
+if (Type ==1) grvar <- expand.grid(map,sensvar) else
+grvar<-data.frame(x=map,var=ynames)
 if (ndim ==1) svar <- sensvar else svar <- paste(grvar[,2],grvar[,1],sep="")
 
 yRef  <- as.vector(yRef[,ivar])
@@ -115,7 +129,7 @@ attr(Sens,"varscale") <- varscale
 attr(Sens,"var") <- sensvar
 attr(Sens,"nx") <- length(map)
 attr(Sens,"x")   <- map
-
+attr(Sens,"Type") <- Type  # type 1: modCost
 return(Sens)
 }
 
@@ -141,6 +155,10 @@ out <- data.frame(
            )
 out$L2 <- sqrt(out$L2)/out$N
 out$var <- unique(Vars)
+np<-length(pp)
+nv<-length(unique(Vars))
+out <- data.frame(cbind(value=rep(pp,times=rep(nv,np)),
+                        scale=rep(parscale,times=rep(nv,np)),out))
 } else {
 # global summaries
 L1   <- colMeans(abs(Sens))
@@ -148,7 +166,8 @@ L2   <- sqrt(colSums(Sens*Sens))/nout
 Mean <- colMeans(Sens)
 Min  <- apply(Sens,2,min)
 Max  <- apply(Sens,2,max)
-out  <- data.frame(cbind(value=pp,scale=parscale,L1,L2,Mean,Min,Max))
+N  <- apply(Sens,2,length)
+out  <- data.frame(cbind(value=pp,scale=parscale,L1,L2,Mean,Min,Max,N))
 rownames(out) <- names(pp)
 }
 class(out) <- c("summary.sensFun","data.frame")
@@ -189,4 +208,28 @@ plot.sensFun<- function(x,legpos="topleft",...)
   nc <- ncol(x) - 2
   if (! is.na(legpos)) legend(legpos,names(x[,-(1:2)]),col=1:nc,lty=1:nc)
 
+}
+
+plot.summary.sensFun<- function(x,...)
+{
+  dots <- list(...)
+  nmdots <- names(dots)
+
+  nr <- nrow(x)
+
+  if ("main" %in% nmdots)
+    dotchart(c(x$Mean,Inf),labels=rownames(x),xlim=range(c(x$Min,x$Max)),
+             pch=3,...)
+  else dotchart(c(x$Mean,Inf),labels=rownames(x),xlim=range(c(x$Min,x$Max)),
+             pch=3, main="Sensitivity")
+
+ # add ranges
+ for (i in 1:nr)
+ {
+ segments(x$Min[i],i,x$Max[i],i,lty=1)
+ }
+ points(x$L1,1:nr,pch=16,col="red")
+ points(x$L2,1:nr,pch=18,col="blue")
+
+ legend("top",legend=c("L1","L2","Mean"),pch=c(3,16,18),col=c("black","red","blue"),ncol=3)
 }

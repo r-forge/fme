@@ -22,7 +22,7 @@
 \title{\proglang{R}-package \fme: utilities for the application of models consisting of differential equations}
 \Plaintitle{FME}
 
-\Keywords{simlation models, differential equations, fitting, sensitivity, monte carlo, identifiability,
+\Keywords{simulation models, differential equations, fitting, sensitivity, monte carlo, identifiability,
   \proglang{R}}
 
 \Plainkeywords{simulation models, differential equations, fitting, sensitivity, monte carlo, identifiability, R}
@@ -62,6 +62,7 @@ of models, consisting of differential equations. This is a preliminary version.}
 <<preliminaries,echo=FALSE,results=hide>>=
 library("FME")
 options(prompt = "> ")
+options(width=70)
 @
 
 \maketitle
@@ -76,16 +77,21 @@ options(prompt = "> ")
 Although \fme can work with many types of functions, it is mainly meant to be used with models that are written as
 (a system of) differential equations (ordinary or partial), which
 are solved either with routines from package \code{deSolve} \citep{deSolve}, which integrate the model in time,
-of from package \code{rootSolve} \citep{rootSolve} which estimate steady-state conditions.
+or from package \code{rootSolve} \citep{rootSolve} which estimate steady-state conditions.
 
 \fme contains:
 \begin{itemize}
-\item functions to perform local and global sensitivity analysis
-\item functions to perform identifiability analysis
-\item a function to estimate the model cost function, useful for fitting a model to data.
-\end{itemize}
+\item Functions to perform local and global sensitivity analysis
+\item A function to perform parameter identifiability analysis
+\item A function to estimate the model cost function, useful for fitting a model to data.
+\item Functions to fit a model to data.
+\item A function to run a markov chain monte carlo (MCMC).
 
-In addition, there are functions to generate parameter combinations corresponding to a certain distribution.
+\end{itemize}
+Most of these functions have suitable methods for printing, visualising output etc...
+
+In addition, there are functions to generate parameter combinations corresponding
+to a certain distribution.
 
 In this document a -very quick- survey of de functionality are given, based on a
 simple model from \citep{Soetaert08}.
@@ -103,13 +109,28 @@ The model equations are:
 where the first, second and third term of the rate of change of \code{Bact} is growth of bacteria,
 death and respiration respectively.
 
-In \R, this model is implemented and solved as (see help pages of \ds):
+In \R, this model is implemented and solved as follows (see help pages of \ds):
+
+First the parameters are defined, as a list (a vector would also do)
 <<>>=
-# the parameters
 pars <- list(gmax =0.5,eff = 0.5,
               ks =0.5, rB =0.01, dB =0.01)
+@
 
-# runs the model
+The model function \code{solveBact} takes as input the parameters and the time
+sequence at which output is wanted.
+
+Within this function, \code{derivs} is defined, which is the \emph{derivative}
+function, called at each time step by the solver. It takes as input the current
+time (\code{t}), the current values of the state variables (\code{state}) and
+the parameters (\code{pars}). It returns the rate of change of the state variables,
+packed as a list.
+
+Also within function \code{solveBact}, the state variables are given an initial
+condition (\code{state}) and the model solved by integration, using function
+\code{ode} from package \code{deSolve}. The results of the integration are
+returned, packed as a data.frame.
+<<>>=
 solveBact <- function(pars, times=seq(0,50,by=0.5))
 {
  derivs <- function(t,state,pars)     # returns rate of change
@@ -127,7 +148,10 @@ solveBact <- function(pars, times=seq(0,50,by=0.5))
  # ode solves the model by integration...
  return(as.data.frame(ode(y=state,times=times,func=derivs,parms=pars)))
 }
+@
 
+The model is solved by calling \code{solveBact} with the default parameters:
+<<>>=
 out <- solveBact(pars)
 @
 and output plotted as:
@@ -166,7 +190,7 @@ rownames(parRanges)<- c("gmax","eff","rB")
 parRanges
 @
 
-First we estimate the sensitivity to one parameter, \code{rB} (parameter 3), varying its values
+Then we estimate the sensitivity to one parameter, \code{rB} (parameter 3), varying its values
 according to a regular grid (\code{dist=grid}). The effect of that on sensitivitiy
 variables \code{Bact} and \code{Sub} are estimated.
 To do this, the model is run 100 times (\code{num=100}). The \code{system.time} is printed (in seconds)
@@ -174,20 +198,25 @@ To do this, the model is run 100 times (\code{num=100}). The \code{system.time} 
 <<>>=
 tout    <- 0:50
 print(system.time(
-Sens <- summary(sensRange(func=solveBact,parms=pars,dist="grid",
-                   sensvar="Bact",parRange=parRanges[3,],num=100))
+sR<-sensRange(func=solveBact,parms=pars,dist="grid",
+                sensvar=c("Bact","Sub"),parRange=parRanges[3,],num=50)
 ))
-head(Sens)
+head(summary(sR))
 @
 The results are represented as a data.frame, containing summary information of the
 value of the sensitivity variable (\code{var}) at each time step (\code{x}).
 
-It is relatively simple to plot ranges around the mean value.
+It is relatively simple to plot the ranges, either as min+-std or using quantiles.
 
 <<label=sens,include=FALSE>>=
-plot(Sens,main="Sensitivity rB",xlab="time, hour",ylab="molC/m3")
+par(mfrow=c(2,2))
+plot(summary(sR),main="Sensitivity rB",xlab="time, hour",ylab="molC/m3",
+    legpos="topright")
+plot(summary(sR),main="Sensitivity rB",xlab="time, hour",ylab="molC/m3",
+     quant=TRUE,col=c("lightblue","darkblue"),legpos="topright")
+par(mfrow=c(1,1))
 @
-\setkeys{Gin}{width=0.4\textwidth}
+\setkeys{Gin}{width=0.8\textwidth}
 \begin{figure}
 \begin{center}
 <<label=sensfig,fig=TRUE,echo=FALSE>>=
@@ -221,19 +250,23 @@ plot(Sens2,main="Sensitivity gmax,eff,rB",xlab="time, hour",ylab="molC/m3")
 
 
 \section{Local sensitivity}
-In local sensitivity, the effect of a parameter value near its nominal value is estimated.
+In local sensitivity, the effect of a parameter value in a very small region
+near its nominal value is estimated.
 
 The methods implemented in \fme are based on \citep{Brun} which should be consulted for details.
 
 They are based on so-called "sensitivity functions".
 
 \subsection{Sensitivity functions}
+Sensitivity functions are generated with \code{sensFun}, and estimate the effect
+of a selection of parameters (here all parameters are selected) on a selection
+of variables (here only \code{Bact}).
 <<>>=
 SnsBact<- sensFun(func=solveBact,parms=pars,
                    sensvar="Bact",varscale=1)
 head(SnsBact)
 @
-which can easily be plotted:
+They can easily be plotted:
 <<label=sfun, include=FALSE>>=
 plot(SnsBact)
 
@@ -254,10 +287,16 @@ allow to rank the parameters based on their influence on the selected variables.
 <<>>=
 summary(SnsBact)
 @
+
+Sensitivity analysis can also be performed on several variables:
+<<>>=
+summary(sensFun(solveBact,pars,varscale=1),var=TRUE)
+@
 \subsection{Bivariate sensitivity}
 
-The pairwise relationships in paramter sensitivity is easily assessed by plotting the
-sensitivity functions using \R-function \code{pairs}, and calculating the correlation.
+The pairwise relationships in parameter sensitivity is easily assessed by
+plotting the sensitivity functions using \R-function \code{pairs}, and
+by calculating the correlation.
 
 <<>>=
 cor(SnsBact[,-(1:2)])
@@ -280,34 +319,19 @@ pairs(SnsBact)
 \section{multivariate sensitivity analysis}
 Based on the sensitivity functions of model variables to selection of parameters,
 function \code{collin} calculates the \emph{collinearity} or
-\emph{identifiability} of sets of parameter.
+\emph{identifiability} of sets of parameters.
 
-The larger the collinearity value, the less identifiable the data set.
-In general a collinearity value less than about 20 is "identifiable"
 
 <<>>=
 Coll <- collin(SnsBact)
 Coll
 Coll [Coll[,"collinearity"]<20&Coll[,"N"]==4,]
+collin(SnsBact,parset=1:5)
 @
 
-Below we plot the collinarity as a function of the number of parameters selected.
-We add a line at the height of 20, shich is a critical value
-
-<<label=coll, include=FALSE>>=
-plot(Coll,log="y")
-abline(h=20,col="red")
-@
-\setkeys{Gin}{width=0.4\textwidth}
-\begin{figure}
-\begin{center}
-<<label=collfig,fig=TRUE,echo=FALSE>>=
-<<coll>>
-@
-\end{center}
-\caption{Collinearity analysis - see text for \R-code}
-\label{fig:coll}
-\end{figure}
+The higher the value, the larger the (approximate) linear dependence. This
+function is mainly useful to derive suitable parameter sets that can be
+calibrated based on data (see next section).
 
 \section{Fitting the model to data}
 \subsection{data structures}
@@ -396,26 +420,15 @@ head(Data)
 and assume that we want to fit the model parameters \code{gmax} and \code{eff} to these
 data.
 
-First it is instructive to establish whether these parameters are identifiable based
-on the data set. We assess that by means of the identifiability function \code{collin},
-selecting only the output variables at the instances when there is an observation.
+We first define an objective function that returns the residuals of the model
+versus the data, as estimated by \code{modcost}.
+Input to the function are the current values of the parameters that need to be
+finetuned and their names (or position in \code{par}).
 
 <<>>=
-collin(sensFun(func=solveBact,times=Data[,1],parms=pars,
-              senspar=c("gmax","eff"),sensvar="Bact",varscale=1))
-@
-The collinearity index is small enough to enable estimating both parameters.
-
-We next define an objective function that returns the sum of squared residuals, which
-should be minimised. Input to the function are the current values of the parameters.
-
-After updating the parameter vector with the new values, the model is run and the
-model cost estimated by comparing the model output with the data, and using function \code{modCost}.
-
-<<>>=
-Objective <- function (x)
+Objective <- function (x,parset=names(x))
 {
- pars[c("gmax","eff")]<- x
+ pars[parset]<- x
  tout    <- seq(0,50,by=0.5)
 
  # output times
@@ -424,12 +437,50 @@ Objective <- function (x)
  return(modCost(obs=Data,model=out))
 }
 @
-We then use function \code{modFit} to locate the minimum. It includes several fitting procedures;
+First it is instructive to establish which parameters are identifiable based
+on the data set.
+
+We assess that by means of the identifiability function \code{collin},
+selecting only the output variables at the instances when there is an observation.
+
+<<>>=
+Coll <- collin(sF<-sensFun(func=Objective,parms=pars,varscale=1))
+Coll
+@
+The larger the collinearity value, the less identifiable the data set.
+In general a collinearity value less than about 20 is "identifiable"
+
+Below we plot the collinarity as a function of the number of parameters selected.
+We add a line at the height of 20, the critical value
+
+<<label=coll, include=FALSE>>=
+plot(Coll,log="y")
+abline(h=20,col="red")
+@
+\setkeys{Gin}{width=0.4\textwidth}
+\begin{figure}
+\begin{center}
+<<label=collfig,fig=TRUE,echo=FALSE>>=
+<<coll>>
+@
+\end{center}
+\caption{Collinearity analysis - see text for \R-code}
+\label{fig:coll}
+\end{figure}
+
+The collinearity index for parameters \code{gmax} and \code{eff} is small enough
+to enable estimating both parameters.
+
+<<>>=
+collin(sF,parset=1:2)
+@
+We now use function \code{modFit} to locate the minimum. It includes several fitting procedures;
 the default one is the Levenberg-marquardt algorithm.
 
 Parameters are constrained to be > 0
 <<>>=
-print(system.time(Fit<-modFit(p=c(0.5,0.5),f=Objective,lower=c(0.,0.))))
+print(system.time(Fit<-modFit(p=c(gmax=0.5,eff=0.5),
+                  f=Objective,lower=c(0.,0.))))
 summary(Fit)
 @
 
@@ -460,7 +511,7 @@ and the model outcome compared to data.
 
 Finally, model residuals are plotted
 <<label=res, include=FALSE>>=
- plot(Cost$residual$x, Cost$residual$res,xlab="time",ylab="",main="residual")
+ plot(Cost, xlab="time",ylab="",main="residuals")
 @
 \setkeys{Gin}{width=0.4\textwidth}
 \begin{figure}
@@ -479,7 +530,7 @@ We can use the results of the fit to run a MCMC (\citep{Gelman}).
 Function \code{modMCMC} implements the delayed rejection (DR) adaptive
 metropolis (AM) algorithm (\citep{Haario05})
 
-The \code{summary} method of the best fit returns several usefull values:
+The \code{summary} method of the best fit returns several useful values:
 \begin{itemize}
 \item the model variance \code{modVarianc} is used as the initial model error variance
 (\code{var0}).

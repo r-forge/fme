@@ -22,7 +22,8 @@ sensRange(func,parms=NULL,sensvar=NULL,dist="unif",
 
 \method{summary}{sensRange}(object,  \dots)
 \method{plot}{summary.sensRange}(x, xyswap =FALSE,
-              what=NULL, legpos="topleft",col=c(grey(0.8),grey(0.7)), \dots)
+              what=NULL, legpos="topleft",
+              col=c(grey(0.8),grey(0.7)), quant =FALSE, \dots)
 \method{plot}{sensRange}(x, xyswap =FALSE,
               what=NULL,\dots)
 
@@ -66,6 +67,7 @@ sensRange(func,parms=NULL,sensvar=NULL,dist="unif",
   \item{xyswap }{if TRUE, then x-and y-values are swapped and y-axis is from top to bottom. Useful for drawing vertical profiles}
   \item{what }{the name or the number of the variables that should be plotted}
   \item{col }{the two colors of the polygons that should be plotted}
+  \item{quant }{if TRUE, then the median surrounded by the quantiles q25-q75 and q95-q95 are plotted, else the min-max and mean+- sd are plotted}
   \item{... }{additional arguments passed to function \code{func} or to the methods}
   }
 \value{

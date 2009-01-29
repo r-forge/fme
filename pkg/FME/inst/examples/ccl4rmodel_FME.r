@@ -165,6 +165,10 @@ Residuals <- function(P)
  return(out$CP-Obs$ChamberConc)
 }
 
+# Are the parameters identifiable based on the data?   (CONC is NOT)
+collin(sensFun(f=Residuals,parms= c(VMAX=0.04,CONC=1000,KM=0.4),map=NULL))
+
+
 (MrqFit<-modFit(p=c(VMAX=0.04,CONC=1000,KM=0.4),
              lower=c(0,0,0),f=Residuals))
 summary(MrqFit)

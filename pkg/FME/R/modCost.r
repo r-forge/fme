@@ -107,16 +107,20 @@ if (! is.null(err))    # weighing
    if (length(ix) >0) xDat   <- obs[,1]
    obsdat    <- obs[,i]
    }
-   if (ierr>0) Err <- obs[iDat,ierr] else
+   if (length(ix) >0) ModVar   <- approx(xMod,yMod,xout=xDat)$y else
+   {ModVar <- mean(yMod)
+    obsdat <- mean(obsdat)
+   }
+   iex <- which(!is.na(ModVar))
+   ModVar <- ModVar[iex]
+   obsdat <- obsdat[iex]
+   xDat   <- xDat[iex]
+   if (ierr>0) {Err <- obs[iDat,ierr]; Err <- Err[ix]} else
    { if (weight=="std")   Err <- sd (obsdat) else
      if (weight=="mean")  Err <- mean(abs(obsdat)) else Err<-1
    }
    if (any(is.na(Err))) stop(paste("error: cannot estimate weighing for observed variable: ",Names[i]))
    if (min(Err) <= 0) stop(paste("error: weighing for observed variable is 0 or negative:",Names[i]))
-   if (length(ix) >0) ModVar   <- approx(xMod,yMod,xout=xDat)$y else
-   {ModVar <- mean(yMod)
-    obsdat <- mean(obsdat)
-   }
    if (scaleVar) Scale <- 1/length(obsdat) else Scale <- 1
    Res <- (ModVar- obsdat)
    res <- Res/Err
