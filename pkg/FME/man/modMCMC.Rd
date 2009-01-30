@@ -89,10 +89,10 @@ R-function \code{f} is called as \code{f(p,...)}. It should return either -2 tim
 likelihood of the model (one value), the residuals between model and data or an item of class
 \code{modFit} (as created by function \code{\link{modFit}}.
 
-In the latter two cases, it is assumed that the prior distribution for $\theta$ is gaussean,
+In the latter two cases, it is assumed that the prior distribution for \eqn{\theta} is gaussian,
 and can be treated as a sum of squares (SS). The posterior for the parameters will be estimated as:
 \deqn{p(\theta | y,\sigma^2)\propto exp(-0.5*(SS(\theta^2)/\sigma^2+SS_{pri}(\theta))}
-and where $\sigma^2$ is the error variance.
+and where \eqn{\sigma^2} is the error variance.
 
 The error variance $\sigma^2$ is considered a nuisance parameter. A prior distribution
 of it should be specified and a posterior distribution estimated.
