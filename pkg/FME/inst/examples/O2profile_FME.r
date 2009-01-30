@@ -19,8 +19,8 @@ require(FME)
 pars <- c(upO2=360,  # concentration at upper boundary, mmolO2/m3
           lowO2=10,  # concentration at lower boundary, mmolO2/m3
           cons=80,   # consumption rate, mmolO2/m3/day
-          ks=1)      # O2 half-saturation ct, mmolO2/m3
-
+          ks=1,      # O2 half-saturation ct, mmolO2/m3
+          D=1)       # Diffusion coefficient
 # The model grid
 n  <- 100                       # nr grid points
 dx <- 0.05   #cm
@@ -34,7 +34,7 @@ O2fun <- function(pars)
   {
   with (as.list(pars),{
 
-    Flux <- -diff(c(upO2,O2,lowO2))/dX
+    Flux <- -D* diff(c(upO2,O2,lowO2))/dX
     dO2  <- -diff(Flux)/dx-cons*O2/(O2+ks)
 
     return(list(dO2,UpFlux = Flux[1],LowFlux = Flux[n+1]))
@@ -147,7 +147,9 @@ Objective <- function (x)
  return(Cost)
 }
 # 2. collinearity of the parameters
-sF<-sensFun(Objective,parms=c(upO2=360,lowO2=10,cons=80,ks=1))
+sF<-sensFun(Objective,parms=c(upO2=360,lowO2=10,cons=80,ks=1,D=1))
+
+summary(sF)
 collin(sF)
 
 

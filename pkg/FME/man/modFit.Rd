@@ -5,6 +5,7 @@
 \alias{coef.modFit}
 \alias{residuals.modFit}
 \alias{df.residual.modFit}
+\alias{plot.modFit}
 \alias{print.summary.modFit}
 \title{Constrained fitting}
 \description{Fitting a model to data, with lower and/or upper bounds}
@@ -23,6 +24,8 @@ control=list(),hessian=TRUE)
 \method{residuals}{modFit}(object, \dots)
 
 \method{df.residual}{modFit}(object, \dots)
+
+\method{plot}{modFit}(x, \dots)
 
 \method{print}{summary.modFit}(x, digits = max(3, getOption("digits") - 3),
                \dots)

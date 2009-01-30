@@ -82,10 +82,10 @@ or from package \code{rootSolve} \citep{rootSolve} which estimate steady-state c
 \fme contains:
 \begin{itemize}
 \item Functions to perform local and global sensitivity analysis
-\item A function to perform parameter identifiability analysis
+\item A function to perform parameter identifiability analysis (\citep{Brun})
 \item A function to estimate the model cost function, useful for fitting a model to data.
 \item Functions to fit a model to data.
-\item A function to run a markov chain monte carlo (MCMC).
+\item A function to run a markov chain monte carlo (MCMC) (\citep{Haario06}.
 
 \end{itemize}
 Most of these functions have suitable methods for printing, visualising output etc...
@@ -528,7 +528,7 @@ Finally, model residuals are plotted
 We can use the results of the fit to run a MCMC (\citep{Gelman}).
 
 Function \code{modMCMC} implements the delayed rejection (DR) adaptive
-metropolis (AM) algorithm (\citep{Haario05})
+metropolis (AM) algorithm (\citep{Haario06})
 
 The \code{summary} method of the best fit returns several useful values:
 \begin{itemize}
@@ -655,7 +655,8 @@ with imposed upper and lower boundary concentration
 
 
 \section{finally}
-This vignette is mainly a Sweave \citep{Leisch02} translation of part of the \fme help files.
+This vignette is mainly a Sweave \citep{Leisch02} translation of part of the \fme help files
+and examples.
 
 \clearpage
 \begin{table*}[t]

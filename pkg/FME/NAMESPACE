@@ -26,3 +26,4 @@ S3method("plot",    "sensRange")
 S3method("plot","summary.sensRange")
 
 S3method("plot","modCost")
+S3method("plot","modFit")

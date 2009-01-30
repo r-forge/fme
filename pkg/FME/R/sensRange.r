@@ -176,7 +176,7 @@ if (nx > 1)
 
     if ("main" %in% nmdots) {
     if (!xyswap) matplot(X,t(sens[,ii]),type="l",...)
-    else matplot(t(sens[,ii]),X,type="l",ylim=rev(yrange))
+    else matplot(t(sens[,ii]),X,type="l",ylim=rev(yrange),...)
     }else {
     Main  <- var[i]
     if (!xyswap) matplot(X,t(sens[,ii]),type="l",main=Main,...)

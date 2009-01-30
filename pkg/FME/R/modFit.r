@@ -242,3 +242,37 @@ print.summary.modFit <-
   }
   invisible(x)
 }
+
+plot.modFit <- function(x,...)
+
+{
+  vn  <- unique(names(x$residuals))
+  lvn <- max(1,length(vn))
+
+  np <- NP <- lvn
+  if(! is.null(x$rsstrace)) np <- np +1
+
+  dots   <- list(...)
+  nmdots <- names(dots)
+
+  if (! "mfrow" %in% nmdots)
+  {
+  nc <- ceiling(sqrt(np))
+  nr <- ceiling(np/nc)
+  mfrow <- c(nr,nc)
+  } else mfrow <- dots$mfrow
+
+  if (! is.null(mfrow)){
+    mf <- par(mfrow=mfrow)
+    on.exit(par(mf))
+  }
+
+  if(! is.null(x$rsstrace))
+    plot(x$rsstrace,main="residual sum of squares",xlab="iteration",ylab="-",log="y")
+
+  if(is.null(vn))
+    {plot(x$residuals,ylab="-",main="residuals",pch=18,...)}
+  else for(i in vn)
+  { ii <- which (names(x$residuals)==i)
+   plot(x$residuals[ii],main=i,ylab="residuals",pch=18,...)}
+}

@@ -41,7 +41,6 @@ collFun <- function(cc)
    n        <- ncol(cc)
    Collin   <<- rbind(Collin,c(psub,n,id))
   }
-
 }
 if (is.null(parset)){
 
@@ -69,8 +68,13 @@ if (is.null(parset)){
 {
 if (! is.vector(parset))
   stop("'parset' should be a vector")
-parset<-matrix(nr=1,parset)
-collFun(parset)
+if (is.character(parset))
+  {
+  pnames<-colnames(Sens)
+  parset <- which (pnames%in%parset)
+  }
+  parset<-matrix(nr=1,parset)
+  collFun(parset)
 }
 Collin <- as.data.frame(Collin)
 

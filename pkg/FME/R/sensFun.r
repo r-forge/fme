@@ -107,6 +107,10 @@ dp[ii]  <- sign(dp[ii])*tiny
 if (is.null(parscale)) parscale <- pp else parscale<-rep(parscale,npar)
 if (is.null(varscale)) varscale <- yRef else varscale <- rep (varscale,length(yRef))
 
+# 0 is set equal to a very small number (e-10)
+varscale[varscale == 0]<-1e-20
+parscale[parscale == 0]<-1e-20
+
 Sens    <- matrix(nrow=length(yRef),ncol=npar,NA)
 
 for (i in 1:length(ipar))
