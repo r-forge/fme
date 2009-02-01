@@ -94,15 +94,15 @@ and can be treated as a sum of squares (SS). The posterior for the parameters wi
 \deqn{p(\theta | y,\sigma^2)\propto exp(-0.5*(SS(\theta^2)/\sigma^2+SS_{pri}(\theta))}
 and where \eqn{\sigma^2} is the error variance.
 
-The error variance $\sigma^2$ is considered a nuisance parameter. A prior distribution
+The error variance \eqn{\sigma^2} is considered a nuisance parameter. A prior distribution
 of it should be specified and a posterior distribution estimated.
 
-At each step, 1/ the error variance ($\sigma^{-2}$ ) is sampled from a gamma distribution:
+At each step, 1/ the error variance (\eqn{\sigma^{-2}} ) is sampled from a gamma distribution:
 \deqn{p(\sigma^{-2}|y,\theta) \sim \Gamma(0.5*(n_0+n),0.5*(n_0*var0+SS(\theta)))}
 
 where \code{n} is the number of data points and where \eqn{n0=n*wvar0}
 The prior parameters
-(\code{var0}) and \code{pvar0} are the prior mean for $\sigma^2$ and the prior accuracy.
+(\code{var0}) and \code{pvar0} are the prior mean for \eqn{\sigma^2} and the prior accuracy.
 
 By setting \code{wvar0} equal to 1, equal weight is given to the prior and the current value.
 
@@ -158,9 +158,9 @@ size of the target distribution.
 Setting \code{updatecov} smaller to \code{niter} will trigger this function.
 In this case, every \code{updatecov} iterations, the jump covariance matrix will be estimated
 from the covariance matrix of the saved parameter values. The covariance matrix is scaled
-with $(2.4^2/npar)$ where npar is the number of parameters, unless \code{covscal} has
+with \eqn{(2.4^2/npar)} where npar is the number of parameters, unless \code{covscal} has
 been given a different value.
-Thus, \eqn{Jump= ( cov(p1,p2,....pn) \cdot diag(np,+1e^{-16}) /(2.4^2/npar)} where the small number $1e^{-16}$ is added
+Thus, \eqn{Jump= ( cov(p1,p2,....pn) \cdot diag(np,+1e^{-16}) /(2.4^2/npar)} where the small number \eqn{1e^{-16}} is added
 on the diagonal of the covariance matrix to prevent it from becoming singular.
 
 Note that, a problem of adapting the proposal distribution using the MCMC results so
