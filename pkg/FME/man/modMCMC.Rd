@@ -355,6 +355,10 @@ points(Obs,pch=16,cex=1.5)
 }
 \author{Karline Soetaert <k.soetaert@nioo.knaw.nl>}
 \references{
+Laine, M, 2008. Adaptive MCMC methods with applications in environmental and geophysical models,
+  Finnish meteorological institute contributions n0 69 -ISBN 978-951-697-662-7,
+  Finnish meteorological institute, Helsinki.
+
 H. Haario, E. Saksman and J. Tamminen, 2001. An adaptive Metropolis algorithm Bernoulli 7, pp. 223-242.
 
 H. Haario, E. Saksman and J. Tamminen, 2005. Componentwise adaptation for high dimensional MCMC.

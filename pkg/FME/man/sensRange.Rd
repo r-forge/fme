@@ -6,11 +6,12 @@
 
 \title{Global sensitivity analysis}
 \description{Given a model consisting of differential equations, estimates
-the global effect of certain (sensitivity) parameters on selected sensitivity variables.
+the global effect of certain (sensitivity) parameters on a time series (or 1-D spatial
+series) of selected sensitivity variables.
 
 This is done by drawing parameter values according to some predefined distribution, running
-the model with each of these parameter combinations, and calculating summary statistics for
-the selected output variables at each output interval.
+the model with each of these parameter combinations, and calculating the
+values selected output variables at each output interval.
 
 This function thus produces 'envelopes' around the sensitivity variables.
 
@@ -23,15 +24,17 @@ sensRange(func,parms=NULL,sensvar=NULL,dist="unif",
 \method{summary}{sensRange}(object,  \dots)
 \method{plot}{summary.sensRange}(x, xyswap =FALSE,
               what=NULL, legpos="topleft",
-              col=c(grey(0.8),grey(0.7)), quant =FALSE, \dots)
+              col=c(grey(0.8),grey(0.7)),
+              quant =FALSE,xlab=NULL, ylab=NULL, \dots)
 \method{plot}{sensRange}(x, xyswap =FALSE,
               what=NULL,\dots)
 
  }
 \arguments{
   \item{func }{An R-function that has as first argument \code{parms} and that returns a matrix
-  or data.frame with
-  the values of the output variables (columns), and -optionally- a mapping variable (by default the first column)}
+  or data.frame with the values of the output variables (columns) at certain output intervals (rows),
+  and -optionally- a mapping variable (by default the first column).
+  }
   \item{parms }{parameters passed to \code{func}; should be either a vector, or a list with named elements.
   If \code{NULL}, then the first element of \code{parInput} is taken}
   \item{sensvar }{the output variables for which the sensitivity needs to be estimated. Either \code{NULL}, the default=all output variables,
@@ -46,17 +49,17 @@ sensRange(func,parms=NULL,sensvar=NULL,dist="unif",
   parameter means \code{parMean} and variance-covariance matrix, \code{parCovar}. Note that,
   if the distribution is \code{"norm"} and \code{parRange} is given, then a truncated distribution
   will be generated. (This is useful to prevent for instance that certain parameters become negative).
-  Ignored if \code{parms} is a matrix}
+  Ignored if \code{parInput} is specified}
   \item{parRange }{the range (min, max) of the sensitivity parameters, a matrix or (preferred) a data.frame with
   one row for each parameter, and two columns with the minimum (1st) and maximum (2nd) value.
   The rownames of \code{parRange} should be parameter names that are known in argument \code{parms}
-  Ignored if \code{parms} is a matrix
+  Ignored if \code{parInput} is specified
   }
   \item{parInput }{a matrix with dimension (*, npar) with the values of the sensitivity parameters }
-  \item{parMean }{only when \code{dist} is \code{"norm"}: the mean value of each parameter   }
+  \item{parMean }{only when \code{dist} is \code{"norm"}: the mean value of each parameter. Ignored if \code{parInput} is specified   }
   \item{parCovar }{only when \code{dist} is \code{"norm"}: the parameters variance-covariance matrix  }
-  \item{num }{the number of times the model has to be run. Set large enough. If \code{parms} is a matrix,
-  then \code{num} parameters are selected randomly (from the rows of \code{parms}}
+  \item{num }{the number of times the model has to be run. Set large enough. If \code{parInput} is specified,
+  then \code{num} parameters are selected randomly (from the rows of \code{parInput}}
   \item{map }{The column number with the (independent) mapping variable in the output matrix returned by \code{func}. For
   dynamic models solved by integration, this will be the (first) column with \code{time}.
   Set to NULL if there is no mapping variable. Mapping variables cannot be selected for estimating
@@ -68,6 +71,8 @@ sensRange(func,parms=NULL,sensvar=NULL,dist="unif",
   \item{what }{the name or the number of the variables that should be plotted}
   \item{col }{the two colors of the polygons that should be plotted}
   \item{quant }{if TRUE, then the median surrounded by the quantiles q25-q75 and q95-q95 are plotted, else the min-max and mean+- sd are plotted}
+  \item{xlab }{X axis label to the plot}
+  \item{ylab }{Y axis label to the plot}
   \item{... }{additional arguments passed to function \code{func} or to the methods}
   }
 \value{

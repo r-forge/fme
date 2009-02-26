@@ -72,8 +72,6 @@ parRange
 
 # 2. Define a function that takes as input the current parameter values (pselect)
 # and generates as output part of the vertical profiles (isel) and the oxygen flux.
-# sensRange expects a matrix with one row.
-
 sFun <- function(P, isel)
 {
   parms(myOmexDia)[pselect] <- P   # current parameter
@@ -132,12 +130,11 @@ sFun2 <- function(P)
 # 3. Solve the model 100 times, parameter values regularly spaced
 # keep full model output
 print(system.time(
-Response<-sensRange(func=sFun2,parms=Parms["MeanFlux"],dist="grid",
+Response<-modCRL(func=sFun2,parms=Parms["MeanFlux"],dist="grid",
                 parRange=parRange)
 ))
 # first column is parameter value, next columns: variables
 head(Response)
-
 
 plot(Response)
 

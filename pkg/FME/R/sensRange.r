@@ -15,9 +15,24 @@ sensRange <- function(  func,
                         num = 100,      # number of runs (approximate if dist="grid"...
                         ...)
 {
+vec2mat <- function(vec)
+{
+ NN <- names(vec)
+ mat <- matrix(nr=1,vec)
+ colnames(mat) <- NN
+ mat
+}
+if(is.vector(parInput)) parInput <- vec2mat(parInput)
+if(is.vector(parRange)) parRange <- vec2mat(parRange)
+if(is.vector(parMean))  parMean  <- vec2mat(parMean)
+if(is.vector(parCovar)) parCovar <- vec2mat(parCovar)
+
+if(is.vector(parInput)) parInput <- matrix(nr=1,parInput)
 if (is.null(parms) & ! is.null(parInput))
   parms <- parInput[1,]
 if (is.null(parms)) parms <- parMean
+if (is.null(parms)){
+  if (is.vector(parRange)) parms<-mean(parRange) else parms <- rowMeans(parRange) }
 if (is.null(parms)) stop ("'parms' not known")
 if (is.matrix(parms) && nrow(parms)>1) stop ("'parms' should be a vector")
 
@@ -64,6 +79,7 @@ if (is.null(sensvar))
 if (is.null(map)) map   <- 1:nrow(yRef) else map <- yRef[,map]
 
 nout  <- length(ivar)
+if (nout == 0) stop (" should select at least ONE output variable - set map=NULL")
 ndim  <- nrow(yRef)
 grvar <- expand.grid(map,sensvar)
 if (ndim ==1) svar <- sensvar else svar <- paste(grvar[,2],grvar[,1],sep="")
@@ -73,12 +89,13 @@ Sens  <- matrix(ncol=length(YREF),nrow=num,NA)
 
 # sensitivity parameters
 senspar <- NULL
-senspar <- names(parMean)
+senspar <- colnames(parMean)
 if (is.null(senspar)) senspar <- rownames(parRange)
 if (is.null(senspar)) senspar <- rownames(parCovar)
 if (is.null(senspar)) senspar <- colnames(parCovar)
 if (is.null(senspar)) senspar <- colnames(parInput)
 if (is.null(senspar)) senspar <- names(Parms)
+if (is.null(senspar)) senspar <- 1:length(Parms)
 #if (is.null(senspar)) stop("parameter names are not known")
 
 npar  <- length(senspar)
@@ -191,6 +208,8 @@ plot.summary.sensRange<-function(x,xyswap=FALSE,
                                  what=NULL,legpos="topleft",
                                  col=c(grey(0.8),grey(0.7)),
                                  quant=FALSE,
+                                 xlab=NULL,
+                                 ylab=NULL,
                                  ...)
 {
 nx  <-attr(x,"nx")
@@ -225,8 +244,8 @@ if (nx > 1)  {    # summary of a times series or a profile...
   yrange<- if ("ylim" %in% nmdots) dots$ylim else range(cbind(xmin,xmax))
   xrange<- if ("xlim" %in% nmdots) dots$xlim else range(X$x)
   Main  <- if ("main" %in% nmdots) dots$main else var[i]
-  xlab  <- if ("xlab" %in% nmdots) dots$xlab else "x"
-  ylab  <- if ("ylab" %in% nmdots) dots$ylab else "y"
+  if(is.null(xlab)) xlab<- "x"
+  if(is.null(ylab)) xlab<- "y"
   if (!xyswap) {
     plot(X$x,xmean,ylim=yrange,xlim=xrange,type="n",main=Main,xlab=xlab,ylab=ylab)
     polygon(c(X$x,rev(X$x)),c(xmin,rev(xmax)),col=col[1],border=NA)

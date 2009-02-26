@@ -146,19 +146,20 @@ FitMrq<- modFit(p=parms(mc2)[whichpar],f=Cost,method="Marq")
 FitMrq[]
 summary(FitMrq)
 
-# a dirty trick
+# a dirty trick, in case covariance matrix is singular
 diag(FitMrq$hessian) <- diag(FitMrq$hessian) + 1e-11
 summary(FitMrq)
 
 BestPar <- FitMrq$par
-plot(Cost(Fit$par))
+plot(Cost(Fit$par),legpos="bottomleft")
 Cost(FitMrq$par)
 Cost(Oderes$par)
 
 #===========================
 # 3. Identifiability
 #===========================
-# Function that returns the modeled values at datpoints, as a function of input parameters
+# Function that returns the modeled values at datapoints,
+# as a function of input parameters
 idFun <- function (p) Cost(p)$residual$mod
 
 # Sensitivity functions at "best" values
@@ -168,6 +169,8 @@ summary(sF)
 pairs(sF)
 
 collin(sF)
+# small enough value for all parameters
+collin(sF,parset=1:6)
 
 # or, equivalently - and quicker!
 sF2 <- sensFun(func=Cost,parms=BestPar)
@@ -180,11 +183,11 @@ collin(sF2,1:6)  # collinearity of all parameters...
 CM <- Cost(FitMrq$par)
 
 # The true variance of the observed data are used.
-s2prior <- CM$var$SSR.unweighted/9
+s2prior <- CM$var$SSR/9
 
 # using the estimated covariance does not work...
 sP <- summary(FitMrq)
-Covar  <- sP$cov.unscaled * (sum(s2prior))/2 * (2.4^2)/6
+Covar  <- sP$cov.scaled * (2.4^2)/6
 
 # so, 20% of parameter value is used for initial jump length
 MCMC <- modMCMC(f=Cost,p=FitMrq$par,jump=FitMrq$par*0.2,niter=5000,

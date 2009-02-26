@@ -1,5 +1,5 @@
 export(modCost,sensFun,collin,sensRange,Unif,Norm,Latinhyper,Grid,
-       modFit,modMCMC,pseudoOptim)
+       modFit,modMCMC,pseudoOptim,modCRL)
 
 S3method("summary",     "modFit")
 S3method("deviance",    "modFit")
@@ -24,6 +24,9 @@ S3method("print", "summary.sensFun")
 S3method("summary", "sensRange")
 S3method("plot",    "sensRange")
 S3method("plot","summary.sensRange")
+
+S3method("summary", "modCRL")
+S3method("plot",    "modCRL")
 
 S3method("plot","modCost")
 S3method("plot","modFit")

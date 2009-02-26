@@ -124,20 +124,21 @@ parRange <- data.frame(min=10,max=5000)
 rownames(parRange) <- "v"
 parRange
 
-Sens2Vmodel <- function (pars)
+crlmodel <- function (pars)
 {
 # steady-state solution
 out   <-O2BOD(pars)
 
-out$O2[100]
+c(O2end=out$O2[100],BODend=out$BOD[100],MeanBODrate = mean(out$BODrate))
 }
 
 # there is no mapping variable here...
-sens <-sensRange(parms=pars,func=Sens2Vmodel,map=NULL,
-                dist="grid",parRange=parRange,num=100)
+crl <-modCRL(parms=pars,func=crlmodel,dist="grid",
+                parRange=parRange,num=100)
 
-head(sens)
-plot(sens[,1],sens[,2],xlab="velocity,m/day",ylab="mmol/m3",main="oxygen at outflow")
+head(crl)
+par(mfrow=c(1,2))
+plot(crl,xlab="velocity,m/day")
 
 ##===============================================================##
 ##===============================================================##

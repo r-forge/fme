@@ -108,7 +108,7 @@ O2fun2 <- function(pars)
   {
   with (as.list(pars),{
 
-    Flux <- -diff(c(upO2,O2,lowO2))/dX
+    Flux <- -D*diff(c(upO2,O2,lowO2))/dX
     dO2  <- -diff(Flux)/dx-cons*O2/(O2+ks)
 
     return(list(dO2,UpFlux = Flux[1],LowFlux = Flux[n+1]))
@@ -132,10 +132,11 @@ O2flux  <- c(UpFlux=170,LowFlux=0)       # measured fluxes
 # 1. Objective function to minimise; all parameters are fitted
 Objective <- function (x)
 {
- pars[]<- x
+ Pars <- pars
+ Pars[names(x)]<-x
 
  # Solve the steady-state conditions of the model
- modO2 <- O2fun2(pars)
+ modO2 <- O2fun2(Pars)
 
  # Model cost: first the oxygen profile
  Cost  <- modCost(obs=O2depth,model=modO2[[1]],x="x",y="y")
@@ -163,11 +164,15 @@ Fit
 plot(Objective(Fit$par),xlab="depth",ylab="",main="residual",legpos="top")
 
 # 5. Show best-fit
-modO2 <- O2fun(Fit$par)
+BestPar <- pars
+BestPar[names(Fit$par)]<-Fit$par
+
+modO2 <- O2fun(BestPar)
 
 plot(O2depth$y,O2depth$x,ylim=rev(range(O2depth$x)),pch=18,
      main="Oxygen-fitted", xlab="mmol/m3",ylab="depth, cm")
 lines(modO2$O2,modO2$X)
+Cost <- Objective(Fit$par)
 
 ##===============================================================##
 ##===============================================================##
@@ -191,22 +196,22 @@ hist(MCMC,Full=TRUE)
 pairs(MCMC,Full=TRUE)
 summary(MCMC)
 cor(MCMC$pars)
-plot(summary(sensRange(parInput=MCMC$par,f=O2fun,num=100)),xyswap=TRUE)
+plot(summary(sensRange(parms=pars,parInput=MCMC$par,
+                       f=O2fun,num=100)),xyswap=TRUE)
 
 # 2. mean variance of separate fitted variables are prior for model variance
 # This does not work so well...
 s2priorvar <- Fit$varsigma
 
-# artificially increase varaiance for low O2 flux
-s2priorvar[2]<-0.01
-
+# unless we artificially increase varaiance for low O2 flux
+s2priorvar[2]<-1
 
 MCMC2<- modMCMC(f=Objective,p=Fit$par,jump=Covar,niter=1000,
                 var0=s2priorvar,wvar0=1,updatecov=10,lower=c(NA,0,NA,0))
 plot(MCMC2,Full=TRUE)
 hist(MCMC2,Full=TRUE)
 pairs(MCMC2,Full=TRUE)
-plot(summary(sensRange(parInput=MCMC2$par,f=O2fun,num=500)),xyswap=TRUE)
+plot(summary(sensRange(parms=pars,parInput=MCMC2$par,f=O2fun,num=500)),xyswap=TRUE)
 
 # 3. idem 2 but with delayed rejection
 MCMC3<- modMCMC(f=Objective,p=Fit$par,jump=Covar,niter=1000,ntrydr=3,
@@ -215,7 +220,7 @@ plot(MCMC3,Full=TRUE)
 hist(MCMC3,Full=TRUE)
 pairs(MCMC3,Full=TRUE)
 
-sR <- sensRange(func=O2fun,parInput=MCMC3$pars,num=100)
+sR <- sensRange(parms=pars,func=O2fun,parInput=MCMC3$par,num=100)
 plot(summary(sR),xyswap=TRUE)
 
 points(O2depth$y,O2depth$x)

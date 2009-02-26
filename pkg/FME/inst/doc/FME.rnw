@@ -79,21 +79,19 @@ Although \fme can work with many types of functions, it is mainly meant to be us
 are solved either with routines from package \code{deSolve} \citep{deSolve}, which integrate the model in time,
 or from package \code{rootSolve} \citep{rootSolve} which estimate steady-state conditions.
 
-\fme contains:
+With \fme it is possible to:
 \begin{itemize}
-\item Functions to perform local and global sensitivity analysis
-\item A function to perform parameter identifiability analysis (\citep{Brun})
-\item A function to estimate the model cost function, useful for fitting a model to data.
-\item Functions to fit a model to data.
-\item A function to run a markov chain monte carlo (MCMC) (\citep{Haario06}.
-
+\item perform local and global sensitivity analysis (\citep{Brun}, \citep{Soetaert08})
+\item perform parameter identifiability analysis (\citep{Brun})
+\item Fit a model to data.
+\item Run a markov chain monte carlo (MCMC) (\citep{Haario06}.
 \end{itemize}
 Most of these functions have suitable methods for printing, visualising output etc...
 
 In addition, there are functions to generate parameter combinations corresponding
 to a certain distribution.
 
-In this document a -very quick- survey of de functionality are given, based on a
+In this document a -very quick- survey of thee functionality are given, based on a
 simple model from \citep{Soetaert08}.
 
 \section{The example model}
@@ -316,6 +314,31 @@ pairs(SnsBact)
 \label{fig:pairs}
 \end{figure}
 
+\subsection{monte carlo runs}
+Function \code{modCRL} runs a monte carlo, outputting 0-D variables, (in contrast to
+sensRange which outputs 1-D variables).
+<<>>=
+SF <- function (pars)
+{
+  out <- solveBact(pars)
+  return(out[nrow(out),2:3])
+}
+CRL <- modCRL(func=SF,parms=pars,parRange=parRanges[1,])
+@
+<<label=crl,include=FALSE>>=
+plot(CRL)
+@
+\setkeys{Gin}{width=0.8\textwidth}
+\begin{figure}
+\begin{center}
+<<label=crlfig,fig=TRUE,echo=FALSE>>=
+<<crl>>
+@
+\end{center}
+\caption{Monte carlo analysis - see text for \R-code}
+\label{fig:crl}
+\end{figure}
+
 \section{multivariate sensitivity analysis}
 Based on the sensitivity functions of model variables to selection of parameters,
 function \code{collin} calculates the \emph{collinearity} or
@@ -378,6 +401,9 @@ provide separate errors per data point
 \subsection{the model cost function}
 \fme function \code{modCost} estimates the "model cost", which the sum of (weighted)
 squared residuals of the model versus the data.
+
+This function is central to parameter identifiability analysis, modelfitting, running a markov chain
+monte carlo.
 
 Assume the following model output (in a matrix or data.frame called \code{Mod}
 \begin{table}[H]

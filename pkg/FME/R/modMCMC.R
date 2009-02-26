@@ -98,7 +98,7 @@ modMCMC <- function (f,p,...,
   }
   
 #-------------------------------------------------------------------------------
-# Prior, absent or a function that returns -2 n* log(prior parameter probability)
+# Prior, absent or a function that returns -2 * log(prior parameter probability)
 #-------------------------------------------------------------------------------
   if (is.null(prior))
       Prior <- function(p) return(0)
@@ -194,10 +194,10 @@ modMCMC <- function (f,p,...,
        Fun <- function(p,...)  {
          PPnew  <<- Prior(p)
          SSnew  <<- f(p,...)
-         SSnew  <<- (SSnew$residuals$res.unweighted)^2
+         SSnew  <<- (SSnew$residuals$res)^2
          return(0.5*(sum(SSnew*divsigma) + PPnew))
        }
-       SSold <- (SSnew$residuals$res.unweighted)^2
+       SSold <- (SSnew$residuals$res)^2
 
     } else
     if (length(var0) != 1 & length(var0) != nrow(SSnew$var))
@@ -208,10 +208,10 @@ modMCMC <- function (f,p,...,
      Fun <- function(p,...)  {
        PPnew  <<- Prior(p)
        SSnew  <<- f(p,...)
-       SSnew  <<- SSnew$var$SSR.unweighted
+       SSnew  <<- SSnew$var$SSR
        return(0.5*(sum(SSnew*divsigma) + PPnew))
      }
-     SSold <- SSnew$var$SSR.unweighted
+     SSold <- SSnew$var$SSR
     }
   }
   
