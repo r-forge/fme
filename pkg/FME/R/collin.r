@@ -1,46 +1,42 @@
+## -----------------------------------------------------------------------------
+## Collinearity indices
+## -----------------------------------------------------------------------------
 
-###############################
-# Collinearity indices
-###############################
+collin <- function(sensfun,parset=NULL) {
+  if (colnames(sensfun)[1]=="x" && colnames(sensfun)[2] == "var")
+    Sens <- sensfun[,-(1:2)]
+  else Sens<-sensfun
 
-collin <- function(sensfun,parset=NULL)  # sensitivity functions, as estimated from sensFun(...,)
-{
-if (colnames(sensfun)[1]=="x" && colnames(sensfun)[2] == "var")
-   Sens <- sensfun[,-(1:2)] else Sens<-sensfun
+  npar <- ncol(Sens)
+  L2 <- sqrt(colSums(Sens*Sens))
 
-npar <- ncol(Sens)
-L2 <- sqrt(colSums(Sens*Sens))
-
-iNa <- 0
-# Check for non-identifiable parameters
-if (any(L2==0)){
-  iNa<-which(L2==0)
-  warning (paste("Sensitivity of parameter",colnames(Sens)[iNa],"is 0! "))
-}
-if (npar > 14)
+  iNa <- 0
+  # Check for non-identifiable parameters
+  if ( any (L2 == 0 ) ) {
+    iNa<-which(L2==0)
+    warning (paste("Sensitivity of parameter",colnames(Sens)[iNa],"is 0! "))
+  }
+  if (npar > 14)
     warning ("will reduce collinearity estimates: too many combinations")
 
-normSens <- t(t(Sens) / L2)
+  normSens <- t(t(Sens) / L2)
 
+  Collin <- NULL
+  # internal function to generate collinearities
+  # for a given set of parameter combinations
 
-Collin <- NULL
-
-# internal function to generate collinearities
-# for a given set of parameter combinations
-collFun <- function(cc)
-{
-  for (i in 1:nrow(cc))
-  {
-   ii    <- cc[i,]
-   S     <- normSens[,ii]
-   Nident <- (iNa != 0 & iNa %in% ii)
-   if (Nident) id <- Inf
-   else id    <- 1/sqrt(min(eigen(t(S)%*%S)$value))
-   psub     <- rep(0,npar)
-   psub[ii] <- 1
-   n        <- ncol(cc)
-   Collin   <<- rbind(Collin,c(psub,n,id))
-  }
+  collFun <- function(cc) {
+    for (i in 1:nrow(cc)) {
+      ii    <- cc[i,]
+      S     <- normSens[,ii]
+      Nident <- (iNa != 0 & iNa %in% ii)
+      if (Nident) id <- Inf
+      else id    <- 1/sqrt(min(eigen(t(S)%*%S)$value))
+      psub     <- rep(0,npar)
+      psub[ii] <- 1
+      n        <- ncol(cc)
+      Collin   <<- rbind(Collin,c(psub,n,id))
+    }
 }
 if (is.null(parset)){
 
@@ -83,12 +79,17 @@ names(Collin)<-c(colnames(Sens),"N","collinearity")
 return(Collin)
 }
 
-plot.collin <- function(x,...)
-{
-nc <- ncol(x)
-plot(x[,nc-1],x[,nc],main="Collinearity",
+## -----------------------------------------------------------------------------
+## S3 methods of collin
+## -----------------------------------------------------------------------------
+
+plot.collin <- function(x,...) {
+  nc <- ncol(x)
+  plot(x[,nc-1],x[,nc],main="Collinearity",
      xlab="Nr parameters",ylab="-",...)
 }
 
+## -----------------------------------------------------------------------------
+
 print.collin <- function (x,...)
-print(format(as.data.frame(unclass(x)),digits=2,scientific=FALSE,...))
+  print(format(as.data.frame(unclass(x)),digits=2,scientific=FALSE,...))

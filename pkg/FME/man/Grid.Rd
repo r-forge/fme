@@ -1,26 +1,36 @@
 \name{Grid}
 \alias{Grid}
 
-\title{Grid distribution}
-\description{Generates parameter sets arranged on a regular grid
+\title{
+  Grid Distribution
 }
+
+\description{
+  Generates parameter sets arranged on a regular grid
+}
+
 \usage{
-Grid(parRange,num)
+Grid(parRange, num)
 }
 \arguments{
-  \item{parRange}{the range (min, max) of the parameters, a matrix or a data.frame with
-  one row for each parameter, and two columns with the minimum (1st) and maximum (2nd) column.
+  \item{parRange}{the range (min, max) of the parameters, a matrix or a
+    data.frame with one row for each parameter, and two columns with the minimum
+    (1st) and maximum (2nd) column.
   }
-  \item{num }{the number of random parameter sets to generate}
+  \item{num }{the number of random parameter sets to generate.
   }
+}
 \value{
-  a matrix with one row for each generated parameter set, and one column per parameter
+  a matrix with one row for each generated parameter set, and one column per
+  parameter.
 }
 
 \details{
-The grid design produces the most regular parameter distribution; there is no randomness involved.
-The number of parameter sets generated with \code{Grid} will be <= \code{num}.
+  The grid design produces the most regular parameter distribution; there is no
+  randomness involved.
+  The number of parameter sets generated with \code{Grid} will be <= \code{num}.
 }
+
 \examples{
 
 # 4 parameters
@@ -32,12 +42,15 @@ pairs(Grid(parRange,500),main="Grid")
 
 }
 \seealso{
- \code{\link{Norm}} for (multi)normally distributed random parameter sets.
+  \code{\link{Norm}} for (multi)normally distributed random parameter sets.
 
- \code{\link{Latinhyper}} to generate random parameter sets according to a latin hypercube distribution.
+  \code{\link{Latinhyper}} to generate random parameter sets according to a
+    latin hypercube distribution.
 
- \code{\link{Unif}} for uniformly distributed random parameter sets.
+  \code{\link{Unif}} for uniformly distributed random parameter sets.
 }
-\author{Karline Soetaert <k.soetaert@nioo.knaw.nl>}
+\author{
+  Karline Soetaert <k.soetaert@nioo.knaw.nl>
+}
 \keyword{utilities}
 

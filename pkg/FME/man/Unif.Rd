@@ -1,29 +1,42 @@
 \name{Unif}
 \alias{Unif}
 
-\title{uniform random distribution}
-\description{Generates uniformly distributed random parameter sets.
+\title{
+  Uniform Random Distribution
 }
+\description{
+  Generates uniformly distributed random parameter sets.
+}
+
 \usage{
 Unif(parRange,num)
 }
+
 \arguments{
-  \item{parRange}{the range (min, max) of the parameters, a matrix or a data.frame with
-  one row for each parameter, and two columns with the minimum (1st) and maximum (2nd) value.
+  \item{parRange}{the range (min, max) of the parameters, a matrix or a
+    data.frame with one row for each parameter, and two columns with the
+    minimum (1st) and maximum (2nd) value.
   }
-  \item{num }{the number of random parameter sets to generate}
+  \item{num }{the number of random parameter sets to generate.
   }
+}
+
 \value{
-  a matrix with one row for each generated parameter set, and one column per parameter
+  a matrix with one row for each generated parameter set, and one column
+  per parameter
 }
 
 \details{
-In the uniform sampling, each parameter is uniformly random distributed over its range.
+  In the uniform sampling, each parameter is uniformly random distributed
+  over its range.
 }
+
 \note{
-For small sample sizes, the latin hypercube distributed parameter sets (\code{\link{Latinhyper}})
-may give better coverage in parameter space than the uniform random design.
+  For small sample sizes, the latin hypercube distributed parameter sets
+  (\code{\link{Latinhyper}}) may give better coverage in parameter space
+  than the uniform random design.
 }
+
 \examples{
 
 # 4 parameters
@@ -33,13 +46,18 @@ rownames(parRange) <- c("par1","par2","par3","par4")
 # uniform
 pairs(Unif(parRange,100),main="Uniformly random")
 }
+
 \seealso{
- \code{\link{Norm}} for (multi)normally distributed random parameter sets.
+  \code{\link{Norm}} for (multi)normally distributed random parameter sets.
 
-\code{\link{Latinhyper}} to generate random parameter sets according to a latin hypercube distribution.
+  \code{\link{Latinhyper}} to generate random parameter sets according to a
+    latin hypercube distribution.
 
- \code{\link{Grid}} to generate random parameter sets arranged on a regular grid
+  \code{\link{Grid}} to generate random parameter sets arranged on a
+    regular grid
 }
-\author{Karline Soetaert <k.soetaert@nioo.knaw.nl>}
+\author{
+  Karline Soetaert <k.soetaert@nioo.knaw.nl>
+}
 \keyword{utilities}
 

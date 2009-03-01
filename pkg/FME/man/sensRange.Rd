@@ -3,111 +3,157 @@
 \alias{summary.sensRange}
 \alias{plot.sensRange}
 \alias{plot.summary.sensRange}
+\title{
+  Sensitivity Ranges of a Timeseries or 1-D Variables
+}
 
-\title{Global sensitivity analysis}
-\description{Given a model consisting of differential equations, estimates
-the global effect of certain (sensitivity) parameters on a time series (or 1-D spatial
-series) of selected sensitivity variables.
+\description{
+  Given a model consisting of differential equations, estimates
+  the global effect of certain (sensitivity) parameters on a time series or on
+  1-D spatial series of selected sensitivity variables.
 
-This is done by drawing parameter values according to some predefined distribution, running
-the model with each of these parameter combinations, and calculating the
-values selected output variables at each output interval.
+  This is done by drawing parameter values according to some predefined
+  distribution, running the model with each of these parameter combinations,
+  and calculating the values of the selected output variables at each output
+  interval.
 
-This function thus produces 'envelopes' around the sensitivity variables.
-
+  This function thus produces 'envelopes' around the sensitivity variables.
 }
 \usage{
 sensRange(func,parms=NULL,sensvar=NULL,dist="unif",
- parInput=NULL, parRange=NULL, parMean=NULL, parCovar=NULL,
- map=1, num=100,  ...)
-
+  parInput=NULL, parRange=NULL, parMean=NULL, parCovar=NULL,
+  map=1, num=100,  ...)
+  
 \method{summary}{sensRange}(object,  \dots)
+
 \method{plot}{summary.sensRange}(x, xyswap =FALSE,
               what=NULL, legpos="topleft",
               col=c(grey(0.8),grey(0.7)),
               quant =FALSE,xlab=NULL, ylab=NULL, \dots)
+
 \method{plot}{sensRange}(x, xyswap =FALSE,
               what=NULL,\dots)
+}
 
- }
 \arguments{
-  \item{func }{An R-function that has as first argument \code{parms} and that returns a matrix
-  or data.frame with the values of the output variables (columns) at certain output intervals (rows),
-  and -optionally- a mapping variable (by default the first column).
+  \item{func }{an R-function that has as first argument \code{parms} and that
+    returns a matrix or data.frame with the values of the output variables
+    (columns) at certain output intervals (rows), and -optionally- a mapping
+    variable (by default the first column).
   }
-  \item{parms }{parameters passed to \code{func}; should be either a vector, or a list with named elements.
-  If \code{NULL}, then the first element of \code{parInput} is taken}
-  \item{sensvar }{the output variables for which the sensitivity needs to be estimated. Either \code{NULL}, the default=all output variables,
-  or a vector with output variable \code{names} (which should be present in the matrix returned by \code{func}),
-  or a vector with \code{indices} to output variables as present in the output matrix
-  (note that the column of this matrix with the mapping variable should not be selected) }
-  \item{dist }{the distribution according to which parameter should be generated, one of
-  "unif" (uniformly random samples), "norm", (normally distributed random samples),
-  "latin" (latin hypercube distribution), "grid" (parameters arranged on a grid).
-  The parameter distribution is specified by argument \code{parRange}, except for the
-  normally distributed parameters, in which case the distribution is specified by the
-  parameter means \code{parMean} and variance-covariance matrix, \code{parCovar}. Note that,
-  if the distribution is \code{"norm"} and \code{parRange} is given, then a truncated distribution
-  will be generated. (This is useful to prevent for instance that certain parameters become negative).
-  Ignored if \code{parInput} is specified}
-  \item{parRange }{the range (min, max) of the sensitivity parameters, a matrix or (preferred) a data.frame with
-  one row for each parameter, and two columns with the minimum (1st) and maximum (2nd) value.
-  The rownames of \code{parRange} should be parameter names that are known in argument \code{parms}
-  Ignored if \code{parInput} is specified
+  \item{parms }{parameters passed to \code{func}; should be either a vector,
+    or a list with named elements.
+    If \code{NULL}, then the first element of \code{parInput} is taken.
   }
-  \item{parInput }{a matrix with dimension (*, npar) with the values of the sensitivity parameters }
-  \item{parMean }{only when \code{dist} is \code{"norm"}: the mean value of each parameter. Ignored if \code{parInput} is specified   }
-  \item{parCovar }{only when \code{dist} is \code{"norm"}: the parameters variance-covariance matrix  }
-  \item{num }{the number of times the model has to be run. Set large enough. If \code{parInput} is specified,
-  then \code{num} parameters are selected randomly (from the rows of \code{parInput}}
-  \item{map }{The column number with the (independent) mapping variable in the output matrix returned by \code{func}. For
-  dynamic models solved by integration, this will be the (first) column with \code{time}.
-  Set to NULL if there is no mapping variable. Mapping variables cannot be selected for estimating
-  sensitivity ranges; they are used for plotting.}
-  \item{object }{an object of class \code{sensRange}}
-  \item{x }{an object of class \code{sensRange}}
-  \item{legpos }{position of the legend; set to NULL to avoid legend}
-  \item{xyswap }{if TRUE, then x-and y-values are swapped and y-axis is from top to bottom. Useful for drawing vertical profiles}
-  \item{what }{the name or the number of the variables that should be plotted}
-  \item{col }{the two colors of the polygons that should be plotted}
-  \item{quant }{if TRUE, then the median surrounded by the quantiles q25-q75 and q95-q95 are plotted, else the min-max and mean+- sd are plotted}
-  \item{xlab }{X axis label to the plot}
-  \item{ylab }{Y axis label to the plot}
-  \item{... }{additional arguments passed to function \code{func} or to the methods}
+  \item{sensvar }{the output variables for which the sensitivity needs to be
+    estimated. Either \code{NULL}, the default, which selects all variables,
+    or a vector with variable \code{names} (which should be present
+    in the matrix returned by \code{func}), or a vector with \code{indices}
+    to variables as present in the output matrix (note that the column of this
+    matrix with the mapping variable should not be selected).
   }
+  \item{dist }{the distribution according to which the parameters should be
+    generated, one of \code{"unif"} (uniformly random samples),
+    \code{"norm"}, (normally distributed random samples),
+    \code{"latin"} (latin hypercube distribution),
+    \code{"grid"} (parameters arranged on a grid).
+    The input parameters for the distribution are specified by \code{parRange}
+    (min,max), except for the normally distributed parameters, in which case
+    the distribution is specified by the parameter means \code{parMean} and
+    the variance-covariance matrix, \code{parCovar}. Note that, if the
+    distribution is \code{"norm"} and \code{parRange} is given, then a
+    truncated distribution will be generated.
+    (This is useful to prevent for instance that certain parameters become
+    negative). Ignored if \code{parInput} is specified.
+  }
+  \item{parRange }{the range (min, max) of the sensitivity parameters, a matrix
+    or (preferred) a data.frame with one row for each parameter, and two
+    columns with the minimum (1st) and maximum (2nd) value.
+    The rownames of \code{parRange} should be parameter names that are known
+    in argument \code{parms}. Ignored if \code{parInput} is specified.
+  }
+  \item{parInput }{a matrix with dimension (*, npar) with the values of the
+    sensitivity parameters.
+  }
+  \item{parMean }{only when \code{dist} is \code{"norm"}: the mean value of
+    each parameter. Ignored if \code{parInput} is specified.
+  }
+  \item{parCovar }{only when \code{dist} is \code{"norm"}: the parameter's
+    variance-covariance matrix.
+  }
+  \item{num }{the number of times the model has to be run. Set large enough.
+    If \code{parInput} is specified, then \code{num} parameters are selected
+    randomly (from the rows of \code{parInput}.
+  }
+  \item{map }{the column number with the (independent) mapping variable in the
+    output matrix returned by \code{func}. For dynamic models solved by
+    integration, this will be the (first) column with \code{time}. For 1-D
+    spatial output, this column will be some distance variable.
+    Set to NULL if there is no mapping variable. Mapping variables should not
+    be selected for estimating sensitivity ranges; they are used for plotting.
+  }
+  \item{object }{an object of class \code{sensRange}.
+  }
+  \item{x }{an object of class \code{sensRange}.
+  }
+  \item{legpos }{position of the legend; set to \code{NULL} to avoid plotting
+  a legend.
+  }
+  \item{xyswap }{if \code{TRUE}, then x-and y-values are swapped and the y-axis
+    is from top to bottom. Useful for drawing vertical profiles.
+  }
+  \item{what }{the name or the index to the variables that should be plotted.
+  }
+  \item{col }{the two colors of the polygons that should be plotted.
+  }
+  \item{quant }{if \code{TRUE}, then the median surrounded by the quantiles
+    q25-q75 and q95-q95 are plotted, else the min-max and mean+- sd are plotted.
+    }
+  \item{xlab }{the X axis label to the plot.
+  }
+  \item{ylab }{the Y axis label to the plot.
+  }
+  \item{... }{additional arguments passed to \code{func} or to the methods.
+  }
+}
 \value{
   a data.frame of type \code{sensRange} containing the parameter set and
   the corresponding values of the sensitivity output variables.
   
   The list returned by \code{sensRange} has a method for the generic functions
    \code{\link{summary}},\code{\link{plot}} and \code{plot.summary}
- - see note.
-
-  }
+  - see note.
+}
 
 \details{
+  Models solved by integration (i.e. by using one of \code{'ode', 'ode.1D',
+  'ode.band', 'ode.2D'}), have the output already in a form usable by
+  \code{sensRange}.
 
-Models solved by integration (i.e. by using one of \code{'ode', 'ode.1D', 'ode.band', 'ode.2D'}),
-have the output already in a form usable by \code{sensRange}.
-
-The output for models solved by a steady-state solver (i.e. one of \code{steady, steady.1D,
-steady.band, steady.2D}, needs to be rearranged - see examples.
+  The output for models solved by a steady-state solver (i.e. one of
+  \code{'steady', 'steady.1D','steady.band', 'steady.2D'}, needs to be
+  rearranged - see examples.
 }
 \note{
-The following \emph{methods} are included:
-
- \code{\link{summary}}, estimates summary statistics for the sensitivity variables,
- a data.frame with as many rows as there are mapping variables (or rows in the matrix returned by \code{func})
- and the following columns: \code{x}, the mapping value, \code{Mean}, the mean, \code{sd}, the standard deviation,
-  \code{Min}, the minimal value, \code{Max}, the maximal value, \code{q25},  \code{q50}, \code{q75},
-  the 25th, 50 and 75\% quantile
+  The following \emph{methods} are included:
+  \itemize{
+    \item \link{summary}, estimates summary statistics for the sensitivity
+      variables, a data.frame with as many rows as there are mapping variables
+      (or rows in the matrix returned by \code{func})
+      and the following columns: \code{x}, the mapping value, \code{Mean},
+      the mean, \code{sd}, the standard deviation, \code{Min}, the minimal
+      value, \code{Max}, the maximal value, \code{q25},  \code{q50}, \code{q75},
+      the 25th, 50 and 75\% quantile
   
- \code{\link{plot}}, produces a "matplot" of the \code{sensRange} output, one plot for each sensitivity variable and
- with the mapping variable on the x-axis.
+    \item \link{plot}, produces a "matplot" of the \code{sensRange} output,
+      one plot for each sensitivity variable and with the mapping variable on
+      the x-axis.
 
- \code{summary.plot}, produces a plot of the summary of the \code{sensRange} output, one plot for each sensitivity variable and
- with the ranges and mean +- standard deviation as coloured polygons.
+    \item summary.plot, produces a plot of the summary of the \code{sensRange}
+      output, one plot for each sensitivity variable and with the ranges and
+      mean +- standard deviation as coloured polygons.
   }
+}
 \examples{
 
 #========================================
@@ -166,6 +212,8 @@ plot(Sens2,xlab="time, hour",ylab="molC/m3",
 
 par(mfrow=mf )
 }
-\author{Karline Soetaert <k.soetaert@nioo.knaw.nl>}
+\author{
+  Karline Soetaert <k.soetaert@nioo.knaw.nl>
+}
 \keyword{utilities}
 
