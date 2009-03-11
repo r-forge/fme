@@ -51,10 +51,10 @@ differential equations
       analysis). It implements the delayed rejection - adaptive metropolis
       (DRAM) algorithm.
 
-    \item FME also contains unctions to generate multiple parameter values
+    \item FME also contains functions to generate multiple parameter values
       arranged according to a grid (\code{Grid}), latin hypercube
-      (\code{Latinhyper}), multinormal (\code{Normal}) or uniform
-      (\code{Uniform}) design.
+      (\code{Latinhyper}), multinormal (\code{Norm}) or uniform
+      (\code{Unif}) design.
    }
 }
 

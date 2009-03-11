@@ -1,0 +1,29 @@
+ThPe
+
+- 2009-03-11: just started to make me familiar with FME
+
+Comments
+
+- Norm: there is already a package mvtnorm with function rmvnorm
+- but, I understand (to some extent), that it is useful to have Unif,
+  Norm, Grid, ... with consistent interface, ...
+- todo: add a seealso to the repective functions in "stats"
+
+
+ThPe's next steps:
+
+o understand details of modFit and modCost
+  - try to combine the approaches of FME and simecol
+  - FME: more optimizers, Hessian, weighting, user specified cost function,
+    S3 methods to work with the output
+  - simecol: better vectorization (less looping) i.e. slightly faster
+    appproxTime, use of simObj'ects as models
+  - ??: improve structure modFit a little bit?
+  - ??: write method in simecol that makes use of modFit!
+
+o sensFun
+  - write method for simObj'ects
+
+o modMCMC
+  - can this be useful for simObj'ects
+
