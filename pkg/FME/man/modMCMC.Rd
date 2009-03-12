@@ -14,7 +14,7 @@
 
 \usage{
 modMCMC(f, p, ..., jump=NULL,  lower=-Inf, upper=+Inf, prior=NULL,
-  var0 = NULL, wvar0 = NULL, niter=1000, outputlength = niter,
+  var0 = NULL, wvar0 = NULL, n0= NULL, niter=1000, outputlength = niter,
   burninlength=0, updatecov=niter, covscale = 2.4^2/length(p),
   ntrydr=1, drscale=NULL, verbose=TRUE)
 
@@ -59,6 +59,10 @@ modMCMC(f, p, ..., jump=NULL,  lower=-Inf, upper=+Inf, prior=NULL,
     see details.
   }
   \item{wvar0 }{"weight" for the initial model variance - see details.
+  }
+  \item{n0 }{parameter used for weighing the initial model variance -
+    if \code{NULL}, it is estimated as \code{n0=wvar0*N}, where N = number
+    of observations. see details
   }
   \item{lower }{lower bounds on the parameters; if unbounded set equal to
     \code{-Inf}.

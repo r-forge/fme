@@ -3,6 +3,7 @@
 ## -----------------------------------------------------------------------------
 
 collin <- function(sensfun,parset=NULL) {
+
   if (colnames(sensfun)[1]=="x" && colnames(sensfun)[2] == "var")
     Sens <- sensfun[,-(1:2)]
   else Sens<-sensfun
@@ -37,46 +38,46 @@ collin <- function(sensfun,parset=NULL) {
       n        <- ncol(cc)
       Collin   <<- rbind(Collin,c(psub,n,id))
     }
-}
-if (is.null(parset)){
+  }
+  if (is.null(parset)) {
 
-  combin <- function(n, v)  # combinations of n elements from a vector p (length (p) > = n)
-  {
-   if (n == 1)
-     matrix(data=v, ncol=1)
-   else if (n >= length(v))
-     matrix(data=v, nrow=1)
-   else rbind(cbind(v[1],combin(n-1,v[-1])),combin(n,v[-1]))
+    combin <- function(n, v) { # combinations of n elements from a vector p (length (p) > = n)
+
+      if (n == 1)
+        matrix(data=v, ncol=1)
+      else if (n >= length(v))
+        matrix(data=v, nrow=1)
+      else
+        rbind(cbind(v[1],combin(n-1,v[-1])),combin(n,v[-1]))
+    }
+
+    pset   <- 1:npar
+
+    for (n in 2:npar) {
+      numcomb <- choose(npar,n)
+      if (numcomb < 5000) {
+        cc  <-combin(n,pset)
+        collFun(cc)
+      }
+    }
+  } else {
+    if (! is.vector(parset))
+      stop("'parset' should be a vector")
+    if (is.character(parset)) {
+      pnames<-colnames(Sens)
+      parset <- which (pnames%in%parset)
+    }
+
+    parset <- matrix(nr=1,parset)
+    collFun(parset)
   }
 
- pset   <- 1:npar
+  Collin <- as.data.frame(Collin)
 
- for (n in 2:npar)
- {
-   numcomb <- choose(npar,n)
-   if (numcomb < 5000)
-   {
-   cc  <-combin(n,pset)
-   collFun(cc)
-   }
- }
-} else
-{
-if (! is.vector(parset))
-  stop("'parset' should be a vector")
-if (is.character(parset))
-  {
-  pnames<-colnames(Sens)
-  parset <- which (pnames%in%parset)
-  }
-  parset<-matrix(nr=1,parset)
-  collFun(parset)
-}
-Collin <- as.data.frame(Collin)
+  class(Collin) <- c("collin","data.frame")
+  names(Collin) <- c(colnames(Sens),"N","collinearity")
 
-class(Collin) <- c("collin","data.frame")
-names(Collin)<-c(colnames(Sens),"N","collinearity")
-return(Collin)
+  return(Collin)
 }
 
 ## -----------------------------------------------------------------------------
@@ -84,6 +85,7 @@ return(Collin)
 ## -----------------------------------------------------------------------------
 
 plot.collin <- function(x,...) {
+
   nc <- ncol(x)
   plot(x[,nc-1],x[,nc],main="Collinearity",
      xlab="Nr parameters",ylab="-",...)

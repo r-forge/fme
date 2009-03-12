@@ -156,34 +156,34 @@ sensRange <- function( func, parms=NULL, sensvar=NULL, dist="unif",
 ## S3 methods of sensRange
 ## -----------------------------------------------------------------------------
 
-summary.sensRange<-function(object,...)
-{
-npar<-attr(object,"npar")
-sens<- as.matrix(object[,-(1:npar)])
-x   <- attr(object,"x")
-names(x) <- NULL
-nx  <-attr(object,"nx")
-var <-attr(object,"var")
+summary.sensRange<-function(object,...) {
 
-SumSens <- data.frame(
-x    = x,
-Mean = apply(sens,2,FUN=mean),
-Sd   = apply(sens,2,FUN=sd),
-Min  = apply(sens,2,FUN=min),
-Max  = apply(sens,2,FUN=max),
-q05  = apply(sens,2,FUN=function(x)quantile(x,probs=0.05)),
-q25  = apply(sens,2,FUN=function(x)quantile(x,probs=0.25)),
-q50  = apply(sens,2,FUN=function(x)quantile(x,probs=0.5)),
-q75  = apply(sens,2,FUN=function(x)quantile(x,probs=0.75)),
-q95  = apply(sens,2,FUN=function(x)quantile(x,probs=0.95))
-)
+  npar<-attr(object,"npar")
+  sens<- as.matrix(object[,-(1:npar)])
+  x   <- attr(object,"x")
+  names(x) <- NULL
+  nx  <-attr(object,"nx")
+  var <-attr(object,"var")
 
-rownames(SumSens) <- colnames(sens)
-attr(SumSens,"var") <- attr(object,"var")
-attr(SumSens,"nx")  <- attr(object,"nx")
-class(SumSens)<-c("summary.sensRange","data.frame")
+  SumSens <- data.frame(
+    x    = x,
+    Mean = apply(sens,2,FUN=mean),
+    Sd   = apply(sens,2,FUN=sd),
+    Min  = apply(sens,2,FUN=min),
+    Max  = apply(sens,2,FUN=max),
+    q05  = apply(sens,2,FUN=function(x)quantile(x,probs=0.05)),
+    q25  = apply(sens,2,FUN=function(x)quantile(x,probs=0.25)),
+    q50  = apply(sens,2,FUN=function(x)quantile(x,probs=0.5)),
+    q75  = apply(sens,2,FUN=function(x)quantile(x,probs=0.75)),
+    q95  = apply(sens,2,FUN=function(x)quantile(x,probs=0.95))
+  )
 
-return(SumSens)
+  rownames(SumSens) <- colnames(sens)
+  attr(SumSens,"var") <- attr(object,"var")
+  attr(SumSens,"nx")  <- attr(object,"nx")
+  class(SumSens)<-c("summary.sensRange","data.frame")
+
+  return(SumSens)
 }
 
 ## -----------------------------------------------------------------------------

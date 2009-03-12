@@ -43,7 +43,7 @@ collin(sensfun, parset=NULL)
   }
   }
 \value{
-  a data.frame of clas \code{collin} with one row for each parameter combination
+  a data.frame of class \code{collin} with one row for each parameter combination
   (parameters as in \code{sensfun})
 
   Each row contains:
@@ -176,12 +176,13 @@ collin( sensFun(Objective,P,varscale=1))
   Karline Soetaert <k.soetaert@nioo.knaw.nl>
 }
 \references{
-Brun, R., Reichert, P., Kunsch, H.R., 2001.
-Practical identifiability analysis of large environmental simulation models.
-Water Resour. Res. 37(4): 1015 1030
+  Brun, R., Reichert, P., Kunsch, H.R., 2001.
+  Practical identifiability analysis of large environmental simulation models.
+  Water Resour. Res. 37(4): 1015 1030
 
-Omlin, M., Brun, R. and Reichert, P., 2001. Biogeochemical model of Lake Zurich:
-sensitivity, identifiability and uncertainty analysis. Ecol. Modell. 141: 105 123.
+  Omlin, M., Brun, R. and Reichert, P., 2001.
+  Biogeochemical model of Lake Zurich: sensitivity, identifiability and
+  uncertainty analysis. Ecol. Modell. 141: 105 123.
 
 }
 \keyword{utilities}

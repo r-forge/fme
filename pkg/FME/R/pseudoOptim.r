@@ -3,7 +3,8 @@
 ## -----------------------------------------------------------------------------
 
 pseudoOptim <- function (f, p, ..., lower, upper, control=list() ) {
-  # check input
+
+  ## check input
   npar  <- length(p)
   if (! all(is.finite(lower))) stop("lower cannot be Inf or -Inf")
   if (! all(is.finite(upper))) stop("upper cannot be Inf or -Inf")
@@ -12,7 +13,7 @@ pseudoOptim <- function (f, p, ..., lower, upper, control=list() ) {
   if (length(upper)!= npar & length(upper)!=1)
     stop("length of 'upper' should be either 1 or equal to number of parameters")
 
-  # Initialisation
+  ## Initialisation
   con <- list(npop=max(5*length(p),50),  # nr elements in population
              numiter=10000,              # number of iterations
              centroid = 3,               # number of points in centroid
@@ -43,7 +44,7 @@ pseudoOptim <- function (f, p, ..., lower, upper, control=list() ) {
   iworst         <- which.max(populationcost)
   worstcost      <- populationcost[iworst]
 
-  # Hybridisation phase
+  ## Hybridisation phase
   iter<-0
   lastbest  <- -Inf
   while (iter<numiter && (max(populationcost)-min(populationcost))

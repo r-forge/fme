@@ -1,4 +1,4 @@
-# private function
+## private function
 
 findvar <- function(var1, var2, str="var") {
   if (is.character(var2[[1]])){
@@ -20,7 +20,7 @@ findvar <- function(var1, var2, str="var") {
 sensFun <- function(func, parms, sensvar=NULL, senspar=names(parms),
                     varscale = NULL, parscale = NULL,
                     tiny=1e-8, map = 1, ...) {
-  # 1. The solver
+  ## 1. The solver
   Solve <- function(parms) func(parms,...)
 
   yRef  <- Solve(parms)
@@ -40,7 +40,7 @@ sensFun <- function(func, parms, sensvar=NULL, senspar=names(parms),
     }
 
   }
-  # if a data.frame or a vector is returned, make it a matrix
+  ## if a data.frame or a vector is returned, make it a matrix
   if (is.data.frame(yRef)) yRef <- as.matrix(yRef)
   if (is.vector(yRef)) {
     ynames <- names(yRef)
@@ -48,7 +48,7 @@ sensFun <- function(func, parms, sensvar=NULL, senspar=names(parms),
     colnames(yRef) <- ynames
   }
   
-  # 2. sensitivity variables
+  ## 2. sensitivity variables
   if (is.null(sensvar)) {
     ivar    <- 1:ncol(yRef)
     if (! is.null(map))
@@ -81,7 +81,7 @@ sensFun <- function(func, parms, sensvar=NULL, senspar=names(parms),
 
   yRef  <- as.vector(yRef[,ivar])
 
-  # 3. sensitivity parameters/
+  ## 3. sensitivity parameters/
   npar  <- length(senspar)
   if (npar ==0)
     stop ("cannot proceed: there are no sensitivity parameters")
@@ -89,7 +89,7 @@ sensFun <- function(func, parms, sensvar=NULL, senspar=names(parms),
   ipar <- findvar(parms,senspar,"parameters")
   pp    <- unlist(parms)[ipar]
 
-  # 4. perturbed parameters
+  ## 4. perturbed parameters
   dp        <- pp*tiny
   dp[dp==0] <- tiny
   ii      <- which (abs(dp)<tiny)
@@ -103,13 +103,13 @@ sensFun <- function(func, parms, sensvar=NULL, senspar=names(parms),
     varscale <- yRef
   else varscale <- rep (varscale,length(yRef))
 
-  # 0 is set equal to a very small number
+  ## 0 is set equal to a very small number
   varscale[varscale == 0]<-1e-20
   parscale[parscale == 0]<-1e-20
 
   Sens    <- matrix(nrow=length(yRef),ncol=npar,NA)
 
-  # 5. Loop over all parameters
+  ## 5. Loop over all parameters
   for (i in 1:length(ipar)) {
     dval    <- pp[i]+dp[i]
     parms[ipar[i]] <- dval
@@ -121,7 +121,7 @@ sensFun <- function(func, parms, sensvar=NULL, senspar=names(parms),
     parms[ipar[i]] <- pp[i]
   }
 
-  # 6. Finally
+  ## 6. Finally
   colnames(Sens) <- names(pp)
   Sens <- data.frame(x=grvar[,1],var=as.character(grvar[,2]),Sens)
   attr(Sens,"class") <- c("sensFun","data.frame")
@@ -140,6 +140,7 @@ sensFun <- function(func, parms, sensvar=NULL, senspar=names(parms),
 ## -----------------------------------------------------------------------------
 
 summary.sensFun <- function(object,vars=FALSE,...) {
+
   pp       <- attributes(object)$pars
   parscale <-  attributes(object)$parscale
   Sens <- object[,-(1:2)]
