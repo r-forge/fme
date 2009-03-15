@@ -91,6 +91,15 @@ plot.collin <- function(x,...) {
      xlab="Nr parameters",ylab="-",...)
 }
 
+## ThPe: Alternative suggestion: uncomment this if you like ...
+
+#plot.collin <- function(x, ...) {
+#  nc <- ncol(x)
+#  stripchart(x[,nc] ~ x[,nc-1], method="stack", main = "Collinearity",
+#     xlab="Number of parameters", ylab="Collinearity index", vertical = TRUE, ...)
+#}
+
+
 ## -----------------------------------------------------------------------------
 
 print.collin <- function (x,...)

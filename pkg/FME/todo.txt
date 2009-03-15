@@ -42,10 +42,13 @@ o sensFun
       main title overwrites scale, 
       replace ylab = "-" in plot.sensFun  with something more readable
 
-  - sensFun may be useful in general, however I would do this a little
-    bit different, taking biologists perspective, so I cannot really
-    comment on this.
+  - sensFun is useful,
+    - but collinearity index is fine, see also improved (?) plot
+
+o modCRL, sensRange
+  - that's similar to things I usually do
+  - pleas explain "what" in the help page (with example)
 
 o modMCMC
-  - can this be useful for simObj'ects
+  - not yet tested
 
