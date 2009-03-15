@@ -10,7 +10,9 @@ Comments
 - todo: add a seealso to the repective functions in "stats"
 
 
-ThPe's next steps:
+
+
+ThPe's comments
 
 o understand details of modFit and modCost
   - try to combine the approaches of FME and simecol
@@ -18,11 +20,31 @@ o understand details of modFit and modCost
     S3 methods to work with the output
   - simecol: better vectorization (less looping) i.e. slightly faster
     appproxTime, use of simObj'ects as models
+
+==>  o.k., tested: modFit is **great** - and works well with simecol, 
+  see package vignette of simecol and new example
+  "modFit_with_simecol.R"
+  
+  ToDo:
+  - improve example "mcystmodel.R" accordingly
   - ??: improve structure modFit a little bit?
   - ??: write method in simecol that makes use of modFit!
 
 o sensFun
   - write method for simObj'ects
+==> Not yet a method, but sensFun with simecol was no problem.
+  
+  - comment: mathematical formulae (and typesetting) need some
+    improvement, 
+    syntax is:  \eqn{latex}{ascii} and \deqn{latex}{ascii}
+
+  - plot functions: 
+      main title overwrites scale, 
+      replace ylab = "-" in plot.sensFun  with something more readable
+
+  - sensFun may be useful in general, however I would do this a little
+    bit different, taking biologists perspective, so I cannot really
+    comment on this.
 
 o modMCMC
   - can this be useful for simObj'ects
