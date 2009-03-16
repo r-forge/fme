@@ -9,6 +9,8 @@ require(FME)
 #---------------------
 Obs <- data.frame(x=c(   28,  55,   83,  110,  138,  225,  375),   # mg COD/l
                   y=c(0.053,0.06,0.112,0.105,0.099,0.122,0.125))   # 1/hour
+Obs2 <- cbind(Obs, err= Obs$y*0.1)
+
 plot(Obs,pch=16,cex=2,xlim=c(0,400),ylim=c(0,0.15),
      xlab="mg COD/l",ylab="1/hr")
 
@@ -27,6 +29,17 @@ P      <- modFit(f=Residuals,p=c(0.1,1))
 # plot best-fit model
 x      <-0:375
 lines(Model(P$par,x))
+
+# Now with error
+mcost <- function(p) {
+  Mod <- Model(p,Obs$x)
+  modCost(Mod,Obs2,x="x",err="err")
+}
+
+# fit the model to data
+P2     <- modFit(f=mcost,p=P$par)
+lines(Model(P2$par,x),col="red")
+
 
 # summary of fit
 sP    <- summary(P)

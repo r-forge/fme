@@ -103,9 +103,9 @@ modCost(model, obs, x="time", y=NULL, err=NULL,
 
   It computes
   \enumerate{
-    \item the weighted \emph{residuals}, one for each data point
+    \item the weighted \emph{residuals}, one for each data point.
     \item the \emph{variable costs}, i.e. the sum of squared weight
-      residuals per variable
+      residuals per variable.
     \item the \emph{model cost}, the scaled sum of variable costs .
   }
   There are three steps:
@@ -227,6 +227,11 @@ out
 
 # The cost function
 modCost(model=out,obs=Data,y="val")
+
+# The cost function with a data error added
+Dat2 <- cbind(Data, Err=Data$val*0.1)  # error=10% of value
+modCost(model=out,obs=Dat2,y="val",err="Err")
+
 
 #==============================================================#
 # Type 2 input:  Matrix format; column names = variable names

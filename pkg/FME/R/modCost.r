@@ -126,7 +126,7 @@ modCost <- function (model, obs, x="time", y=NULL, err=NULL,
     xDat   <- xDat[iex]
     if (ierr>0) {
       Err <- obs[iDat,ierr]
-      Err <- Err[ix]
+      Err <- Err[iex]
     } else {
       if (weight=="std")
         Err <- sd (obsdat)
