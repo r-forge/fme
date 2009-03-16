@@ -30,7 +30,7 @@ P      <- modFit(f=Residuals,p=c(0.1,1))
 x      <-0:375
 lines(Model(P$par,x))
 
-# Now with error
+# Now with model error...
 mcost <- function(p) {
   Mod <- Model(p,Obs$x)
   modCost(Mod,Obs2,x="x",err="err")

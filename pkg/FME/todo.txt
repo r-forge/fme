@@ -2,13 +2,18 @@ ThPe
 
 - 2009-03-11: just started to make me familiar with FME
 
+- 2009-03-16: KS : thanks for this input!  Below I use ** KS **
+
 Comments
 
 - Norm: there is already a package mvtnorm with function rmvnorm
 - but, I understand (to some extent), that it is useful to have Unif,
   Norm, Grid, ... with consistent interface, ...
+  
+  **KS** So I left Norm as it is...
+  
 - todo: add a seealso to the repective functions in "stats"
-
+  **KS** seealso rnorm, runif, seq
 
 
 
@@ -27,9 +32,16 @@ o understand details of modFit and modCost
   
   ToDo:
   - improve example "mcystmodel.R" accordingly
-  - ??: improve structure modFit a little bit?
-  - ??: write method in simecol that makes use of modFit!
 
+  ** KS ** Or remove this example  entirely ? It was there for you...
+  
+  - ??: improve structure modFit a little bit?
+  ** KS ** Please be more specific. What would you like to see changed?
+  
+  - ??: write method in simecol that makes use of modFit!
+  ** KS ** This is up to you
+  
+  
 o sensFun
   - write method for simObj'ects
 ==> Not yet a method, but sensFun with simecol was no problem.
@@ -37,18 +49,34 @@ o sensFun
   - comment: mathematical formulae (and typesetting) need some
     improvement, 
     syntax is:  \eqn{latex}{ascii} and \deqn{latex}{ascii}
+    **KS** I thought I consistently used that - but there was an error in the
+    L1 norm help. Perhaps you did not like my ascii version?  y_i etc...
 
   - plot functions: 
       main title overwrites scale, 
+      ** KS ** don't understand
       replace ylab = "-" in plot.sensFun  with something more readable
+      ** KS ** changed to "sensitivity"
+
+   **KS btw ** , in these plotting codes I check whether "main" is part of the
+   dots, and then adjust accordingly. Problem is that "main" remains part of the
+   dots, so I cannot pass the dots anymore to the plot function.
+   To be really flexible, I would need to be able
+   to remove "main" from the dots. Is this possible? (and do you understand what I mean?).
+
 
   - sensFun is useful,
     - but collinearity index is fine, see also improved (?) plot
+    ** KS** I accepted this improvement. Much clearer
 
 o modCRL, sensRange
   - that's similar to things I usually do
   - pleas explain "what" in the help page (with example)
 
+  ** KS ** done!
+  
 o modMCMC
   - not yet tested
+  
+  **KS** it is the best part!  (also the more difficult one!)
 

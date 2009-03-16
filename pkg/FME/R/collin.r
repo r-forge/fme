@@ -84,20 +84,12 @@ collin <- function(sensfun,parset=NULL) {
 ## S3 methods of collin
 ## -----------------------------------------------------------------------------
 
-plot.collin <- function(x,...) {
-
+## ThPe:
+plot.collin <- function(x, ...) {
   nc <- ncol(x)
-  plot(x[,nc-1],x[,nc],main="Collinearity",
-     xlab="Nr parameters",ylab="-",...)
+  stripchart(x[,nc] ~ x[,nc-1], method="stack", main = "Collinearity",
+     xlab="Number of parameters", ylab="Collinearity index", vertical = TRUE, ...)
 }
-
-## ThPe: Alternative suggestion: uncomment this if you like ...
-
-#plot.collin <- function(x, ...) {
-#  nc <- ncol(x)
-#  stripchart(x[,nc] ~ x[,nc-1], method="stack", main = "Collinearity",
-#     xlab="Number of parameters", ylab="Collinearity index", vertical = TRUE, ...)
-#}
 
 
 ## -----------------------------------------------------------------------------

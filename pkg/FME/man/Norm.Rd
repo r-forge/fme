@@ -69,6 +69,10 @@ pairs(Norm(parCovar=parCovar,parMean=parMean,parRange=Ranges,num=500),
 
   \code{\link{Grid}} to generate random parameter sets arranged on a regular
     grid
+
+  \code{\link{rnorm}} the R-default for generating normally distributed random
+    numbers.
+
 }
 \author{
   Karline Soetaert <k.soetaert@nioo.knaw.nl>

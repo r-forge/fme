@@ -204,8 +204,12 @@ plot.sensFun<- function(x,legpos="topleft",...) {
     ii <- ((i-1)*nx):(i*nx)
     Main  <- if ("main" %in% nmdots) dots$main else var[i]
     sens<- x[ii,]
-    matplot(sens$x,as.matrix( sens[,-(1:2)]),type="l",ylab="-",
-        main=Main,...)
+   if ("main" %in% nmdots)
+    matplot(sens$x,as.matrix( sens[,-(1:2)]),type="l",
+        ylab="sensitivity",main=Main)
+   else
+    matplot(sens$x,as.matrix( sens[,-(1:2)]),type="l",
+        ylab="sensitivity",main=Main,...)
   }
   nc <- ncol(x) - 2
   if (! is.na(legpos))

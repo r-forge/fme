@@ -48,6 +48,9 @@ pairs(Grid(parRange,500),main="Grid")
     latin hypercube distribution.
 
   \code{\link{Unif}} for uniformly distributed random parameter sets.
+  
+  \code{\link{seq}} the R-default for generating regular sequences of numbers.
+
 }
 \author{
   Karline Soetaert <k.soetaert@nioo.knaw.nl>

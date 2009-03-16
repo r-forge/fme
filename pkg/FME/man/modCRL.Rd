@@ -162,7 +162,8 @@ SF <- function (p)
 
 CRL <- modCRL(func=SF,parRange=c(0.2,0.8))
 
-plot(CRL)
+plot(CRL)  # plots both variables
+plot(CRL, what="Bact") #selects one
 
 }
 \author{

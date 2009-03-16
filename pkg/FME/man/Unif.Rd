@@ -55,6 +55,10 @@ pairs(Unif(parRange,100),main="Uniformly random")
 
   \code{\link{Grid}} to generate random parameter sets arranged on a
     regular grid
+
+  \code{\link{runif}} the R-default for generating uniformally distributed
+    random numbers.
+
 }
 \author{
   Karline Soetaert <k.soetaert@nioo.knaw.nl>

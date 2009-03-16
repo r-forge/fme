@@ -207,8 +207,15 @@ plot(Sens,legpos="topleft",xlab="time, hour",ylab="molC/m3",
 # sensitivity to all; latin hypercube
 Sens2 <- summary(sensRange(func=solveBact,parms=pars,dist="latin",
                    sensvar=c("Bact","Sub"),parRange=parRanges,num=50))
+
+# Plot all variables; plot mean +- sd, min max
 plot(Sens2,xlab="time, hour",ylab="molC/m3",
      main="Sensitivity to gmax,eff,rB")
+
+par(mfrow=c(1,1) )
+
+# Select one variable for plotting; plot the quantiles
+plot(Sens2,xlab="time, hour",ylab="molC/m3", what="Bact", quant = TRUE)
 
 par(mfrow=mf )
 }

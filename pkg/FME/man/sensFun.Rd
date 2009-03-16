@@ -129,8 +129,7 @@ sensFun(func,parms,sensvar=NULL,senspar=names(parms),
       functions, a data.frame with:
       one row for each parameter and the following columns:
       \itemize{
-        \item L1: the L1-norm \eqn{\frac{1}{n} \cdot \sum{|S_{ij}|}}
-          {sum(abs(Sij))/n}
+        \item L1: the L1-norm \eqn{\frac{1}{n} \cdot \sum{|S_{ij}|}}{sum(abs(Sij))/n}
 
         \item L2: the L2-norm \eqn{\frac{1}{n} \cdot \sqrt{\sum{S_{ij}
           \cdot S_{ij}}}}{sqrt(sum(Sij^2))/n}
