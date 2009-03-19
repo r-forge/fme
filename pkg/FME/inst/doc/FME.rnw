@@ -26,10 +26,10 @@
 \Plaintitle{FME}
 
 \Keywords{simulation models, differential equations, fitting,
-  sensitivity, monte carlo, identifiability, \proglang{R}}
+  sensitivity, Monte Carlo, identifiability, \proglang{R}}
 
 \Plainkeywords{simulation models, differential equations, fitting,
-  sensitivity, monte carlo, identifiability, R}
+  sensitivity, Monte Carlo, identifiability, R}
 
 
 \author{Karline Soetaert\\
@@ -75,54 +75,47 @@ options(width=70)
 
 \R-package \fme contains part of the functions present in the software
 environment \code{FEMME} \citep{FEMME}, a \emph{F}lexible
-\emph{E}nvironment for \emph{M}athematically \emph{M}odelling the
-\emph{E}nvironment.
-
-\code{FEMME} was written in FORTRAN. \fme is -obviously- written in
-\R.
+\emph{E}nvironment for \emph{M}athematically \emph{M}odel\-ling the
+\emph{E}nvironment. \code{FEMME} was written in FORTRAN. \fme is --
+obviously -- written in \R.
 
 Although \fme can work with many types of functions, it is mainly
 meant to be used with models that are written as (a system of)
 differential equations (ordinary or partial), which are solved either
 with routines from package \code{deSolve} \citep{deSolve}, which
 integrate the model in time, or from package \code{rootSolve}
-\citep{rootSolve} which estimate steady-state conditions.
-
-With \fme it is possible to:
+\citep{rootSolve} which estimate steady-state conditions.  With \fme
+it is possible to:
 
 \begin{itemize}
-\item perform local and global sensitivity analysis (\citep{Brun},
-  \citep{Soetaert08})
-\item perform parameter identifiability analysis (\citep{Brun})
-\item Fit a model to data.
-\item Run a markov chain monte carlo (MCMC) (\citep{Haario06}.
+\item perform local and global sensitivity analysis \citep{Brun,
+    Soetaert08},
+\item perform parameter identifiability analysis \citep{Brun},
+\item fit a model to data,
+\item run a Markov chain Monte Carlo \cite[MCMC, ][]{Haario06}.
 \end{itemize}
 
 Most of these functions have suitable methods for printing,
 visualising output etc.  In addition, there are functions to generate
 parameter combinations corresponding to a certain distribution.  In
-this document a -- very quick -- survey of the functionality are
+this document a -- very quick -- survey of the functionality is
 given, based on a simple model from \citep{Soetaert08}.
 
 \section{The example model}
 
 The example model describes growth of bacteria (\code{BACT}) on a
-substrate (\code{SUB}), and in a closed vessel.
+substrate (\code{SUB}) in a closed vessel. The model equations are:
 
-The model equations are:
-
-\begin{eqnarray*}
-\frac{dBact}{dt}= gmax \cdot eff \cdot \frac{Sub}{Sub+ks}\cdot Bact - d \cdot Bact - r_B \cdot Bact\\
-\frac{dSub}{dt}=- gmax \cdot \frac{Sub}{Sub+ks}\cdot Bact + d \cdot Bact
-\end{eqnarray*}
+\begin{align*}
+\frac{dBact}{dt} &= gmax \cdot eff \cdot \frac{Sub}{Sub+ks}\cdot Bact - d \cdot Bact - r_B \cdot Bact\\
+\frac{dSub}{dt} &=- gmax \cdot \frac{Sub}{Sub+ks}\cdot Bact + d \cdot Bact
+\end{align*}
 
 where the first, second and third term of the rate of change of
 \code{Bact} is growth of bacteria, death and respiration respectively.
-
 In \R, this model is implemented and solved as follows (see help pages
-of \ds):
-
-First the parameters are defined, as a list (a vector would also do)
+of \ds). First the parameters are defined, as a list (a vector would
+also do)
 
 <<>>=
 pars <- list(gmax =0.5,eff = 0.5,
@@ -130,37 +123,34 @@ pars <- list(gmax =0.5,eff = 0.5,
 @
 
 The model function \code{solveBact} takes as input the parameters and
-the time sequence at which output is wanted.
-
-Within this function, \code{derivs} is defined, which is the
-\emph{derivative} function, called at each time step by the solver. It
-takes as input the current time (\code{t}), the current values of the
-state variables (\code{state}) and the parameters (\code{pars}). It
-returns the rate of change of the state variables, packed as a list.
-
-Also within function \code{solveBact}, the state variables are given
-an initial condition (\code{state}) and the model solved by
-integration, using function \code{ode} from package
-\code{deSolve}. The results of the integration are returned, packed as
-a data.frame.
+the time sequence at which output is wanted.  Within this function,
+\code{derivs} is defined, which is the \emph{derivative} function,
+called at each time step by the solver. It takes as input the current
+time (\code{t}), the current values of the state variables
+(\code{state}) and the parameters (\code{pars}). It returns the rate
+of change of the state variables, packed as a list.  Also within
+function \code{solveBact}, the state variables are given an initial
+condition (\code{state}) and the model is solved by integration, using
+function \code{ode} from package \code{deSolve}. The results of the
+integration are returned, packed as a data.frame.
 
 <<>>=
 solveBact <- function(pars, times=seq(0,50,by=0.5)) {
- derivs <- function(t,state,pars) {    # returns rate of change
+ derivs <- function(t,state,pars) { # returns rate of change
    with(as.list(c(state,pars)), {
 
-     dBact = gmax*eff*Sub/(Sub+ks)*Bact - dB*Bact - rB*Bact
-     dSub  =-gmax    *Sub/(Sub+ks)*Bact + dB*Bact
+     dBact =  gmax*eff*Sub/(Sub+ks)*Bact - dB*Bact - rB*Bact
+     dSub  = -gmax    *Sub/(Sub+ks)*Bact + dB*Bact
      return(list(c(dBact,dSub)))
    })
  }
  state   <- c(Bact=0.1,Sub = 100)
- # ode solves the model by integration...
+ ## ode solves the model by integration...
  return(as.data.frame(ode(y=state,times=times,func=derivs,parms=pars)))
 }
 @
 
-The model is solved by calling \code{solveBact} with the default
+The model is then solved by calling \code{solveBact} with the default
 parameters:
 
 <<>>=
@@ -171,7 +161,7 @@ and output plotted as:
 
 <<label=ode,include=FALSE>>=
 plot(out$time,out$Bact,ylim=range(c(out$Bact,out$Sub)),
-     xlab="time, hour",ylab="molC/m3",type="l",lwd=2)
+     xlab="time, hour",ylab="mol C/m3",type="l",lwd=2)
 lines(out$time,out$Sub,lty=2,lwd=2)
 lines(out$time,out$Sub+out$Bact)
 
@@ -194,15 +184,14 @@ legend("topright",c("Bacteria","Glucose","TOC"),
 
 In global sensitivity analysis, certain parameters are changed over a
 large range, and the effect on certain model ouput variables assessed.
-
 In \fme this is done via function \code{sensRange}.
 
-First the sensitivity parameters are defined and a distribution
+First the sensitivity parameters are defined and a distribution is
 assigned; here we specify the minimum and maximum values of three
-parameters, in a data.frame.
+parameters in a \code{data.frame}:
 
 <<>>=
-parRanges <- data.frame(min=c(0.4,0.4,0.),max=c(0.6,0.6,0.02))
+parRanges <- data.frame(min=c(0.4,0.4,0.0),max=c(0.6,0.6,0.02))
 rownames(parRanges)<- c("gmax","eff","rB")
 parRanges
 @
@@ -212,7 +201,7 @@ Then we estimate the sensitivity to one parameter, \code{rB}
 (\code{dist=grid}). The effect of that on sensitivitiy variables
 \code{Bact} and \code{Sub} are estimated.  To do this, the model is
 run 100 times (\code{num=100}). The \code{system.time} is printed (in
-seconds)
+seconds):
 
 <<>>=
 tout    <- 0:50
@@ -225,10 +214,11 @@ head(summary(sR))
 
 The results are represented as a data.frame, containing summary
 information of the value of the sensitivity variable (\code{var}) at
-each time step (\code{x}).
+each time step (\code{x}).  It is relatively simple to plot the
+ranges, either as $\min \pm sd$ or using quantiles:
 
-It is relatively simple to plot the ranges, either as min+-std or
-using quantiles.
+%% ThPe Suggestion: more meaningful figure main,
+%% e.g. state variables and not "Sensitivity rB"
 
 <<label=sens,include=FALSE>>=
 par(mfrow=c(2,2))
@@ -254,6 +244,8 @@ Sensitivity ranges can also be estimated for a combination of
 parameters. Here we use all 3 parameters, and select a latin hypercube
 distribution.
 
+%% ThPe: Is latin hypercube a distribution?? I think it's a sampling algorithm
+
 <<>>=
 Sens2 <- summary(sensRange(func=solveBact,parms=pars,
              dist="latin",sensvar="Bact",parRange=parRanges,num=100))
@@ -270,7 +262,8 @@ plot(Sens2,main="Sensitivity gmax,eff,rB",xlab="time, hour",ylab="molC/m3")
 <<sens2>>
 @
 \end{center}
-\caption{Sensitivity range for a combination of parameters - see text for \R-code}
+\caption{Sensitivity range for a combination of parameters - see text
+  for \R-code}
 \label{fig:sens2}
 \end{figure}
 
@@ -278,8 +271,8 @@ plot(Sens2,main="Sensitivity gmax,eff,rB",xlab="time, hour",ylab="molC/m3")
 
 In local sensitivity, the effect of a parameter value in a very small
 region near its nominal value is estimated.  The methods implemented
-in \fme are based on \citep{Brun} which should be consulted for
-details.  They are based on so-called "sensitivity functions".
+in \fme are based on \citet{Brun} which should be consulted for
+details.  They are based on so-called ``sensitivity functions''.
 
 \subsection{Sensitivity functions}
 
@@ -293,7 +286,7 @@ SnsBact<- sensFun(func=solveBact,parms=pars,
 head(SnsBact)
 @
 
-They can easily be plotted:
+They can easily be plotted (Fig. \ref{fig:sens2}):
 
 <<label=sfun, include=FALSE>>=
 plot(SnsBact)
@@ -309,7 +302,7 @@ plot(SnsBact)
 \label{fig:sfun}
 \end{figure}
 
-\subsection{univariate sensitivity}
+\subsection{Univariate sensitivity}
 
 Based on the sensitivity functions, several summaries are generated,
 which allow to rank the parameters based on their influence on the
@@ -324,6 +317,9 @@ Sensitivity analysis can also be performed on several variables:
 <<>>=
 summary(sensFun(solveBact,pars,varscale=1),var=TRUE)
 @
+
+%% ThPe --> KS: Please give an explanation of the summary output,
+%% esp. L1 and L2
 
 \subsection{Bivariate sensitivity}
 
@@ -352,12 +348,11 @@ pairs(SnsBact)
 
 \subsection{Monte Carlo runs}
 
-Function \code{modCRL} runs a monte carlo, outputting 0-D variables,
+Function \code{modCRL} runs a Monte Carlo simulation, outputting 0-D variables,
 (in contrast to sensRange which outputs 1-D variables).
 
 <<>>=
-SF <- function (pars)
-{
+SF <- function (pars) {
   out <- solveBact(pars)
   return(out[nrow(out),2:3])
 }
