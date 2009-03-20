@@ -1,103 +1,25 @@
-ThPe
+  ToDo
 
-- 2009-03-11: just started to make me familiar with FME
-
-- 2009-03-16: KS : thanks for this input!  Below I use ** KS **
-
-- 2009-03-16 23:50: a few answer
-
-Comments
-
-- Norm: there is already a package mvtnorm with function rmvnorm
-- but, I understand (to some extent), that it is useful to have Unif,
-  Norm, Grid, ... with consistent interface, ...
+  ThPe-> ThPe: improve example "mcystmodel.R" accordingly
   
-  **KS** So I left Norm as it is...
-  ThPe: ok  
+  ThPe-> ThPe: improve structure modFit a little bit?
+    (try vectorization)
 
-- todo: add a seealso to the repective functions in "stats"
-  **KS** seealso rnorm, runif, seq
-  ThPe: ok
+  KS -> ThPe: (sensFun) 
 
+  **KS btw ** , in these plotting codes I check whether "main" is part
+  of the dots, and then adjust accordingly. Problem is that "main"
+  remains part of the dots, so I cannot pass the dots anymore to the
+  plot function.  To be really flexible, I would need to be able to
+  remove "main" from the dots. Is this possible? (and do you
+  understand what I mean?).
 
-ThPe's comments
+  ThPe: yes I understand and yes, it's possible. My task.
 
-o understand details of modFit and modCost
-  - try to combine the approaches of FME and simecol
-  - FME: more optimizers, Hessian, weighting, user specified cost function,
-    S3 methods to work with the output
-  - simecol: better vectorization (less looping) i.e. slightly faster
-    appproxTime, use of simObj'ects as models
-
-==>  o.k., tested: modFit is **great** - and works well with simecol, 
-  see package vignette of simecol and new example
-  "modFit_with_simecol.R"
   
-  ToDo:
-  - improve example "mcystmodel.R" accordingly
-
-  ** KS ** Or remove this example  entirely ? It was there for you...
-  ThPe: yes, thanks, it is my task.
+  modMCMC
+  ThPe -> KS: Great!!! 
+  (but I still  need to order a book to understand all options)
   
-  - ??: improve structure modFit a little bit?
-  ** KS ** Please be more specific. What would you like to see
-  changed?
+
   
-  ThPe: try vectorization; my task; not sure if necessary
-  
-  - ??: write method in simecol that makes use of modFit!
-  ** KS ** This is up to you
-  ThPe: of course, my task. Already there: doc in *my* vignette
-  
-  
-o sensFun
-  - write method for simObj'ects
-==> Not yet a method, but sensFun with simecol was no problem.
-  
-  - comment: mathematical formulae (and typesetting) need some
-    improvement, 
-    syntax is:  \eqn{latex}{ascii} and \deqn{latex}{ascii}
-    **KS** I thought I consistently used that - but there was an error in the
-    L1 norm help. Perhaps you did not like my ascii version?  y_i
-    etc...
-   
-    ThPe: y_i is fine, but perfect formula are indeed difficult, not
-    sure where it was but I let it on the "list of observed items" ;-)
-
-  - plot functions: 
-      main title overwrites scale, 
-      ** KS ** don't understand
-
-      ThPe:I'll try to find it again.
-     
-      replace ylab = "-" in plot.sensFun  with something more readable
-      ** KS ** changed to "sensitivity"
-
-      ThPe: ok
-   
-   **KS btw ** , in these plotting codes I check whether "main" is part of the
-   dots, and then adjust accordingly. Problem is that "main" remains part of the
-   dots, so I cannot pass the dots anymore to the plot function.
-   To be really flexible, I would need to be able
-   to remove "main" from the dots. Is this possible? (and do you understand what I mean?).
-
-   ThPe: yes I understand and yes, it's possible. My task.
-
-  - sensFun is useful,
-    - but collinearity index is fine, see also improved (?) plot
-    ** KS** I accepted this improvement. Much clearer
-    ThPe: ok
-
-o modCRL, sensRange
-  - that's similar to things I usually do
-  - please explain "what" in the help page (with example)
-
-  ** KS ** done!
-  ThPe: hmm, it's really easy, I have obviously missed tomething in my example
-  
-o modMCMC
-  - not yet tested
-  
-  **KS** it is the best part!  (also the more difficult one!)
-
-  ThPe: Sure!!! I intend to invest some more time before I can say something.
