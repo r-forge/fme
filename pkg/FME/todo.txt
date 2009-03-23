@@ -21,5 +21,22 @@
   ThPe -> KS: Great!!! 
   (but I still  need to order a book to understand all options)
   
+  KS -> ThPe the problem is there are no good books unless you are a
+  statistician - at least I haven't discovered them yet.
+  Gelman et al is nice, ... but difficult ; first time I
+  read it, I understood only the first page. Now I see more and more
+  useful stuff.
+  
+  I learnt most from a PhD thesis
+  Laine, M, 2008. Adaptive MCMC methods with applications in environmental
+  and geophysical models, Finnish meteorological institute contributions n0 69
+  -ISBN 978-951-697-662-7, Finnish meteorological institute, Helsinki.
+
+  which I found on the web; it explains very nicely the error variance
+
+  Part of the R-code is also adapted on the matlab code
+  developed by Marco Laine; I contacted him, and he was quire pleased with the
+  fact that his code was used.
+
 
   
