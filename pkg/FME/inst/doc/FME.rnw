@@ -624,9 +624,9 @@ plot(Cost, xlab="time",ylab="",main="residuals")
 
 \section{Markov chain Monte Carlo}
 
-We can use the results of the fit to run a MCMC (\citep{Gelman}).
+We can use the results of the fit to run a MCMC \citep{Gelman}.
 Function \code{modMCMC} implements the delayed rejection (DR) adaptive
-metropolis (AM) algorithm (\citep{Haario06}).
+metropolis (AM) algorithm \citep{Haario06}.
 
 The \code{summary} method of the best fit returns several useful values:
 
@@ -731,7 +731,9 @@ covIni
 \section{Distributions}
 
 Parameter values can be generated according to 4 different
-distributions \code{Grid,Uniform,Normal,Latinhyper}:
+distributions:
+
+\code{Grid,Uniform,Normal,Latinhyper}:
 
 <<label=dist, include=FALSE>>=
 par(mfrow=c(2,2))
@@ -771,7 +773,7 @@ They include:
   been written in FORTRAN.
 \item Omexdia\_FME.R. Here the functions are applied to a model
   implemented in \pkg{simecol}, an object-oriented framework for
-  ecological modeling (\citep{simecol}, more specifically in package
+  ecological modeling \citep{simecol}, more specifically in package
   \pkg{simecolModels} \citep{simecolModels}. The omexdia model is a
   1-D diagenetic model.
 \item O2profile\_FME.R. This contains a simple model of oxygen,
