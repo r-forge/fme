@@ -167,9 +167,11 @@ modMCMC(f, p, ..., jump=NULL,  lower=-Inf, upper=+Inf, prior=NULL,
   If \code{wvar0} is 0 (the default) then the error variances are assumed to
   be fixed.
 
-  \code{var0} measures the variance of the measured components. Typically,
-  these variances can be estimated from the mean squares of fitted residuals.
-  (e.g. as reported in \code{modFit}). See the examples.
+  \code{var0} estimates the variance of the measured components. In case
+  independent estimates are not available, these variances can be obtained
+  from the mean squares of fitted residuals. (e.g. as reported in
+  \code{modFit}). See the examples. (but note that this is not truly independent
+  information)
 
   \code{var0} is either one value, or a value for each observed variable,
   or a value for each observed data point.
@@ -429,7 +431,7 @@ points(Obs,pch=16,cex=1.5)
 \author{
   Karline Soetaert <k.soetaert@nioo.knaw.nl>
   
-  Marko Laine <Marko.Laine@Helsinki.fi>
+  Marko Laine <Marko.Laine@fmi.fi>
 }
 \references{
   Laine, M, 2008. Adaptive MCMC methods with applications in environmental and
