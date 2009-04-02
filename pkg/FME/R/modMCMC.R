@@ -550,7 +550,8 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
 ## S3 methods of modMCMC
 ## -----------------------------------------------------------------------------
 
-pairs.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars), ...) {
+pairs.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars),
+                           remove = NULL, ...) {
 
   panel.cor <- function(x, y,...)
     text(x = mean(range(x)), y = mean(range(y)),
@@ -567,6 +568,14 @@ pairs.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars), ...) {
     rect(breaks[-nB], 0, breaks[-1], y, col = "cyan")
   }
   X <- x$pars[,what]
+  if (! is.null (remove)) {
+    if (max(remove) > nrow(X))
+      stop("too many runs should be removed from modMCMC object")
+    if (min(remove) < 1)
+      stop("cannot remove negative runs from modMCMC object")
+    X <- X[-remove,]
+  }
+
   if (Full)
     X <- cbind(X,SSR=x$SS)
 
@@ -578,9 +587,18 @@ pairs.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars), ...) {
 ## -----------------------------------------------------------------------------
 # This one not yet available ...
 
-cumuplot.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars), ...) {
+cumuplot.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars),
+                              remove = NULL, ...) {
 
   mcmc <- x$pars[,what]
+  if (! is.null (remove)) {
+    if (max(remove) > nrow(mcmc))
+      stop("too many runs should be removed from modMCMC object")
+    if (min(remove) < 1)
+      stop("cannot remove negative runs from modMCMC object")
+    mcmc <- mcmc[-remove,]
+  }
+
 
   if (Full) mcmc <- cbind(mcmc,x$SS)
   if (Full & !is.null(x$sig))
@@ -592,7 +610,7 @@ cumuplot.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars), ...) {
 ## -----------------------------------------------------------------------------
 
 plot.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars), trace=TRUE,
-                           ...) {
+                          remove=NULL, ...) {
 
   np <- NP <- length(what)
   if (Full)
@@ -613,14 +631,23 @@ plot.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars), trace=TRUE,
     mf <- par(mfrow=mfrow)
     on.exit(par(mf))
   }
-  
+
+  mcmc <- x$pars
+  if (! is.null (remove)) {
+    if (max(remove) > nrow(mcmc))
+      stop("too many runs should be removed from modMCMC object")
+    if (min(remove) < 1)
+      stop("cannot remove negative runs from modMCMC object")
+    mcmc <- mcmc[-remove,]
+  }
+
   for(i in what) {
     if ("main" %in% nmdots)
-      plot(x$pars[,i],type="l", xlab="iter",ylab="",...)
+      plot(mcmc[,i],type="l", xlab="iter",ylab="",...)
     else
-      plot(x$pars[,i],type="l",main=colnames(x$pars)[i],
+      plot(mcmc[,i],type="l",main=colnames(mcmc)[i],
                       xlab="iter",ylab="",...)
-    if (trace) lines(lowess(x$pars[,i]),col="darkgrey",lwd=2)
+    if (trace) lines(lowess(mcmc[,i]),col="darkgrey",lwd=2)
   }
 
   if (Full) {
@@ -642,7 +669,8 @@ plot.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars), trace=TRUE,
 
 ## -----------------------------------------------------------------------------
 
-hist.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars), ...) {
+hist.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars),
+                          remove=NULL, ...) {
 
   np <- NP <- length(what)
   if (Full)
@@ -666,11 +694,20 @@ hist.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars), ...) {
   
   Breaks  <- if ("breaks" %in% nmdots) dots$breaks else 100
 
+  mcmc <- x$pars
+  if (! is.null (remove)) {
+    if (max(remove) > nrow(mcmc))
+      stop("too many runs should be removed from modMCMC object")
+    if (min(remove) < 1)
+      stop("cannot remove negative runs from modMCMC object")
+    mcmc <- mcmc[-remove,]
+  }
+
   for(i in what)
     if ("breaks" %in% nmdots)
-      hist(x$pars[,i],main=colnames(x$pars)[i],
+      hist(mcmc[,i],main=colnames(mcmc)[i],
                   xlab="",ylab="-",freq=FALSE,...)
-    else hist(x$pars[,i],main=colnames(x$pars)[i],
+    else hist(mcmc[,i],main=colnames(mcmc)[i],
                   xlab="",ylab="-",breaks=Breaks,freq=FALSE,...)
 
   if (Full) {
@@ -693,15 +730,24 @@ hist.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars), ...) {
 
 ## -----------------------------------------------------------------------------
 
-summary.modMCMC <- function (object, ...) {
+summary.modMCMC <- function (object, remove = NULL, ...) {
+
+  mcmc <- object$pars
+  if (! is.null (remove)) {
+    if (max(remove) > nrow(mcmc))
+      stop("too many runs should be removed from modMCMC object")
+    if (min(remove) < 1)
+      stop("cannot remove negative runs from modMCMC object")
+    mcmc <- mcmc[-remove,]
+  }
   Res <- data.frame(rbind(
-    mean=apply(object$pars,2,mean),
-    sd  =apply(object$pars,2,sd),
-    min =apply(object$pars,2,min),
-    max =apply(object$pars,2,max),
-    q025 =apply(object$pars,2,quantile,probs=0.25),
-    q050 =apply(object$pars,2,quantile,probs=0.5),
-    q075 =apply(object$pars,2,quantile,probs=0.75)
+    mean=apply(mcmc,2,mean),
+    sd  =apply(mcmc,2,sd),
+    min =apply(mcmc,2,min),
+    max =apply(mcmc,2,max),
+    q025 =apply(mcmc,2,quantile,probs=0.25),
+    q050 =apply(mcmc,2,quantile,probs=0.5),
+    q075 =apply(mcmc,2,quantile,probs=0.75)
     ))
 
   if (!is.null(object$sig))

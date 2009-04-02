@@ -20,13 +20,16 @@ modMCMC(f, p, ..., jump=NULL,  lower=-Inf, upper=+Inf, prior=NULL,
 
 %%cumuplot.modMCMC(x, Full=FALSE, what=1:ncol(x$pars), ...)
 
-\method{summary}{modMCMC}(object, \dots)
+\method{summary}{modMCMC}(object,   remove = NULL, \dots)
 
-\method{pairs}{modMCMC}(x, Full=FALSE, what = 1:ncol(x$pars), \dots)
+\method{pairs}{modMCMC}(x, Full=FALSE, what = 1:ncol(x$pars),
+  remove = NULL, \dots)
 
-\method{hist}{modMCMC}(x, Full=FALSE, what = 1:ncol(x$pars), \dots)
+\method{hist}{modMCMC}(x, Full=FALSE, what = 1:ncol(x$pars),
+  remove = NULL, \dots)
 
-\method{plot}{modMCMC}(x, Full=FALSE, what = 1:ncol(x$pars), trace=TRUE, \dots)
+\method{plot}{modMCMC}(x, Full=FALSE, what = 1:ncol(x$pars), trace=TRUE,
+  remove = NULL, \dots)
 }
 
 \arguments{
@@ -103,6 +106,9 @@ modMCMC(f, p, ..., jump=NULL,  lower=-Inf, upper=+Inf, prior=NULL,
   \item{what }{the name or the index to the variables that should be plotted.
   }
   \item{trace }{if \code{TRUE}, adds smoothed line to the plot.
+  }
+  \item{remove }{a list with indices of the runs that should be removed (e.g.
+    to remove runs during burnin.
   }
 }
 \value{

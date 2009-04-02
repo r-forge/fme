@@ -95,10 +95,10 @@ Oderes <- fitOdeModel(sc, whichpar=whichpar, obstime, optdat,  method="BFGS",
 Oderes$par
 
 # this works too...
-Oderes2 <- fitOdeModel(sc, whichpar=whichpar, obstime, optdat,  method="PORT",
-  debuglevel=0, lower = lower, upper = upper, control=list(trace=TRUE))
+#Oderes2 <- fitOdeModel(sc, whichpar=whichpar, obstime, optdat,  method="PORT",
+#  debuglevel=0, lower = lower, upper = upper, control=list(trace=TRUE))
 
-Oderes$par
+#Oderes$par
 
 ## asign parms to the model object and simulate again
 parms(sc)[whichpar] <- Oderes$par

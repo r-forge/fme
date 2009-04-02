@@ -183,8 +183,8 @@ Cost <- Objective(Fit$par)
 # 1. use parameter covariances of fit to update parameters
 Covar   <- SFit$cov.scaled * 2.4^2/4
 
-# mean variance of fit = prior for model variance
-s2prior <- SFit$modVariance
+# mean squared residuals of fit = prior for model variance
+s2prior <- Fit$ms
 
 # adaptive metropolis
 MCMC <- modMCMC(f=Objective,p=Fit$par,jump=Covar,niter=100,ntrydr=3,
@@ -201,7 +201,7 @@ plot(summary(sensRange(parms=pars,parInput=MCMC$par,
 
 # 2. mean variance of separate fitted variables are prior for model variance
 # This does not work so well...
-s2priorvar <- Fit$varsigma
+s2priorvar <- Fit$var_ms
 
 # unless we artificially increase varaiance for low O2 flux
 s2priorvar[2]<-1
