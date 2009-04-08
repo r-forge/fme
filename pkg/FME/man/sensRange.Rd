@@ -28,8 +28,8 @@ sensRange(func,parms=NULL,sensvar=NULL,dist="unif",
 
 \method{plot}{summary.sensRange}(x, xyswap =FALSE,
               what=NULL, legpos="topleft",
-              col=c(grey(0.8),grey(0.7)),
-              quant =FALSE,xlab=NULL, ylab=NULL, \dots)
+              col=c(grey(0.8), grey(0.7)),
+              quant =FALSE, \dots)
 
 \method{plot}{sensRange}(x, xyswap =FALSE,
               what=NULL,\dots)
@@ -109,10 +109,6 @@ sensRange(func,parms=NULL,sensvar=NULL,dist="unif",
   \item{quant }{if \code{TRUE}, then the median surrounded by the quantiles
     q25-q75 and q95-q95 are plotted, else the min-max and mean+- sd are plotted.
     }
-  \item{xlab }{the X axis label to the plot.
-  }
-  \item{ylab }{the Y axis label to the plot.
-  }
   \item{... }{additional arguments passed to \code{func} or to the methods.
   }
 }

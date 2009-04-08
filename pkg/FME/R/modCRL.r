@@ -62,7 +62,7 @@ summary.modCRL<-function(object,...) {
 
 ## -----------------------------------------------------------------------------
 
-plot.modCRL<-function(x,what=NULL,xlab=NULL,ylab=NULL,...) {
+plot.modCRL<-function(x, what=NULL, ...) {
   var <-attr(x,"var")
   np  <- attr(x,"npar")
   if (np > 1)
@@ -88,16 +88,12 @@ plot.modCRL<-function(x,what=NULL,xlab=NULL,ylab=NULL,...) {
     on.exit(par(mf))
   }
   
-  if (is.null(xlab))
-    xlab<-pars
-  if (is.null(ylab))
-    ylab<-ylab
+  dots$xlab    <- if(is.null(dots$xlab))  pars   else dots$xlab
+  dots$ylab    <- if(is.null(dots$ylab))  ""     else dots$ylab
+  Main <- is.null(dots$main)
 
   for(i in Select) {
-    if ("main" %in% nmdots)
-      plot(x[,1],x[,i+1], xlab=xlab,ylab=ylab,...)
-    else
-      plot(x[,1],x[,i+1],main=var[i],
-                      xlab=pars,ylab="",...)
+    if (Main) dots$main <- var[i]
+    do.call("plot",c(alist(x[,1],x[,i+1]),dots))
   }
 }

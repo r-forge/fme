@@ -193,39 +193,37 @@ plot.sensRange<-function(x, xyswap=FALSE, what=NULL,...) {
   nx  <-attr(x,"nx")
   var <-attr(x,"var")
   X  <-attr(x,"x")
+  sens<- x[,-(1:npar)]
+
   dots <- list(...)
   nmdots <- names(dots)
-
-  sens<- x[,-(1:npar)]
+  Main <- is.null(dots$main)
+  dots$type <- if(is.null(dots$type)) "l" else dots$type
+  dots$ylim <- if(is.null(dots$ylim)) {
+    if (xyswap) range(x) else rev(range(x))
+  } else dots$ylim
 
   if (!is.null(what))
     Select <- which (var %in% what) else Select <- 1:length(var)
 
   if (nx > 1)
     for (i in Select){
-      yrange <- if ("ylim" %in% nmdots) dots$ylim else range(X)
       ii <- ((i-1)*nx+1):(i*nx)
 
-      if ("main" %in% nmdots) {
         if (!xyswap)
-           matplot(X,t(sens[,ii]),type="l",...)
-        else matplot(t(sens[,ii]),X,type="l",ylim=rev(yrange),...)
-      } else {
-        Main  <- var[i]
-        if (!xyswap)
-           matplot(X,t(sens[,ii]),type="l",main=Main,...)
-        else matplot(t(sens[,ii]),X,type="l",main=Main,ylim=rev(yrange))
-      }
+          do.call("matplot",c(alist(X,t(sens[,ii])),dots))
+        else
+          do.call("matplot",c(alist(t(sens[,ii]),X),dots))
+
     }  # end for
   else
-    boxplot(sens[,Select])
+    boxplot(sens[,Select],...)
 }
 
 ## -----------------------------------------------------------------------------
 
 plot.summary.sensRange<-function(x, xyswap=FALSE, what=NULL,legpos="topleft",
-                                 col=c(grey(0.8),grey(0.7)), quant=FALSE,
-                                 xlab=NULL, ylab=NULL, ...) {
+      col=c(grey(0.8),grey(0.7)), quant=FALSE, ...) {
   nx  <-attr(x,"nx")
   var <-attr(x,"var")
 
@@ -234,6 +232,19 @@ plot.summary.sensRange<-function(x, xyswap=FALSE, what=NULL,legpos="topleft",
 
   if (!is.null(what))
     Select <- which (var %in% what) else Select <- 1:length(var)
+
+  Main <- is.null(dots$main)
+  Ylim <- is.null(dots$ylim)
+  Xlim <- is.null(dots$xlim)
+
+  dots$ylab <- if(is.null(dots$ylab)) "y" else dots$ylab
+  dots$xlab <- if(is.null(dots$xlab)) "x" else dots$xlab
+
+  Dots <- dots
+  Dots$ylab<-NULL
+  Dots$ylim<-NULL
+  Dots$xlab<-NULL
+  Dots$xlim<-NULL
 
   if (nx > 1)  {    # summary of a times series or a profile...
     for (i in Select){
@@ -254,23 +265,22 @@ plot.summary.sensRange<-function(x, xyswap=FALSE, what=NULL,legpos="topleft",
         xup  <- X$Mean+X$Sd
         leg <- c("Min-Max","Mean+-sd")
       }
-      yrange<- if ("ylim" %in% nmdots) dots$ylim else range(cbind(xmin,xmax))
-      xrange<- if ("xlim" %in% nmdots) dots$xlim else range(X$x)
-      Main  <- if ("main" %in% nmdots) dots$main else var[i]
-      if(is.null(xlab)) xlab<- "x"
-      if(is.null(ylab)) xlab<- "y"
+
+      if (Ylim) dots$ylim <- range(cbind(xmin,xmax))
+      if (Xlim) dots$xlim <- range(X$x)
+      if (Main) dots$main <- var[i]
+
       if (!xyswap) {
-        plot(X$x,xmean,ylim=yrange,xlim=xrange,type="n",main=Main,
-             xlab=xlab,ylab=ylab)
+        do.call("plot",c(alist(X$x,xmean,type="n"),dots))
         polygon(c(X$x,rev(X$x)),c(xmin,rev(xmax)),col=col[1],border=NA)
         polygon(c(X$x,rev(X$x)),c(xlow,rev(xup)),col=col[2],border=NA)
-        lines(X$x,xmean,...) }
+        do.call("lines",c(alist(X$x,xmean),Dots) )
+      }
       else {
-        plot(xmean,X$x,xlim=yrange,type="n",main=Main,ylim=rev(xrange),
-             xlab=xlab,ylab=ylab)
+        do.call("plot",c(alist(xmean,X$x,type="n"),dots))
         polygon(c(xmin,rev(xmax)),c(X$x,rev(X$x)),col=col[1],border=NA)
         polygon(c(xlow,rev(xup)),c(X$x,rev(X$x)),col=col[2],border=NA)
-        lines(xmean,X$x,...)
+        do.call("lines",c(alist(xmean,X$x),Dots) )
       }
     } # end i loop
     if (! is.null(legpos))

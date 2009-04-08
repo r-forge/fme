@@ -28,7 +28,7 @@ modCRL(func,parms=NULL,sensvar=NULL,dist="unif",
 
 \method{summary}{modCRL}(object,  \dots)
 
-\method{plot}{modCRL}(x, what=NULL,xlab=NULL, ylab=NULL, \dots)
+\method{plot}{modCRL}(x, what=NULL, \dots)
 }
 \arguments{
   \item{func }{an R-function that has as first argument \code{parms} and that
@@ -83,10 +83,6 @@ modCRL(func,parms=NULL,sensvar=NULL,dist="unif",
   \item{x }{an object of class \code{modCRL}.
   }
   \item{what }{the name or the index to the variables that should be plotted.
-  }
-  \item{xlab }{X axis label to the plot.
-  }
-  \item{ylab }{Y axis label to the plot.
   }
   \item{... }{additional arguments passed to function \code{func} or to
     the methods.

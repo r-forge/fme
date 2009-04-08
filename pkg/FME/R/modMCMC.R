@@ -551,7 +551,7 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
 ## -----------------------------------------------------------------------------
 
 pairs.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars),
-                           remove = NULL, ...) {
+                           remove = NULL, nsample = NULL, ...) {
 
   panel.cor <- function(x, y,...)
     text(x = mean(range(x)), y = mean(range(y)),
@@ -565,8 +565,10 @@ pairs.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars),
     nB <- length(breaks)
     y <- h$counts
     y <- y/max(y)
-    rect(breaks[-nB], 0, breaks[-1], y, col = "cyan")
+    rect(breaks[-nB], 0, breaks[-1], y, col = "grey")
   }
+  panel.main <- function(x,y,...)
+    points(x[ii],y[ii],...)
   X <- x$pars[,what]
   if (! is.null (remove)) {
     if (max(remove) > nrow(X))
@@ -576,12 +578,23 @@ pairs.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars),
     X <- X[-remove,]
   }
 
+  if (is.null(nsample))
+    ii <- 1:nrow(X) else
+    ii <- sample((1:nrow(X)),nsample)
   if (Full)
     X <- cbind(X,SSR=x$SS)
 
   labels <- colnames(X)
-  pairs(X, diag.panel = panel.hist, labels = labels, gap = 0,
-        lower.panel = panel.cor, ...)
+  dots <- list(...)
+
+  dots$diag.panel <- if(is.null(dots$diag.panel)) panel.hist else dots$diag.panel
+  dots$lower.panel <- if(is.null(dots$lower.panel)) panel.cor else dots$lower.panel
+  dots$upper.panel <- if(is.null(dots$upper.panel)) panel.main else dots$upper.panel
+  dots$gap <- if(is.null(dots$gap)) 0 else dots$gap
+  dots$labels <- if(is.null(dots$labels)) labels else dots$labels
+
+  do.call("pairs",c(alist(X),dots))
+
 }
 
 ## -----------------------------------------------------------------------------
@@ -640,13 +653,15 @@ plot.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars), trace=TRUE,
       stop("cannot remove negative runs from modMCMC object")
     mcmc <- mcmc[-remove,]
   }
+  Main <- is.null(dots$main)
+
+  dots$xlab <- if(is.null(dots$xlab)) "iter" else dots$xlab
+  dots$ylab <- if(is.null(dots$ylab)) "" else dots$ylab
+  dots$type <- if(is.null(dots$type)) "l" else dots$type
 
   for(i in what) {
-    if ("main" %in% nmdots)
-      plot(mcmc[,i],type="l", xlab="iter",ylab="",...)
-    else
-      plot(mcmc[,i],type="l",main=colnames(mcmc)[i],
-                      xlab="iter",ylab="",...)
+    if (Main) dots$main <- colnames(mcmc)[i]
+    do.call("plot",c(alist(mcmc[,i]),dots))
     if (trace) lines(lowess(mcmc[,i]),col="darkgrey",lwd=2)
   }
 
@@ -692,7 +707,11 @@ hist.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars),
     on.exit(par(mf))
   }
   
-  Breaks  <- if ("breaks" %in% nmdots) dots$breaks else 100
+  Main <- is.null(dots$main)
+  dots$xlab    <- if(is.null(dots$xlab))    ""    else dots$xlab
+  dots$freq    <- if(is.null(dots$freq))    FALSE else dots$freq
+  dots$ylab    <- if(is.null(dots$ylab))    "-"   else dots$ylab
+  dots$breaks  <- if (is.null(dots$breaks)) 100   else dots$breaks
 
   mcmc <- x$pars
   if (! is.null (remove)) {
@@ -703,29 +722,22 @@ hist.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars),
     mcmc <- mcmc[-remove,]
   }
 
-  for(i in what)
-    if ("breaks" %in% nmdots)
-      hist(mcmc[,i],main=colnames(mcmc)[i],
-                  xlab="",ylab="-",freq=FALSE,...)
-    else hist(mcmc[,i],main=colnames(mcmc)[i],
-                  xlab="",ylab="-",breaks=Breaks,freq=FALSE,...)
-
+  for(i in what) {
+    if (Main) dots$main <- colnames(mcmc)[i]
+    do.call("hist",c(alist(mcmc[,i]),dots))
+  }
   if (Full) {
-    if ("breaks" %in% nmdots)
-       hist(x$SS,main="SSR",xlab="",ylab="-",freq=FALSE,...)
-    else hist(x$SS,main="function value",xlab="",ylab="-",
-              breaks=Breaks,freq=FALSE,...)
+    dots$main <- "SSR"
+    do.call("hist",c(alist(mcmc[,i]),dots))
   }
 
-  if (Full & !is.null(x$sig))
-    for ( i in 1:ncol(x$sig))
-      if ("breaks" %in% nmdots)
-        hist(sqrt(x$sig[,i]),main="error std posterior",
-             xlab="",ylab=colnames(x$sig)[i],freq=FALSE,...)
-      else hist(sqrt(x$sig[,i]),main="error std posterior",
-                xlab="",ylab=colnames(x$sig)[i],
-                breaks=Breaks,freq=FALSE,...)
-
+  if (Full & !is.null(x$sig)) {
+    if (Main) dots$main <- "error std posterior"
+    for ( i in 1:ncol(x$sig))  {
+      dots$ylab <- colnames(x$sig)[i]
+      do.call("hist",c(alist(mcmc[,i]),dots))
+    }
+  }
 }
 
 ## -----------------------------------------------------------------------------

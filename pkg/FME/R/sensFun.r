@@ -188,8 +188,13 @@ pairs.sensFun <- function (x, ...) {
 
   panel.cor <- function(x, y) text(x = mean(range(x)), y = mean(range(y)),
        labels = format(cor(x, y), digits = 2))
-  pairs(as.matrix(X), diag.panel = NULL, gap = 0,
-       lower.panel = panel.cor, ...)
+  dots <- list(...)
+
+  dots$diag.panel <- if(is.null(dots$diag.panel)) NULL else dots$diag.panel
+  dots$lower.panel <- if(is.null(dots$lower.panel)) panel.cor else dots$lower.panel
+  dots$gap <- if(is.null(dots$gap)) 0 else dots$gap
+  do.call("pairs",c(alist(as.matrix(X)),dots))
+
 }
 
 ## -----------------------------------------------------------------------------
@@ -200,18 +205,20 @@ plot.sensFun<- function(x,legpos="topleft",...) {
   dots <- list(...)
   nmdots <- names(dots)
 
+  nc <- ncol(x) - 2
+
+  Main <- is.null(dots$main)
+  dots$ylab <- if(is.null(dots$ylab)) "sensitivity" else dots$ylab
+  dots$type <- if(is.null(dots$type)) "l" else dots$type
+  dots$col <- if(is.null(dots$col)) 1:nc else dots$col
+  dots$lty <- if(is.null(dots$lty)) 1:nc else dots$lty
+
   for (i in 1:length(var)){
     ii <- ((i-1)*nx):(i*nx)
-    Main  <- if ("main" %in% nmdots) dots$main else var[i]
+    if (Main) dots$main <- var[i]
     sens<- x[ii,]
-   if ("main" %in% nmdots)
-    matplot(sens$x,as.matrix( sens[,-(1:2)]),type="l",
-        ylab="sensitivity",main=Main)
-   else
-    matplot(sens$x,as.matrix( sens[,-(1:2)]),type="l",
-        ylab="sensitivity",main=Main,...)
+    do.call("matplot",c(alist(sens$x,as.matrix( sens[,-(1:2)])),dots))
   }
-  nc <- ncol(x) - 2
   if (! is.na(legpos))
     legend(legpos,names(x[,-(1:2)]),col=1:nc,lty=1:nc)
 }
@@ -223,12 +230,13 @@ plot.summary.sensFun<- function(x,...) {
   nmdots <- names(dots)
 
   nr <- nrow(x)
+  dots$main <- if(is.null(dots$main)) "sensitivity" else dots$main
+  dots$labels<- if(is.null(dots$labels)) rownames(x) else dots$labels
+  dots$xlim <- if(is.null(dots$xlim)) range(c(x$Min,x$Max)) else dots$xlim
+  dots$pch <- if(is.null(dots$pch)) 1 else dots$pch
+  dots$col <- if(is.null(dots$col)) "black" else dots$col
 
-  if ("main" %in% nmdots)
-    dotchart(c(x$Mean,Inf),labels=rownames(x),xlim=range(c(x$Min,x$Max)),
-             pch=3,...)
-  else dotchart(c(x$Mean,Inf),labels=rownames(x),xlim=range(c(x$Min,x$Max)),
-             pch=3, main="Sensitivity")
+  do.call("dotchart",c(alist(c(x$Mean,Inf)),dots))
 
   # add ranges
   for (i in 1:nr) {
@@ -237,6 +245,6 @@ plot.summary.sensFun<- function(x,...) {
   points(x$L1,1:nr,pch=16,col="red")
   points(x$L2,1:nr,pch=18,col="blue")
 
-  legend("top",legend=c("L1","L2","Mean"),pch=c(3,16,18),
-          col=c("black","red","blue"),ncol=3)
+  legend("top",legend=c("L1","L2","Mean"),pch=c(dots$pch ,16,18),
+          col=c(dots$col,"red","blue"),ncol=3)
 }

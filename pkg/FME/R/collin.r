@@ -86,9 +86,15 @@ collin <- function(sensfun,parset=NULL) {
 
 ## ThPe:
 plot.collin <- function(x, ...) {
+
+  dots <- list(...)
+  dots$ylab <- if(is.null(dots$ylab)) "Collinearity index" else dots$ylab
+  dots$xlab <- if(is.null(dots$xlab)) "Number of parameters" else dots$xlab
+  dots$main <- if(is.null(dots$main)) "Collinearity" else dots$main
+
   nc <- ncol(x)
-  stripchart(x[,nc] ~ x[,nc-1], method="stack", main = "Collinearity",
-     xlab="Number of parameters", ylab="Collinearity index", vertical = TRUE, ...)
+    do.call("stripchart",c(alist(x[,nc] ~ x[,nc-1], method="stack",
+    vertical = TRUE),dots))
 }
 
 

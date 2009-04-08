@@ -23,7 +23,7 @@ modMCMC(f, p, ..., jump=NULL,  lower=-Inf, upper=+Inf, prior=NULL,
 \method{summary}{modMCMC}(object,   remove = NULL, \dots)
 
 \method{pairs}{modMCMC}(x, Full=FALSE, what = 1:ncol(x$pars),
-  remove = NULL, \dots)
+  remove = NULL, nsample = NULL, \dots)
 
 \method{hist}{modMCMC}(x, Full=FALSE, what = 1:ncol(x$pars),
   remove = NULL, \dots)
@@ -109,6 +109,12 @@ modMCMC(f, p, ..., jump=NULL,  lower=-Inf, upper=+Inf, prior=NULL,
   }
   \item{remove }{a list with indices of the runs that should be removed (e.g.
     to remove runs during burnin.
+  }
+  \item{nsample }{the number of xy pairs to be plotted on the upper panel in
+    the pairs plot. When \code{NULL} all xy pairs plotted. Set to a lower number
+    in case the graph becomes too dense (and the exported picture too large).
+    This does not affect the histograms on the diagonal plot
+   (which are estimated using all MCMC draws).
   }
 }
 \value{
