@@ -56,7 +56,7 @@ of models, consisting of differential equations. This is a preliminary version.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% R/Sweave specific LaTeX commands.
 %% need no \usepackage{Sweave}
-%\VignetteIndexEntry{FME - utilities for the application of models consisting of differential equations}
+%\VignetteIndexEntry{FME - sensitivity, calibration, identifiability, monte carlo analysis for models consisting of differential equations}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Begin of the document
 \begin{document}
