@@ -4,6 +4,12 @@
 
 Norm <- function(parMean, parCovar, parRange=NULL, num) {
 
+  if(is.matrix(parMean)) {
+    cn <- colnames(parMean)
+    parMean <- as.vector(parMean)
+    names(parMean) <- cn
+  }
+
   nc  <- NCOL(parCovar)
   if (nc != length(parMean))
     stop ("cannot generate Normal distribution: parCovar and parMean not compatible")

@@ -1,0 +1,366 @@
+\documentclass[article,nojss]{jss}
+\DeclareGraphicsExtensions{.pdf,.eps}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Add-on packages and fonts
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{float}
+
+
+\newcommand{\noun}[1]{\textsc{#1}}
+%% Bold symbol macro for standard LaTeX users
+\providecommand{\boldsymbol}[1]{\mbox{\boldmath $#1$}}
+
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+\newcommand{\fme}{\textbf{\textsf{FME }}}
+\newcommand{\ds}{\textbf{\textsf{deSolve }}}
+\newcommand{\rs}{\textbf{\textsf{rootSolve }}}
+\newcommand{\R}{\proglang{R}}
+\title{\proglang{R}-package \fme: MCMC tests}
+\Plaintitle{FME - MCMC tests}
+
+\Keywords{markov chain monte carlo, delayed rejection, adapative metropolis,
+MCMC, DRAM,  \proglang{R}}
+
+\Plainkeywords{markov chain monte carlo, delayed rejection, adapative metropolis,
+MCMC, DRAM,  R}
+
+
+\author{Karline Soetaert\\
+NIOO-CEME\\
+The Netherlands
+}
+
+\Plainauthor{Karline Soetaert}
+
+\Abstract{This vignette tests the markov chain monte carlo (MCMC) implementation
+of \R package \fme \citep{FME}.
+
+It includes the delayed rejection and adaptive metropolis algorithm \citep{Haario06}}
+
+%% The address of (at least) one author should be given
+%% in the following format:
+\Address{
+  Karline Soetaert\\
+  Centre for Estuarine and Marine Ecology (CEME)\\
+  Netherlands Institute of Ecology (NIOO)\\
+  4401 NT Yerseke, Netherlands\\
+  E-mail: \email{k.soetaert@nioo.knaw.nl}\\
+  URL: \url{http://www.nioo.knaw.nl/ppages/ksoetaert}\\
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% R/Sweave specific LaTeX commands.
+%% need no \usepackage{Sweave}
+%\VignetteIndexEntry{FME - tests of the markov chain monte carlo implementation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Begin of the document
+\begin{document}
+\SweaveOpts{engine=R,eps=FALSE}
+\SweaveOpts{keep.source=TRUE}
+
+<<preliminaries,echo=FALSE,results=hide>>=
+library("FME")
+options(prompt = "> ")
+options(width=70)
+@
+
+\maketitle
+
+\section{Introduction}
+Here some functions from \R-package \fme are tested. As it is a test of the
+function implementation, this does not mean that the results obtained are meaningful.
+
+It includes two tests of the implemented MCMC method:
+\begin{itemize}
+\item The "banana" function, sampling from a curvilinear function (\citep{Laine})
+\item A simple chemical model, fitted to a data series (\citep{Haario06})
+\end{itemize}
+
+Other tests are in the following vignettes:
+\begin{itemize}
+\item "FMEsteady", a steady-state solution of a partial differential equation
+\item "FMEdyna", a dynamic ordinary differential equation model  and
+\item "FMEother", a monod function, fitted to a data-series.
+\end{itemize}
+
+\section{The banana}
+\subsection{the model}
+This example is from \cite{Laine}.
+
+A banana-shaped function is created by distorting a two-dimensional Gaussian
+distribution, with mean = 0 and a covariance matrix $\tau$) with unity variances and
+covariance of 0.9.
+\begin{center}
+\[
+\tau = \left[ {\begin{array}{*{20}c}
+   {0.9} & {0}  \\
+   {0} & {0.9}  \\
+\end{array}} \right]
+\]
+\end{center}
+
+The distortion is along the second-axis only and given by:
+\begin{eqnarray*}
+y_1=x_1\\
+y_2=x_2+x_1^2+1
+\end{eqnarray*}
+
+\subsection{R-implementation}
+First the banana function is defined.
+<<>>=
+Banana <- function (x1,x2)
+{
+  return(x2 - (x1^2+1))
+}
+@
+We also need a function that estimates the probability of a multinormally
+distributed vector
+<<>>=
+pmultinorm <- function(vec,mean,Cov)
+
+{
+ diff <- vec - mean
+ ex   <- -0.5*t(diff) %*% solve(Cov) %*% diff
+ rdet   <- sqrt(det(Cov))
+ power  <- -length(diff)*0.5
+ return((2.*pi)^power / rdet * exp(ex))
+}
+@
+
+The target function returns -2 *log (probability) of the value
+<<>>=
+BananaSS <- function (p)
+{
+  P <- c(p[1],Banana(p[1],p[2]))
+  Cov <- matrix(nr=2,data=c(1,0.9,0.9,1))
+ -2*sum(log(pmultinorm(P,mean=0,Cov=Cov)))
+}
+@
+
+The initial proposal covariance (\code{jump}) is the identity matrix with a
+variance of 5. The simulated chain is of length 1000 (\code{niter}).
+The \code{modMCMC} function prints the \% of accepted runs. More information is
+in item \code{count} of its return element.
+
+The First Markov chain is generated with the simple metropolis hastings (MH) algorithm
+<<>>=
+MCMC <- modMCMC(f=BananaSS, p=c(0,0.5), jump=diag(nrow=2,x=5),
+                niter=1000)
+MCMC$count
+@
+Next we use the adaptive metropolis (AM) algorithm and update the proposal every
+100 runs (\code{updatecov})
+<<>>=
+MCMC2 <- modMCMC(f=BananaSS, p=c(0,0.5), jump=diag(nrow=2,x=5),
+                 updatecov=100,niter=1000)
+MCMC2$count
+@
+Then the metropolis algorithm with delayed rejection (DR) is applied; upon rejection
+one next parameter cadidate is tried (\code{ntrydr}). (note \code{ntrydr=1} means
+no delayed rejection steps).
+<<>>=
+MCMC3 <- modMCMC(f=BananaSS, p=c(0,0.5), jump=diag(nrow=2,x=5),
+                 ntrydr=2,niter=1000)
+MCMC3$count
+@
+
+Finally the adaptive metropolis with delayed rejection (DRAM) is used. (Here we
+also estimate the elapsed CPU time - \code{print(system.time())} does this)
+<<>>=
+print(system.time(
+MCMC4 <- modMCMC(f=BananaSS, p=c(0,0.5), jump=diag(nrow=2,x=5),
+                 updatecov=100,ntrydr=2,niter=1000)
+))
+MCMC4$count
+@
+We plot the generated chains for both parameters and for the four runs in one plot.
+Calling \code{plot} with \code{mfrow=NULL} prevents the plotting function to
+overrule these settings.
+<<label=banana, include=FALSE>>=
+par(mfrow=c(4,2))
+par(mar=c(2,2,4,2))
+plot(MCMC ,mfrow=NULL,main="MH")
+plot(MCMC2,mfrow=NULL,main="AM")
+plot(MCMC3,mfrow=NULL,main="DR")
+plot(MCMC4,mfrow=NULL,main="DRAM")
+mtext(outer=TRUE,side=3,line=-2,at=c(0.05,0.95),c("y1","y2"),cex=1.25)
+par(mar=c(5.1,4.1,4.1,2.1))
+@
+\setkeys{Gin}{width=1.0\textwidth}
+\begin{figure}
+\begin{center}
+<<label=banana,fig=TRUE,echo=FALSE>>=
+<<banana>>
+@
+\end{center}
+\caption{The MCMC chains for the four methods - see text for \R-code}
+\label{fig:ba}
+\end{figure}
+
+The 2-D plots show the banana shape:
+<<label=banana2, include=FALSE>>=
+par(mfrow=c(2,2))
+xl <- c(-3,3)
+yl <- c(-1,8)
+plot(MCMC$pars,main="MH",xlim=xl,ylim=yl)
+plot(MCMC2$pars,main="AM",xlim=xl,ylim=yl)
+plot(MCMC3$pars,main="DR",xlim=xl,ylim=yl)
+plot(MCMC4$pars,main="DRAM",xlim=xl,ylim=yl)
+@
+\setkeys{Gin}{width=0.6\textwidth}
+\begin{figure}
+\begin{center}
+<<label=banana2,fig=TRUE,echo=FALSE>>=
+<<banana2>>
+@
+\end{center}
+\caption{The bananas - see text for \R-code}
+\label{fig:bana}
+\end{figure}
+
+Finally, we test convergence to the original distribution. This can best be done
+by estimating means and covariances of the transformed parameter values.
+<<>>=
+trans <- cbind(MCMC4$pars[,1],Banana(MCMC4$pars[,1],MCMC4$pars[,2]))
+colMeans(trans)    # was:c(0,0)
+sd(trans)          # was:1
+cor(trans)         # 0.9 off-diagonal
+@
+
+
+\section{A simple chemical model}
+This is an example from \citep{Haario06}. We fit two parameters
+that describe the dynamics in the following reversible chemical reaction:
+\[
+\mathrm{A} \rightleftharpoons[k_2]{k_1} \mathrm{B}
+\]
+
+Here $k_1$ is the forward, $k_2$ the backward rate coefficient.
+
+The ODE system is written as:
+\begin{eqnarray*}
+\frac{dA}{dt}=- k_1 \cdot A + k_2 \cdot B\\
+\frac{dB}{dt}=+ k_1 \cdot A - k_2 \cdot B\\
+\end{eqnarray*}
+ with initial values $A_0$ = 1, $B_0$ = 0.
+ 
+The analytical solution for this system of differential equations is given in
+\citep{Haario06}.
+
+First a function is defined that takes as input the parameters and that returns
+the values of the concentrations A and B, at selected output times.
+
+<<>>=
+Reaction <- function (k, times)
+{
+  fac <- k[1]/(k[1]+k[2])
+  A   <- fac + (1-fac)*exp(-(k[1]+k[2])*times)
+  return(data.frame(t=times,A=A))
+}
+@
+All the concentrations were measured at the time the equilibrium was
+already reached. The data are the following:
+<<>>=
+Data     <- data.frame(
+  times = c(2,     4,     6,     8,     10   ),
+  A     = c(0.661, 0.668, 0.663, 0.682, 0.650))
+Data
+@
+We need parameter priors to prevent the model parameters from drifting to infinite
+values. The prior is taken to be a broad Gaussian distribution with mean (2,4) and
+standard deviation = 200 for both.
+
+The prior function returns the weighted sum of squared residuals of the parameter values with
+the expected value.
+<<>>=
+Prior <- function(p)
+    return( sum(((p-c(2,4))/200)^2 ))
+@
+
+First the model is fitted to the data; we restrict the parameter values to be
+in the interval [0,1].
+<<>>=
+residual <- function(k) return(Data$A - Reaction(k,Data$times)$A)
+
+Fit <- modFit(p=c(k1=0.5,k2=0.5),f=residual,lower=c(0,0),upper=c(1,1))
+(sF <- summary(Fit))
+@
+
+The residual error of the fit is used as initial model variance, the scaled
+covariance matrix of the fit is used as the proposal distribution (to generate
+new parameter values). As the covariance matrix is nearly singular this is not
+a very good approximation. The initial MCMC method, using the Metropolis-Hastings
+method does not converge. The MCMC is initiated with the best-fit parameters;
+the parameters are restricted to be positive numbers (\code{lower}).
+<<>>=
+mse <- sF$modVariance
+Cov <- sF$cov.scaled * 2.4^2/2
+
+print(system.time(
+MCMC <- modMCMC(f=residual, p=Fit$par, jump=Cov, lower=c(0,0),
+                var0=mse, wvar0=1, prior=Prior, niter=5000)
+))
+@
+
+The number of accepted runs is much too high, and indeed the MCMC has not at all
+converged...
+<<label=ABMCMC, include=FALSE>>=
+plot(MCMC,Full=TRUE)
+@
+\setkeys{Gin}{width=0.8\textwidth}
+\begin{figure}
+\begin{center}
+<<label=ABMCMC,fig=TRUE,echo=FALSE>>=
+<<ABMCMC>>
+@
+\end{center}
+\caption{Metropolis-Hastings MCMC of the chemical model - see text for \R-code}
+\label{fig:ABMCMC}
+\end{figure}
+
+Better convergence is achieved by the adaptive metropolis, updating the proposal
+every 100 runs
+<<>>=
+MCMC2<- modMCMC(f=residual, p=Fit$par, jump=Cov, updatecov=100, lower=c(0,0),
+                var0=mse, wvar0=1, prior=Prior,niter=5000)    #
+@
+<<label=ABMCMC2, include=FALSE>>=
+plot(MCMC2,Full=TRUE)
+@
+\setkeys{Gin}{width=0.8\textwidth}
+\begin{figure}
+\begin{center}
+<<label=ABMCMC2,fig=TRUE,echo=FALSE>>=
+<<ABMCMC2>>
+@
+\end{center}
+\caption{Adaptive Metropolis MCMC of the chemical model - see text for \R-code}
+\label{fig:ABMCMC2}
+\end{figure}
+
+The correlation between the two parameters is clear:
+
+<<label=ABMCMC3, include=FALSE>>=
+pairs(MCMC2)
+@
+\setkeys{Gin}{width=0.8\textwidth}
+\begin{figure}
+\begin{center}
+<<label=ABMCMC3,fig=TRUE,echo=FALSE>>=
+<<ABMCMC3>>
+@
+\end{center}
+\caption{Pairs plot of the Adaptive Metropolis MCMC of the chemical model - see text for \R-code}
+\label{fig:ABMCMC3}
+\end{figure}
+
+\section{finally}
+This vignette is a Sweave \citep{Leisch02} translation of part of the \fme examples.
+
+\bibliography{vignettes}
+
+\end{document}

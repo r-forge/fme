@@ -25,7 +25,7 @@
 }
 
 \usage{
-collin(sensfun, parset=NULL)
+collin(sensfun, parset=NULL, N=NULL, what=NULL)
 
 \method{print}{collin}(x, \ldots)
 
@@ -34,8 +34,14 @@ collin(sensfun, parset=NULL)
 \arguments{
   \item{sensfun }{model sensitivity functions as estimated by \code{SensFun}.
   }
-  \item{parset }{one selected parameter combination, a vector with indices to
-    the parameters.
+  \item{parset }{one selected parameter combination, a vector with their names
+    or with the indices to the parameters.
+  }
+  \item{N }{the number of parameters in the set; if \code{NULL} then all
+    combinations will be tried. Ignored if \code{parset} is not \code{NULL}
+  }
+  \item{what }{the name or the index to the observed variables that should be
+    used. Default = all observed variables.
   }
   \item{x }{an object of class \code{collin}.
   }
@@ -91,6 +97,16 @@ collin(sensfun, parset=NULL)
   See the paper by Omlin et al. (2001) for more information.
 }
 \examples{
+# Test collinearity
+
+# linearly related set...  => Infinity
+collin (cbind(1:5,2*(1:5)))
+
+# unrelated set            => 1
+MM<- matrix(nr=4,nc=2,byrow=TRUE,data=c( -0.400, -0.374, 0.255,
+   0.797, 0.690, -0.472, -0.546,  0.049))
+
+collin(MM)
 
 #========================================
 # Bacterial model from Soetaert and Herman, 2009
@@ -165,6 +181,10 @@ Coll [Coll[,"collinearity"]<20 & Coll[,"N"]==4,]
 # collinearity of one selected parameter set
 collin(sF,c(1,3,5))
 collin(sF,1:5)
+
+collin(sF,c("gmax","eff"))
+# collinearity of all combinations of 3 parameters
+collin(sF,N=3)
 
 # The collinearity depends on the value of the parameters:
 P      <- pars

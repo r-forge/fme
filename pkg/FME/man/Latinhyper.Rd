@@ -2,10 +2,10 @@
 \alias{Latinhyper}
 
 \title{
-  Latin Hypercube Distribution
+  Latin Hypercube Sampling
 }
 \description{
-  generates random parameter sets according to a latin hypercube distribution.
+  generates random parameter sets using a latin hypercube sampling algorithm.
 }
 
 \usage{

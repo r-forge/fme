@@ -103,7 +103,8 @@ modMCMC(f, p, ..., jump=NULL,  lower=-Inf, upper=+Inf, prior=NULL,
   \item{Full }{If TRUE then not only the parameters will be plotted, but
     also the function value and (if appropriate) the model variance(s).
   }
-  \item{what }{the name or the index to the variables that should be plotted.
+  \item{what }{the name or the index to the parameters that should be plotted.
+    Default = all parameters.
   }
   \item{trace }{if \code{TRUE}, adds smoothed line to the plot.
   }
@@ -145,12 +146,14 @@ modMCMC(f, p, ..., jump=NULL,  lower=-Inf, upper=+Inf, prior=NULL,
   \code{\link{modFit}}.
 
   In the latter two cases, it is assumed that the prior distribution for
-  \eqn{\theta} is gaussian, and can be treated as a sum of squares (SS).
+  \eqn{\theta} is either non-informative or gaussian. If gaussian, it can be
+  treated as a sum of squares (SS).
   The posterior for the parameters will be estimated as:
   \deqn{p(\theta | y,\sigma^2)\propto exp(-0.5*(\frac{SS(\theta)}{\sigma^2}
   +SS_{pri}(\theta))}{prob(p|y,\sigma^2)~exp(-0.5 SS(p)/\sigma^2)+SSpri(p)}
   and where \eqn{\sigma^2} is the error variance, SS is the sum of squares
-  function \eqn{SS(\theta)=\sum(y_i-f(\theta))^2}{SS(p)=sum(yi-f(p))^2.}
+  function \eqn{SS(\theta)=\sum(y_i-f(\theta))^2}{SS(p)=sum(yi-f(p))^2}.
+  If non-informative priors are used, then \eqn{SS_{pri}(\theta)=0}{SSpri(p)=0}.
 
   The error variance \eqn{\sigma^2} is considered a nuisance parameter.
   A prior distribution of it should be specified and a posterior distribution

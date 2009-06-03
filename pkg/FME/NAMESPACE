@@ -1,3 +1,5 @@
+useDynLib(FME)
+
 export(modCost,sensFun,collin,sensRange,Unif,Norm,Latinhyper,Grid,
        modFit,modMCMC,pseudoOptim,modCRL)
 
@@ -27,6 +29,8 @@ S3method("plot","summary.sensRange")
 
 S3method("summary", "modCRL")
 S3method("plot",    "modCRL")
+S3method("hist",    "modCRL")
+S3method("pairs",   "modCRL")
 
 S3method("plot","modCost")
 S3method("plot","modFit")

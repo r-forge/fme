@@ -28,9 +28,9 @@ sensFun(func,parms,sensvar=NULL,senspar=names(parms),
 
 \method{summary}{sensFun}(object, vars=FALSE, \dots)
 
-\method{pairs}{sensFun}(x,  \dots)
+\method{pairs}{sensFun}(x, what=NULL, \dots)
 
-\method{plot}{sensFun}(x, legpos="topleft", \dots)
+\method{plot}{sensFun}(x, what=NULL, legpos="topleft", \dots)
 }
 
 \arguments{
@@ -77,6 +77,9 @@ sensFun(func,parms,sensvar=NULL,senspar=names(parms),
   }
   \item{vars }{if FALSE: summaries per parameter are returned; if \code{TRUE},
     summaries per parameter and per variable are returned.
+  }
+  \item{what }{the name or the index to the variables that should be plotted.
+    Default = all variables.
   }
   \item{legpos }{position of the legend; set to \code{NULL} to avoid plotting
   a legend.
@@ -131,8 +134,8 @@ sensFun(func,parms,sensvar=NULL,senspar=names(parms),
       \itemize{
         \item L1: the L1-norm \eqn{\frac{1}{n} \cdot \sum{|S_{ij}|}}{sum(abs(Sij))/n}
 
-        \item L2: the L2-norm \eqn{\frac{1}{n} \cdot \sqrt{\sum{S_{ij}
-          \cdot S_{ij}}}}{sqrt(sum(Sij^2))/n}
+        \item L2: the L2-norm \eqn{ \cdot \sqrt{\frac{1}{n}\sum{S_{ij}
+          \cdot S_{ij}}}}{sqrt(sum(Sij^2)/n)}
 
         \item Mean: the mean of the sensitivity functions
 

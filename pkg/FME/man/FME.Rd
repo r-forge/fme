@@ -3,15 +3,15 @@
 \alias{FME}
 \docType{package}
 \title{
-Flexible Modelling Environment - Utility functions for models consisting of
-differential equations
+A Flexible Modelling Environment for inverse modelling, sensitivity, identifiability, monte carlo analysis.
 }
 \description{
   R-package FME contains functions to run complex applications of models that
-  produce output as a function of input parameters. It is mainly intended to be
+  produce output as a function of input parameters.
+  Although it was created to be
   used with models consisting of ordinary differential equations (ODE),
   partial differential equations (PDE) or differential algebraic equations
-  (DAE).
+  (DAE), it can work with other models.
 
   It contains:
   \itemize{
@@ -52,9 +52,9 @@ differential equations
       (DRAM) algorithm.
 
     \item FME also contains functions to generate multiple parameter values
-      arranged according to a grid (\code{Grid}), latin hypercube
-      (\code{Latinhyper}), multinormal (\code{Norm}) or uniform
-      (\code{Unif}) design.
+      arranged according to a grid (\code{Grid}) multinormal (\code{Norm}) or uniform
+      (\code{Unif}) design, and a latin hypercube sampling (\code{Latinhyper})
+      function
    }
 }
 
@@ -63,7 +63,7 @@ differential equations
     Package: \tab FME\cr
     Type: \tab Package\cr
     Version: \tab 1.0\cr
-    Date: \tab 2008-11-01\cr
+    Date: \tab 2009-06-01\cr
     License: \tab GNU Public License 2 or above\cr
   }
 
@@ -80,15 +80,24 @@ differential equations
 ## show examples (see respective help pages for details)
 example(modCost)
 example(sensFun)
+example(modMCMC)
+example(modCRL)
 
 
 ## open the directory with documents
 browseURL(paste(system.file(package="FME"), "/doc", sep=""))
 
 ## the vignette
-vignette("FME")
+vignette("FMEdyna")
+vignette("FMEsteady")
+vignette("FMEother")
+vignette("FMEmcmc")
 
-edit(vignette("FME"))
+edit(vignette("FMEdyna"))
+edit(vignette("FMEsteady"))
+edit(vignette("FMEother"))
+edit(vignette("FMEmcmc"))
+
 }
 }
 

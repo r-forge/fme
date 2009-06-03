@@ -50,8 +50,8 @@ pairs(Unif(parRange,100),main="Uniformly random")
 \seealso{
   \code{\link{Norm}} for (multi)normally distributed random parameter sets.
 
-  \code{\link{Latinhyper}} to generate random parameter sets according to a
-    latin hypercube distribution.
+  \code{\link{Latinhyper}} to generates parameter sets using
+    latin hypercube sampling.
 
   \code{\link{Grid}} to generate random parameter sets arranged on a
     regular grid

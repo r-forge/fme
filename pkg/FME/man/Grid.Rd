@@ -44,8 +44,8 @@ pairs(Grid(parRange,500),main="Grid")
 \seealso{
   \code{\link{Norm}} for (multi)normally distributed random parameter sets.
 
-  \code{\link{Latinhyper}} to generate random parameter sets according to a
-    latin hypercube distribution.
+  \code{\link{Latinhyper}} to generates parameter sets using
+    latin hypercube sampling.
 
   \code{\link{Unif}} for uniformly distributed random parameter sets.
   

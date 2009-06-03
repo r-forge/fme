@@ -2,6 +2,8 @@
 \alias{modCRL}
 \alias{summary.modCRL}
 \alias{plot.modCRL}
+\alias{pairs.modCRL}
+\alias{hist.modCRL}
 \title{
   Monte Carlo analysis
 }
@@ -28,7 +30,12 @@ modCRL(func,parms=NULL,sensvar=NULL,dist="unif",
 
 \method{summary}{modCRL}(object,  \dots)
 
-\method{plot}{modCRL}(x, what=NULL, \dots)
+\method{plot}{modCRL}(x, what=NULL, trace=TRUE, \dots)
+
+\method{pairs}{modCRL}(x, what = 1:ncol(x), nsample = NULL, \dots)
+
+\method{hist}{modCRL}(x, what = 1:ncol(x), \dots)
+
 }
 \arguments{
   \item{func }{an R-function that has as first argument \code{parms} and that
@@ -82,7 +89,16 @@ modCRL(func,parms=NULL,sensvar=NULL,dist="unif",
   }
   \item{x }{an object of class \code{modCRL}.
   }
-  \item{what }{the name or the index to the variables that should be plotted.
+  \item{what }{the name or the index to the variables and parameters that
+    should be plotted. Default = all variables and parameters.
+  }
+  \item{nsample }{the number of xy pairs to be plotted on the upper panel in
+    the pairs plot. When \code{NULL} all xy pairs plotted. Set to a lower number
+    in case the graph becomes too dense (and the exported picture too large).
+    This does not affect the histograms on the diagonal plot
+   (which are estimated using all values).
+  }
+  \item{trace }{if \code{TRUE}, adds smoothed line to the plot.
   }
   \item{... }{additional arguments passed to function \code{func} or to
     the methods.
@@ -110,9 +126,18 @@ The following \emph{methods} are included:
       maximal value, \code{q25},  \code{q50}, \code{q75}, the 25th, 50 and
       75\% quantile
   
-    \item \link{plot}, produces a plot of the \code{modCRL} output, one plot
-      for each sensitivity variable and with the parameter value on the x-axis.
-      This only works when there is only one parameter!
+    \item \link{plot}, produces a plot of the \code{modCRL} output, either
+      one plot for each sensitivity variable and with the parameter value on
+      the x-axis. This only works when there is only one parameter!
+
+      OR
+      one plot for each parameter value on the x-axis. This only works when
+      there is only one variable!
+
+    \item \link{hist}, produces a histogram of the \code{modCRL} output
+      parameters and variables
+
+    \item \link{pairs}, produces a pairs plot of the \code{modCRL} output
 
   }
 }
@@ -156,10 +181,13 @@ SF <- function (p)
   return(out[nrow(out),2:3])
 }
 
-CRL <- modCRL(func=SF,parRange=c(0.2,0.8))
+parRange <- matrix(nr=1,nc=2,c(0.2,0.8),dimnames=list("eff",c("min","max")))
+parRange
+
+CRL <- modCRL(func=SF,parRange=parRange)
 
 plot(CRL)  # plots both variables
-plot(CRL, what="Bact") #selects one
+plot(CRL, what=c("eff","Bact"), trace =FALSE) #selects one
 
 }
 \author{

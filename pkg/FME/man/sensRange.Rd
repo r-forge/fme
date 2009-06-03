@@ -32,7 +32,7 @@ sensRange(func,parms=NULL,sensvar=NULL,dist="unif",
               quant =FALSE, \dots)
 
 \method{plot}{sensRange}(x, xyswap =FALSE,
-              what=NULL,\dots)
+              what=NULL, \dots)
 }
 
 \arguments{
@@ -103,6 +103,7 @@ sensRange(func,parms=NULL,sensvar=NULL,dist="unif",
     is from top to bottom. Useful for drawing vertical profiles.
   }
   \item{what }{the name or the index to the variables that should be plotted.
+    Default = all variables.
   }
   \item{col }{the two colors of the polygons that should be plotted.
   }
@@ -147,7 +148,7 @@ sensRange(func,parms=NULL,sensvar=NULL,dist="unif",
 
     \item summary.plot, produces a plot of the summary of the \code{sensRange}
       output, one plot for each sensitivity variable and with the ranges and
-      mean +- standard deviation as coloured polygons.
+      mean +- standard deviation or the quantiles as coloured polygons.
   }
 }
 \examples{

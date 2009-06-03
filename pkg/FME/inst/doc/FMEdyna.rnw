@@ -20,15 +20,15 @@
 \newcommand{\rs}{\textbf{\textsf{rootSolve }}}
 \newcommand{\R}{\proglang{R}}
 
-\title{\proglang{R}-package \fme: utilities for the application of
-  models consisting of differential equations}
+\title{\proglang{R}-package \fme: inverse modelling, sensitivity,
+  monte carlo - applied to a dynamic simulation model}
 
 \Plaintitle{FME}
 
-\Keywords{simulation models, differential equations, fitting,
+\Keywords{dynamic simulation models, differential equations, fitting,
   sensitivity, Monte Carlo, identifiability, \proglang{R}}
 
-\Plainkeywords{simulation models, differential equations, fitting,
+\Plainkeywords{dynamic simulation models, differential equations, fitting,
   sensitivity, Monte Carlo, identifiability, R}
 
 
@@ -39,8 +39,24 @@ The Netherlands
 
 \Plainauthor{Karline Soetaert}
 
-\Abstract{ \R package \fme contains functions to perform complex applications
-of models, consisting of differential equations. This is a preliminary version.}
+\Abstract{ \R package \fme \citep{FME} contains functions for
+model calibration, sensitivity, identifiability, and monte carlo analysis
+of nonlinear models.
+
+This vignette (\code{vignette("FMEdyna")}), applies the functions to a
+dynamic similation model, solved with integration routines from
+package \ds.
+
+A similar vignette, (\code{vignette("FMEsteady")}), applies \fme to a partial
+differential equation, solved with a steady-state solver from package \rs
+
+A third vignette (\code{vignette("FMEother")}), applies the functions to a
+simple nonlinear model
+
+\code{vignette("FMEmcmc")} tests the markov chain monte carlo (MCMC)
+implementation
+
+}
 
 %% The address of (at least) one author should be given
 %% in the following format:
@@ -56,7 +72,7 @@ of models, consisting of differential equations. This is a preliminary version.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% R/Sweave specific LaTeX commands.
 %% need no \usepackage{Sweave}
-%\VignetteIndexEntry{FME - sensitivity, calibration, identifiability, monte carlo analysis for models consisting of differential equations}
+%\VignetteIndexEntry{Sensitivity, calibration, identifiability, monte carlo analysis of a dynamic simulation model}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Begin of the document
 \begin{document}
@@ -217,15 +233,13 @@ information of the value of the sensitivity variable (\code{var}) at
 each time step (\code{x}).  It is relatively simple to plot the
 ranges, either as $\min \pm sd$ or using quantiles:
 
-%% ThPe Suggestion: more meaningful figure main,
-%% e.g. state variables and not "Sensitivity rB"
-
 <<label=sens,include=FALSE>>=
 par(mfrow=c(2,2))
-plot(summary(sR),main="Sensitivity rB",xlab="time, hour",ylab="molC/m3",
+plot(summary(sR),xlab="time, hour",ylab="molC/m3",
     legpos="topright")
-plot(summary(sR),main="Sensitivity rB",xlab="time, hour",ylab="molC/m3",
+plot(summary(sR),xlab="time, hour",ylab="molC/m3",
      quant=TRUE,col=c("lightblue","darkblue"),legpos="topright")
+mtext(outer=TRUE,line=-1.5,side=3,"Sensitivity to rB",cex=1.25)
 par(mfrow=c(1,1))
 @
 
@@ -241,10 +255,8 @@ par(mfrow=c(1,1))
 \end{figure}
 
 Sensitivity ranges can also be estimated for a combination of
-parameters. Here we use all 3 parameters, and select a latin hypercube
-distribution.
-
-%% ThPe: Is latin hypercube a distribution?? I think it's a sampling algorithm
+parameters. Here we use all 3 parameters, and select the latin hypercube
+sampling algorithm.
 
 <<>>=
 Sens2 <- summary(sensRange(func=solveBact,parms=pars,
@@ -311,15 +323,20 @@ selected variables.
 <<>>=
 summary(SnsBact)
 @
+Here
+\begin{itemize}
+  \item L1 is the L1-norm, $\sum{|S_{ij}|}/n$
+  \item L2 is the L2-norm, $\sqrt{\sum(S_{ij}^2)/n}$
+  \item Mean: the mean of the sensitivity functions
+  \item Min: the minimal value of the sensitivity functions
+  \item Max: the maximal value of the sensitivity functions
+\end{itemize}
 
 Sensitivity analysis can also be performed on several variables:
 
 <<>>=
 summary(sensFun(solveBact,pars,varscale=1),var=TRUE)
 @
-
-%% ThPe --> KS: Please give an explanation of the summary output,
-%% esp. L1 and L2
 
 \subsection{Bivariate sensitivity}
 
@@ -348,19 +365,14 @@ pairs(SnsBact)
 
 \subsection{Monte Carlo runs}
 
-Function \code{modCRL} runs a Monte Carlo simulation, outputting 0-D variables,
-(in contrast to sensRange which outputs 1-D variables).
+Function \code{modCRL} runs a Monte Carlo simulation, outputting single variables.
 
-% 1) ThPe -> KS: Please explain shortly the difference between 0-D and
-% 1-D variables.
+This is in contrast to \code{sensRange} which outputs vectors of variables, e.g.
+a time-sequence, or a spatially-dependent variable.
 
-% 2) ThPe -> KS: The example *figure* is not conclusive showing the
-% advantage of Monte Carlo for me. I use MC if I want to see
-% propagation of errors with a specific *distribution*. i.e. to derive
-% the output distribution from an input distribution; mostly (but not
-% exclusively) for the multivariate case
-
-
+It can be used to test what-if scenarios. Here it is used to calculate the
+final concentration of  bacteria and substrate as a function of the maximal
+growth rate.
 <<>>=
 SF <- function (pars) {
   out <- solveBact(pars)
@@ -383,6 +395,35 @@ plot(CRL)
 \caption{Monte carlo analysis - see text for \R-code}
 \label{fig:crl}
 \end{figure}
+
+Monte Carlo methods can also be used to see how parameter uncertainties
+propagate, i.e. to derive the distribution of output variables as a
+function of parameter distribution.
+
+Here the effect of the parameters \code{gmax} and \code{eff} on final
+bacterial concentration is assessed. The parameter values are generated
+according to a multi-normal distribution; they are positively correlated
+(with a correlation = 0.63).
+
+<<>>=
+CRL2 <- modCRL(func=SF,parms=pars,parMean=c("gmax"=0.5,"eff"=0.7),
+               parCovar=matrix(nr=2,data=c(0.02,0.02,0.02,0.05)),
+               dist="norm",sensvar="Bact",num=150)
+@
+<<label=crl2,include=FALSE>>=
+pairs(CRL2)
+@
+\setkeys{Gin}{width=0.8\textwidth}
+\begin{figure}
+\begin{center}
+<<label=crl2fig,fig=TRUE,echo=FALSE>>=
+<<crl2>>
+@
+\end{center}
+\caption{Multivariate monte carlo analysis - see text for \R-code}
+\label{fig:crl2}
+\end{figure}
+
 
 \section{Multivariate sensitivity analysis}
 
@@ -525,7 +566,7 @@ Objective <- function(x,parset=names(x)) {
 }
 @
 
-First it is instructive to establish which parameters are identifiable
+First it is instructive to establish which parameters can be identified
 based on the data set.  We assess that by means of the identifiability
 function \code{collin}, selecting only the output variables at the
 instances when there is an observation.
@@ -535,9 +576,8 @@ Coll <- collin(sF<-sensFun(func=Objective,parms=pars,varscale=1))
 Coll
 @
 
-%% ThPe --> KS: identifiable *data* set or *parameter* set??
-
-The larger the collinearity value, the less identifiable the data set.
+The larger the collinearity value, the less identifiable the parameter
+based on the data.
 In general a collinearity value less than about 20 is "identifiable".
 Below we plot the collinarity as a function of the number of
 parameters selected.  We add a line at the height of 20, the critical
@@ -634,7 +674,7 @@ The \code{summary} method of the best fit returns several useful values:
 
 \begin{itemize}
 
-\item the model variance \code{modVarianc} is used as the initial
+\item the model variance \code{modVariance} is used as the initial
   model error variance (\code{var0}).  In each MCMC step, 1/model
   variance is drawn from a gamma function with parameters
   shape=0.5*N*(1+pvar0), and the rate=0.5*(pvar0*N*var0+SSnew)) and
@@ -762,7 +802,7 @@ plot(Norm(parMean=Mean,parCovar=Covar,num=1000),main="multi normal")
 \section{Examples}
 
 Several examples are present in subdirectory examples of the package.
-They include:
+They include, a.o.:
 
 \begin{itemize}
 \item BODO2\_FME.R, a 1-D model of oxygen dynamics in a river. This
@@ -782,6 +822,7 @@ They include:
 \end{itemize}
 
 % ThPe -> KS: thanks for including a simecol object
+
 
 \section{Finally}
 
