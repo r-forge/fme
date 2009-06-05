@@ -49,7 +49,7 @@ It includes the delayed rejection and adaptive metropolis algorithm \citep{Haari
   Netherlands Institute of Ecology (NIOO)\\
   4401 NT Yerseke, Netherlands\\
   E-mail: \email{k.soetaert@nioo.knaw.nl}\\
-  URL: \url{http://www.nioo.knaw.nl/ppages/ksoetaert}\\
+  URL: \url{http://www.nioo.knaw.nl/users/ksoetaert}\\
 }
 
 
@@ -71,13 +71,12 @@ options(width=70)
 \maketitle
 
 \section{Introduction}
-Here some functions from \R-package \fme are tested. As it is a test of the
-function implementation, this does not mean that the results obtained are meaningful.
+Here the MCMC function, \code{modMCMC} from \R-package \fme is tested  on two
+functions.
 
-It includes two tests of the implemented MCMC method:
 \begin{itemize}
-\item The "banana" function, sampling from a curvilinear function (\citep{Laine})
-\item A simple chemical model, fitted to a data series (\citep{Haario06})
+  \item The "banana" function, sampling from a curvilinear function (\citep{Laine})
+  \item A simple chemical model, fitted to a data series (\citep{Haario06})
 \end{itemize}
 
 Other tests are in the following vignettes:
@@ -92,7 +91,7 @@ Other tests are in the following vignettes:
 This example is from \cite{Laine}.
 
 A banana-shaped function is created by distorting a two-dimensional Gaussian
-distribution, with mean = 0 and a covariance matrix $\tau$) with unity variances and
+distribution, with mean = 0 and a covariance matrix $\tau$ with unity variances and
 covariance of 0.9.
 \begin{center}
 \[
@@ -354,12 +353,13 @@ pairs(MCMC2)
 <<ABMCMC3>>
 @
 \end{center}
-\caption{Pairs plot of the Adaptive Metropolis MCMC of the chemical model - see text for \R-code}
+\caption{Pairs plot of the Adaptive Metropolis MCMC of the chemical model -
+  see text for \R-code}
 \label{fig:ABMCMC3}
 \end{figure}
 
 \section{finally}
-This vignette is a Sweave \citep{Leisch02} translation of part of the \fme examples.
+This vignette is made with Sweave \citep{Leisch02}.
 
 \bibliography{vignettes}
 

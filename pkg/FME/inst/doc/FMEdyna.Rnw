@@ -66,7 +66,7 @@ implementation
   Netherlands Institute of Ecology (NIOO)\\
   4401 NT Yerseke, Netherlands\\
   E-mail: \email{k.soetaert@nioo.knaw.nl}\\
-  URL: \url{http://www.nioo.knaw.nl/ppages/ksoetaert}\\
+  URL: \url{http://www.nioo.knaw.nl/users/ksoetaert}\\
 }
 
 
@@ -82,7 +82,7 @@ implementation
 <<preliminaries,echo=FALSE,results=hide>>=
 library("FME")
 options(prompt = "> ")
-options(width=70)
+options(width=80)
 @
 
 \maketitle
@@ -826,8 +826,7 @@ They include, a.o.:
 
 \section{Finally}
 
-This vignette is mainly a Sweave \citep{Leisch02} translation of part
-of the \fme help files and examples.
+This vignette is made with Sweave \citep{Leisch02}.
 
 \clearpage
 \begin{table*}[t]
