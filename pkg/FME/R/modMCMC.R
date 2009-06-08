@@ -203,7 +203,11 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
   
   ## parameter used in gamma draw.
   if (is.null(n0)) n0 <- wvar0*N
-  
+
+  if (updateSigma)
+      divsigma <- rgamma(lenvar0,shape=0.5*(n0+N),rate=0.5*(n0*var0+SSold))
+
+
 ##------------------------------------------------------------------------------
 ## initial values for f, SS, PP, sigma...
 
@@ -536,7 +540,7 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
               "%) \n", sep = "")
 
   count <- c(dr_steps=dr_steps, Alfasteps = A_count,num_accepted=naccepted,
-             num_covupdate=Rnew)
+             num_covupdate=Rnew-1)
 
   res <-list(pars=t(pars),SS=SSpars,naccepted=naccepted,sig=sig,
              bestpar= bestPar,bestfunp=bestfunp,prior=priorpars,
@@ -587,6 +591,14 @@ pairs.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars),
 
 
   if (is.vector(X)) X<- as.matrix(X)
+  if (is.null(nsample))
+    ii <- 1:nrow(X) else
+    ii <- sample((1:nrow(X)),nsample)
+  if (Full)
+    X <- cbind(X,SSR=x$SS)
+  if (Full & !is.null(x$sig))
+    X <- cbind(X,x$sig)
+
   if (! is.null (remove)) {
     if (max(remove) > nrow(X))
       stop("too many runs should be removed from modMCMC object")
@@ -595,11 +607,6 @@ pairs.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars),
     X <- X[-remove,]
   }
 
-  if (is.null(nsample))
-    ii <- 1:nrow(X) else
-    ii <- sample((1:nrow(X)),nsample)
-  if (Full)
-    X <- cbind(X,SSR=x$SS)
 
   labels <- colnames(X)
   dots <- list(...)
@@ -646,8 +653,7 @@ cumuplot.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars),
 
   if (Full) mcmc <- cbind(mcmc,x$SS)
   if (Full & !is.null(x$sig))
-    for ( i in 1:ncol(x$sig))
-      mcmc <- cbind(mcmc,x$sig[i])
+      mcmc <- cbind(mcmc,x$sig)
   cumuplot(as.mcmc(mcmc),...)
 }
 
@@ -798,8 +804,8 @@ hist.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars),
   }
 
   if (Full & !is.null(x$sig)) {
-    if (Main) dots$main <- "error std posterior"
     for ( i in 1:ncol(x$sig))  {
+      if (Main) dots$main <- paste("error",colnames(x$sig)[i])
       dots$ylab <- colnames(x$sig)[i]
       do.call("hist",c(alist(x$sig[,i]),dots))
     }

@@ -33,7 +33,7 @@ modMCMC(f, p, ..., jump=NULL,  lower=-Inf, upper=+Inf, prior=NULL,
 }
 
 \arguments{
-  \item{f }{the function to be minimized, with first argument the vector of
+  \item{f }{the function to be evaluated, with first argument the vector of
      parameters which should be varied. It should return either the model
      residuals, an element of class \emph{modCost} (as returned by a call to
      \code{\link{modCost}}) or -2*log(likelihood).
@@ -323,10 +323,12 @@ modMCMC(f, p, ..., jump=NULL,  lower=-Inf, upper=+Inf, prior=NULL,
 \examples{
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# testing: sampling a distribution
+# Sampling a distribution
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-# test 1: sampling a normal distribution, mean=1:3, sd = 0.25
+# test 1: sampling a 3-dimensional normal distribution,
+# mean=1:3, sd = 0.1
+# f returns -2*log(probability) of the parameter values
 
 NN <- function(p)
 {
@@ -334,33 +336,44 @@ mu <- c(1,2,3)
 -2*sum(log(dnorm(p,mean=mu,sd=0.1)))      #-2*log(probability)
 }
 
-# no bounds imposed...
-
+# simple metropolis-hastings
 MCMC <- modMCMC (f=NN,p=0:2, niter=10000,
                  outputlength=1000,jump=0.5)
 
 # More accepted values by updating the jump covariance matrix...
 MCMC <- modMCMC (f=NN,p=0:2, niter=10000,updatecov=100,
-                 outputlength=1000,jump=0.1)
+                 outputlength=1000,jump=0.5)
 summary(MCMC)
 
 plot(MCMC)   # check convergence
 pairs(MCMC)
 
-# bounds imposed...
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# test 2: sampling a 3-D normal distribution, larger standard deviation...
+# noninformative priors, lower and upper bounds imposed on parameters
+
 NN <- function(p)
 {
-mu <- c(1,2,3)
+mu <- c(1,2,2.5)
 -2*sum(log(dnorm(p,mean=mu,sd=0.5)))      #-2*log(probability)
 }
-MCMC2 <- modMCMC (f=NN,p=0:2+0.1, niter=10000,burninlength=2500,
-                  outputlength=1000,jump=0.7, lower=-3:-1,upper=6:8)
+MCMC2 <- modMCMC (f=NN,p=1:3,niter=3000,burninlength=500,updatecov=10,
+                  jump=0.5, lower=c(0,2,1),upper=c(1,3,3))
 plot(MCMC2)
-# function from package coda...
-cumuplot(as.mcmc(MCMC2$pars))
+hist(MCMC2,breaks=20)
+
+# Compare output of p3 with theoretical distribution
+hist(MCMC2,what="p3",breaks=20)
+lines(seq(1,3,0.1),dnorm(seq(1,3,0.1),mean=2.5,sd=0.5)/pnorm(3,2.5,0.5))
 summary(MCMC2)
 
-# test 2: sampling a log-normal distribution, log mean=1:4, log sd = 1
+# functions from package coda...
+cumuplot(as.mcmc(MCMC2$pars))
+summary(as.mcmc(MCMC2$pars))
+raftery.diag(MCMC2$pars)
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# test 3: sampling a log-normal distribution, log mean=1:4, log sd = 1
 
 NL <- function(p)
 {
@@ -384,7 +397,7 @@ colMeans(log(MCMCl$pars))
 sd(log(MCMCl$pars))
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# example : Fitting a Monod (Michaelis-Menten) function to data
+# Fitting a Monod (Michaelis-Menten) function to data
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 # the observations

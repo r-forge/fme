@@ -94,7 +94,7 @@ This example is discussed in \citep{Laine}
 The following model:
 \begin{eqnarray*}
 y=\theta_1 \cdot \frac{x}{x+\theta_2}+\epsilon\\
-\epsilon \sim N{(\theta,I \sigma^2)}
+\epsilon \sim N{(0,I \sigma^2)}
 \end{eqnarray*}
 
 is fitted to data.
