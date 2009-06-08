@@ -22,10 +22,10 @@
 \title{\proglang{R}-package \fme: MCMC tests}
 \Plaintitle{FME - MCMC tests}
 
-\Keywords{markov chain monte carlo, delayed rejection, adapative metropolis,
+\Keywords{Markov chain Monte Carlo, delayed rejection, adapative metropolis,
 MCMC, DRAM,  \proglang{R}}
 
-\Plainkeywords{markov chain monte carlo, delayed rejection, adapative metropolis,
+\Plainkeywords{Markov chain Monte Carlo, delayed rejection, adapative metropolis,
 MCMC, DRAM,  R}
 
 
@@ -40,7 +40,7 @@ Finland
 
 \Plainauthor{Karline Soetaert and Marko Laine}
 
-\Abstract{This vignette tests the markov chain monte carlo (MCMC) implementation
+\Abstract{This vignette tests the Markov chain Monte Carlo (MCMC) implementation
 of \R package \fme \citep{FME}.
 
 It includes the delayed rejection and adaptive metropolis algorithm \citep{Haario06}}
@@ -66,7 +66,7 @@ It includes the delayed rejection and adaptive metropolis algorithm \citep{Haari
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% R/Sweave specific LaTeX commands.
 %% need no \usepackage{Sweave}
-%\VignetteIndexEntry{FME - tests of the markov chain monte carlo implementation}
+%\VignetteIndexEntry{FME - tests of the Markov chain Monte Carlo implementation}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Begin of the document
 \begin{document}
@@ -83,7 +83,7 @@ options(width=70)
 
 \section{Introduction}
 Function \code{modMCMC} from package \fme \citep{FME}
-implements a markov chain monte carlo
+implements a Markov chain Monte Carlo
 (MCMC) algorithm using a delayed rejection and adaptive metropolis procedure
 \citep{Haario06}.
 
@@ -107,7 +107,7 @@ following vignettes:
 \end{itemize}
 
 \section{function modMCMC}
-\subsection{The markov chain monte carlo method}
+\subsection{The Markov chain Monte Carlo method}
 The implemented MCMC method is designed to be applied to nonlinear models,
 and taking into account both the uncertainty in the model parameters and in
 the model output.
@@ -242,7 +242,7 @@ rejection; at most 2 delayed rejections steps are tried (\code{ntrydr=2}):
 <<>>=
 summary(MCMC4<-modMCMC(f=Nfun,p=1,niter=2000,jump=5,
   updatecov=10,prior=pri,ntrydr=2))
-  
+
 MCMC4$count
 @
 
@@ -510,7 +510,7 @@ The ODE system is written as:
 \frac{dB}{dt}=+ k_1 \cdot A - k_2 \cdot B\\
 \end{eqnarray*}
  with initial values $A_0$ = 1, $B_0$ = 0.
- 
+
 The analytical solution for this system of differential equations is given in
 \citep{Haario06}.
 

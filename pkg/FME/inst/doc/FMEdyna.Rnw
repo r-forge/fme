@@ -40,11 +40,11 @@ The Netherlands
 \Plainauthor{Karline Soetaert}
 
 \Abstract{ \R package \fme \citep{FME} contains functions for
-model calibration, sensitivity, identifiability, and monte carlo analysis
+model calibration, sensitivity, identifiability, and Monte Carlo analysis
 of nonlinear models.
 
 This vignette (\code{vignette("FMEdyna")}), applies the functions to a
-dynamic similation model, solved with integration routines from
+dynamic simulation model, solved with integration routines from
 package \ds.
 
 A similar vignette, (\code{vignette("FMEsteady")}), applies \fme to a partial
@@ -53,7 +53,7 @@ differential equation, solved with a steady-state solver from package \rs
 A third vignette (\code{vignette("FMEother")}), applies the functions to a
 simple nonlinear model
 
-\code{vignette("FMEmcmc")} tests the markov chain monte carlo (MCMC)
+\code{vignette("FMEmcmc")} tests the Markov Chain Monte Carlo (MCMC)
 implementation
 
 }
