@@ -94,7 +94,7 @@
   }
   \item{ms }{the mean squared residuals, i.e. \code{ssr/length(residuals)}.
   }
-  \item{ms_var }{the mean squared residuals, per variable; only when \code{f}
+  \item{var_ms }{the mean squared residuals, per variable; only when \code{f}
     returns an element of class \emph{modCost} ; \code{NA} otherwise.
   }
   \item{... }{any other arguments returned by the called optimisation routine.

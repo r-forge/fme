@@ -124,14 +124,24 @@ modMCMC(f, p, ..., jump=NULL,  lower=-Inf, upper=+Inf, prior=NULL,
   
   This includes the following:
   
-  \item{par }{an array with dimension (\code{outputlength},length(\code{p})),
+  \item{pars }{an array with dimension (\code{outputlength},length(\code{p})),
     containing the parameters of the MCMC at each iteration that is kept}
-  \item{logp }{vector with the logarithm of the probability for each
-    row in \code{par}}
+  \item{SS }{vector with the sum of squares function, one for each
+    row in \code{pars}}
   \item{naccepted }{the number of accepted runs}
+  \item{sig }{the sampled error variance \eqn{\sigma^2}, a matrix with one
+    row for each row in \code{pars}}
   \item{bestpar }{the parameter set that gave the highest probability}
-  \item{bestlogp }{the logarithm of the highest probability (corresponding
-    to \code{bestpar})}
+  \item{bestfunp }{the function value corresponding to \code{bestpar}}
+  \item{prior }{the parameter prior, one value for each row in \code{pars}}
+  \item{count }{information about the MCMC chain: number of delayed rejection
+    step (\code{dr_steps}), the number of alfa steps \code{Alfasteps},
+    the number of accepted runs (\code{num_accepted}) and the number of times
+    the proposal covariance matrix has been updated (\code{num_covupdate})
+  }
+  \item{settings }{the settings for error covariance calculation, i.e. arguments
+    \code{var0}, \code{n0} and \code{N} the number of data points
+  }
 
   The list returned by \code{modMCMC} has methods for the generic functions
    \code{\link{summary}}, \code{\link{plot}}, \code{\link{pairs}}- see note.
@@ -147,8 +157,12 @@ modMCMC(f, p, ..., jump=NULL,  lower=-Inf, upper=+Inf, prior=NULL,
 
   In the latter two cases, it is assumed that the prior distribution for
   \eqn{\theta} is either non-informative or gaussian. If gaussian, it can be
-  treated as a sum of squares (SS).
-  The posterior for the parameters will be estimated as:
+  treated as a sum of squares (SS). If the measurement function is defined as:
+\deqn{y=f(\theta) + \xi\\
+\xi ~ N(0,\sigma^2)}{y=f(p)+xi; xi~N(0,\sigma^2}
+
+where \eqn{\xi} is the measurement error, assumed normally distribution, then
+  the posterior for the parameters will be estimated as:
   \deqn{p(\theta | y,\sigma^2)\propto exp(-0.5*(\frac{SS(\theta)}{\sigma^2}
   +SS_{pri}(\theta))}{prob(p|y,\sigma^2)~exp(-0.5 SS(p)/\sigma^2)+SSpri(p)}
   and where \eqn{\sigma^2} is the error variance, SS is the sum of squares

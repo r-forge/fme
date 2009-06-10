@@ -16,7 +16,7 @@
       if(ip(1) < 1) call rexit("nout should be at least 1")
       ydot(1) = lam -rho*y(1) - bet*y(1)*y(3)
       ydot(2) = bet*y(1)*y(3) -delt*y(2)
-      ydot(3) = N*delt*y(2) - c*y(3)
+      ydot(3) = N*delt*y(2) - c*y(3) - bet*y(1)*y(3)
 
       yout(1) = log(y(3))
       return

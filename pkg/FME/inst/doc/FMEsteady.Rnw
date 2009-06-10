@@ -448,7 +448,7 @@ points(O2depth$y,O2depth$x)
 \end{figure}
 
 \section{finally}
-This vignette is a Sweave \citep{Leisch02} translation of part of the \fme examples.
+This vignette is made with Sweave \citep{Leisch02}.
 
 \bibliography{vignettes}
 

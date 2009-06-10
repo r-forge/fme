@@ -113,6 +113,7 @@ The Monod model returns a data.frame, with elements x and y :
 Model <- function(p,x) return(data.frame(x=x,y=p[1]*x/(x+p[2])))
 @
 
+\subsection{Fitting the model to data}
 We first fit the model to the data.
 
 Function \code{Residuals} estimates the deviances of model versus the data.
@@ -156,7 +157,9 @@ par(mfrow=c(1,1))
 \label{fig:Monod}
 \end{figure}
 
-Finally, we run an MCMC analysis. The -scaled- parameter covariances returned
+\subsection{MCMC analysis}
+
+We then run an MCMC analysis. The -scaled- parameter covariances returned
 from the \code{summary} function are used as estimate of the proposal covariances
 (\code{jump}). Scaling is as in \citep{Gelman}.
 
@@ -175,6 +178,15 @@ print(system.time(
 MCMC <- modMCMC(f=Residuals,p=P$par,jump=Covar,niter=3000,
                 var0=s2prior,wvar0=1,lower=c(0,0))
 ))
+@
+By toggling on covariance adaptation (\code{updatecov} and delayed rejection
+(\code{ntrydr}), the acceptance rate is increased:
+<<>>=
+print(system.time(
+MCMC <- modMCMC(f=Residuals,p=P$par,jump=Covar,niter=3000, ntrydr=3,
+                var0=s2prior,wvar0=1,updatecov=100,lower=c(0,0))
+))
+MCMC$count
 @
 The plotted results demonstrate (near-) convergence of the chain.
 <<label=Monmcmc, include=FALSE>>=
@@ -250,7 +262,10 @@ cumuplot(MC)
 \label{fig:Moncum}
 \end{figure}
 
-The predictive posterior distribution of the model is easily estimated by running
+\subsection{Predictive inference including only parameter uncertainty}
+
+The predictive posterior distribution of the model, corresponding to the
+parameter uncertainty, is easily estimated by running
 function \code{sensRange}, using a randomly selected subset of the parameters in
 the chain (\code{MCMC$pars}; we use the default of 100 parameter combinations.
 <<>>=
@@ -268,24 +283,55 @@ points(Obs)
 <<Monsum>>
 @
 \end{center}
-\caption{Predictive envelopes of the model - see text for \R-code}
+\caption{Predictive envelopes of the model, only assuming parameter noise
+  - see text for \R-code}
 \label{fig:Monsum2}
 \end{figure}
+\subsection{Predictive inference including also measurement error}
 
+There is an other source of error, which is not captured by the
+\code{senRange} method, i.e. the one corresponding to the measurement error,
+as represented by the sampled values of $\sigma^2$.
 
+This can be estimated by adding normally distribution noise,
+$\xi \sim N(0,I \sigma^2)$ to the model predictions produced by the
+parameters from the MCMC chain. Of course, the $\sigma$ and parameter
+sets used must be compatible.
 
-By toggling on covariance adaptation (\code{updatecov} and delayed rejection
-(\code{ntrydr}), the acceptance rate is increased:
+First we need to extract the parameter sets that were effectively used to
+produce the output in \code{sR}. This information is kept as an attribute
+in the output:
 <<>>=
-print(system.time(
-MCMC2 <- modMCMC(f=Residuals,p=P$par,jump=Covar,niter=3000, ntrydr=3,
-                var0=s2prior,wvar0=1,updatecov=100,lower=c(0,0))
-))
-MCMC2$count
+pset <- attributes(sR)$pset
 @
 
+Then randomly distributed noise is added; note that the first two columns
+are parameters; \code{ivar} points only to the variables.
+<<>>=
+nout  <- nrow(sR)
+sR2   <- sR
+ivar  <- 3:ncol(sR)
+error <- rnorm(nout,mean=0,sd=sqrt(MCMC$sig[pset]))
+sR2[,ivar] <- sR2[,ivar] + error
+@
+<<label=MonsumM, include=FALSE>>=
+plot(summary(sR2),quant=TRUE)
+points(Obs)
+@
+\setkeys{Gin}{width=0.8\textwidth}
+\begin{figure}
+\begin{center}
+<<label=MonsumM,fig=TRUE,echo=FALSE>>=
+<<MonsumM>>
+@
+\end{center}
+\caption{Predictive envelopes of the model, including parameter and measurement
+noise - see text for \R-code}
+\label{fig:MonsumM}
+\end{figure}
+
 \section{finally}
-This vignette is a Sweave \citep{Leisch02} translation of part of the \fme examples.
+This vignette was made with Sweave \citep{Leisch02}.
 
 \bibliography{vignettes}
 

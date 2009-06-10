@@ -138,8 +138,13 @@ The following \emph{methods} are included:
       parameters and variables
 
     \item \link{pairs}, produces a pairs plot of the \code{modCRL} output
-
   }
+
+  The data.frame of type \code{modCRL} has several attributes, which
+  remain hidden, and which are generally not of practical use
+  (they are needed for the S3 methods). There is one exception - see
+  notes in help of \code{\link{sensRange}}.
+
 }
 \examples{
 

@@ -88,11 +88,11 @@ sensFun <- function(func, parms, sensvar=NULL, senspar=names(parms),
   ipar <- findvar(parms,senspar,"parameters")
   pp    <- unlist(parms)[ipar]
 
-  ## 4. perturbed parameters
-  dp        <- pp*tiny
+  ## 4. perturbed parameters - perturbations always positive
+  dp        <- abs(pp*tiny)
   dp[dp==0] <- tiny
-  ii      <- which (abs(dp)<tiny)
-  dp[ii]  <- sign(dp[ii])*tiny
+  ii        <- which (dp<tiny)
+  dp[ii]    <- tiny
 
   if (is.null(parscale))
     parscale <- pp

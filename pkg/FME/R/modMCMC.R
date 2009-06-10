@@ -542,6 +542,10 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
   count <- c(dr_steps=dr_steps, Alfasteps = A_count,num_accepted=naccepted,
              num_covupdate=Rnew-1)
 
+  if (! is.null(sig)) {
+    if (is.null(colnames(sig))) colnames(sig)<-rep("model",ncol(sig))
+    colnames(sig) <- paste("var_",colnames(sig),sep="")
+  }
   res <-list(pars=t(pars),SS=SSpars,naccepted=naccepted,sig=sig,
              bestpar= bestPar,bestfunp=bestfunp,prior=priorpars,
              count=count,settings=settings)

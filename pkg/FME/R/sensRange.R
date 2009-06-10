@@ -39,14 +39,15 @@ sensRange <- function( func, parms=NULL, sensvar=NULL, dist="unif",
 
   Solve <- function(parms) func(parms,...)
 
+  ip <- NULL
   if (! is.null(parInput)) {
     dist <- "input"
     nr <- nrow(parInput)
     num <- min(num,nr)
     if (num == nr)
-       ii <- 1: nr
-    else ii <- sample(1:nr,size=num,replace=FALSE)
-    parset <-as.matrix(parInput[ii,])
+       ip <- 1: nr
+    else ip <- sample(1:nr,size=num,replace=FALSE)
+    parset <-as.matrix(parInput[ip,])
     if(is.null(parms))
       parms <- parInput[1,]
   }
@@ -145,6 +146,7 @@ sensRange <- function( func, parms=NULL, sensvar=NULL, dist="unif",
   }
   sens<- data.frame(cbind(parset,Sens))
   class(sens) <- c("sensRange","data.frame")
+  attr(sens,"pset") <- ip   # if parInput: which parameters were drawn...
   attr(sens,"npar") <- ncol(parset)
   attr(sens,"x")    <- map
   attr(sens,"nx")  <- length(map)
