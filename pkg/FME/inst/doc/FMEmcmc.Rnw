@@ -22,10 +22,10 @@
 \title{\proglang{R}-package \fme: MCMC tests}
 \Plaintitle{FME - MCMC tests}
 
-\Keywords{Markov chain Monte Carlo, delayed rejection, adapative metropolis,
+\Keywords{markov chain monte carlo, delayed rejection, adapative metropolis,
 MCMC, DRAM,  \proglang{R}}
 
-\Plainkeywords{Markov chain Monte Carlo, delayed rejection, adapative metropolis,
+\Plainkeywords{markov chain monte carlo, delayed rejection, adapative metropolis,
 MCMC, DRAM,  R}
 
 
@@ -40,7 +40,7 @@ Finland
 
 \Plainauthor{Karline Soetaert and Marko Laine}
 
-\Abstract{This vignette tests the Markov chain Monte Carlo (MCMC) implementation
+\Abstract{This vignette tests the markov chain monte carlo (MCMC) implementation
 of \R package \fme \citep{FME}.
 
 It includes the delayed rejection and adaptive metropolis algorithm \citep{Haario06}}
@@ -58,7 +58,7 @@ It includes the delayed rejection and adaptive metropolis algorithm \citep{Haari
   Marko Laine\\
   Finnish Meteorological Institute\\
   P.O. Box 503\\
-  FI-00101\\
+  FI-00101 Helsinki\\
   Finland\\
   E-mail: \email{marko.laine@fmi.fi}
 }
@@ -66,7 +66,7 @@ It includes the delayed rejection and adaptive metropolis algorithm \citep{Haari
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% R/Sweave specific LaTeX commands.
 %% need no \usepackage{Sweave}
-%\VignetteIndexEntry{FME - tests of the Markov chain Monte Carlo implementation}
+%\VignetteIndexEntry{FME - tests of the markov chain monte carlo implementation}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Begin of the document
 \begin{document}
@@ -83,7 +83,7 @@ options(width=70)
 
 \section{Introduction}
 Function \code{modMCMC} from package \fme \citep{FME}
-implements a Markov chain Monte Carlo
+implements a markov chain monte carlo
 (MCMC) algorithm using a delayed rejection and adaptive metropolis procedure
 \citep{Haario06}.
 
@@ -106,15 +106,15 @@ following vignettes:
   equation
 \end{itemize}
 
-\section{function modMCMC}
-\subsection{The Markov chain Monte Carlo method}
+\section{Function modMCMC}
+\subsection{The markov chain monte carlo method}
 The implemented MCMC method is designed to be applied to nonlinear models,
 and taking into account both the uncertainty in the model parameters and in
 the model output.
 
 Consider observations y and a model f, that depend on parameters $\theta$ and
 independent variables $x$. Assuming additive, independent Gaussian errors with
-an unknown variance $\sigma$:
+an unknown variance $\sigma^2$:
 
 \[
 y=f(x,\theta) + \xi \]
@@ -123,28 +123,26 @@ where
 \xi \sim N(0,I \sigma^2)
 \]
 For simplicity we assume that the prior distribution for $\theta$ is Gaussian:
-
 \[\theta_i \sim N(v_i,\mu_i)\]
-
-while for 1/the error variance, a Gamma distribution is used as a prior:
-
+while for the reciprocal of the error variance $1/\sigma^2$, a Gamma
+distribution is used as a prior:
 \[
-p(\sigma^{-2}) \sim \Gamma(\frac{n_0}{2},\frac{n_0}{2}S_0^2)
+p(\sigma^{-2}) \sim \Gamma\left(\frac{n_0}{2},\frac{n_0}{2}S_0^2\right).
 \]
 
 The posterior for the parameters will be estimated as:
   \[
-  p(\theta | y,\sigma^2)\propto exp(-0.5*(\frac{SS(\theta)}{\sigma^2}
-  +SS_{pri}(\theta))
+  p(\theta | y,\sigma^2)\propto \exp\left(-0.5\left(\frac{SS(\theta)}{\sigma^2}
+  +SS_{pri}(\theta)\right)\right)
   \]
   and where $\sigma^2$ is the error variance, SS is the sum of squares
   function \[SS(\theta)=\sum(y_i-f(\theta)_i)^2\] and
-  \[SS_{pri}(\theta)=\sum_i{(\frac{\theta_i-v_i}{\mu_i})^2}\]
+  \[SS_{pri}(\theta)=\sum_i{\left(\frac{\theta_i-v_i}{\mu_i}\right)^2}.\]
 
 In the above, the sum of squares functions ($SS(\theta)$)
 are defined for Gaussian likelihoods. For a general likelihood
 function the sum-of-squares corresponds to twice the log likelihood,
-\[SS(\theta) = -2 log(p(y|\theta))\]
+\[SS(\theta) = -2 \log(p(y|\theta))\].
 This is how the function value (\code{f}, see below) should be specified.
 
 Similarly, to obtain a general non-Gaussian prior for the parameters $\theta$
@@ -201,7 +199,7 @@ Nfun <- function(p)
 @
 The proposal covariance is assumed to be 5.
 
-\subsection{noninformative prior}
+\subsection{Noninformative prior}
 In the first run, a noninformative prior parameter distribution is
 used. 2000 iterations are produced; the initial parameter value is taken as 9.5.
 
@@ -215,7 +213,7 @@ MCMC <- modMCMC (f=Nfun, p=9.5, niter=2000, jump=5, updatecov=10)
 summary(MCMC)
 @
 
-\subsection{noninformative prior, lower bound imposed}
+\subsection{Noninformative prior, lower bound imposed}
 In the second run, the sampled parameters are restricted to be > 9
 (\code{lower=9}):
 <<>>=
@@ -223,7 +221,7 @@ MCMC2 <- modMCMC (f=Nfun, p=9.5, lower=9, niter=2000, jump=5,
   updatecov=10)
 summary(MCMC2)
 @
-\subsection{a normally distributed prior}
+\subsection{A normally distributed prior}
 Finally, it is assumed that the prior for the model parameter is itself
 a normal distribution, with mean 8 and standard devation 1:
 $pri(\theta) \sim N(8,1)$.
@@ -351,25 +349,25 @@ summary(MCMCl)
 
 \clearpage
 \section{The banana}
-\subsection{the model}
+\subsection{The model}
 This example is from \cite{Laine}.
 
 A banana-shaped function is created by distorting a two-dimensional Gaussian
 distribution, with mean = 0 and a covariance matrix $\tau$ with unity variances
-and covariance of 0.9.
+and covariance of 0.9:
 \begin{center}
 \[
 \tau = \left[ {\begin{array}{*{20}c}
    {1} & {0.9}  \\
    {0.9} & {1}  \\
-\end{array}} \right]
+\end{array}} \right].
 \]
 \end{center}
 
 The distortion is along the second-axis only and given by:
 \begin{eqnarray*}
 y_1=x_1\\
-y_2=x_2-(x_1^2+1)
+y_2=x_2-(x_1^2+1).
 \end{eqnarray*}
 
 \subsection{R-implementation}
@@ -499,7 +497,7 @@ cov(trans)         # 0.9 off-diagonal
 This is an example from \citep{Haario06}. We fit two parameters
 that describe the dynamics in the following reversible chemical reaction:
 \[
-\mathrm{A} \rightleftharpoons {k_2}{k_1} \mathrm{B}
+\mathrm{A} \rightleftharpoons {k_2}{k_1} \mathrm{B}.
 \]
 
 Here $k_1$ is the forward, $k_2$ the backward rate coefficient.
@@ -507,7 +505,7 @@ Here $k_1$ is the forward, $k_2$ the backward rate coefficient.
 The ODE system is written as:
 \begin{eqnarray*}
 \frac{dA}{dt}=- k_1 \cdot A + k_2 \cdot B\\
-\frac{dB}{dt}=+ k_1 \cdot A - k_2 \cdot B\\
+\frac{dB}{dt}=+ k_1 \cdot A - k_2 \cdot B,\\
 \end{eqnarray*}
  with initial values $A_0$ = 1, $B_0$ = 0.
 
@@ -672,7 +670,7 @@ is fitted to two data sets
 \footnote{A similar example is also discussed in vignette ("FMEother"). Here the emphasis
 is on the MCMC method}.
 
-\subsection{implementation in R}
+\subsection{Implementation in R}
 First we input the observations:
 <<>>=
 Obs <- data.frame(x=c(   28,  55,   83,  110,  138,  225,  375),   # mg COD/l
@@ -735,7 +733,7 @@ Covar   <- summary(P)$cov.scaled * 2.4^2/2
 
 \subsection{Equal model variance}
 In the first run, we assume that both data sets have equal model variance
-$\sigma$.
+$\sigma^2$.
 
 For the initial model variance (\code{var0})
 we use the residual mean squares \code{P$ms}, returned by the \code{modFit}
@@ -807,7 +805,7 @@ summary(MCMC2)
 If \code{var0} has the same number of elements as the number of data points,
 then distinct error variances for each data point will be estimated.
 
-\section{finally}
+\section{Finally}
 This vignette is made with Sweave \citep{Leisch02}.
 
 \bibliography{vignettes}
