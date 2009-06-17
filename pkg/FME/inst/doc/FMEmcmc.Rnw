@@ -771,9 +771,9 @@ plot(MCMC,Full=TRUE)
 In the second run, a different error variance for the two data sets is used.
 
 This is simply done by using, for the initial model variance the variables
-mean squares (\code{P$var_ms}).
+mean squares, before they are weighted (\code{P$var_ms_unweighted}).
 <<>>=
-varprior <- P$var_ms
+varprior <- P$var_ms_unweighted
 
 print(system.time(
 MCMC2 <- modMCMC(f=Residuals,p=P$par,jump=Covar,niter=1000,

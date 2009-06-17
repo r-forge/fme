@@ -147,9 +147,18 @@ sensRange(func,parms=NULL,sensvar=NULL,dist="unif",
       one plot for each sensitivity variable and with the mapping variable on
       the x-axis.
 
+      Each variable will be plotted in a separate figure, and
+      the figures aligned in a rectangular grid, unless par \code{mfrow} is
+      passed as an argument.
+
     \item summary.plot, produces a plot of the summary of the \code{sensRange}
       output, one plot for each sensitivity variable and with the ranges and
       mean +- standard deviation or the quantiles as coloured polygons.
+      
+      Each variable will be plotted in a separate figure, and
+      the figures aligned in a rectangular grid, unless par \code{mfrow} is
+      passed as an argument.
+
   }
 
   The data.frame of type \code{sensRange} has several attributes, which

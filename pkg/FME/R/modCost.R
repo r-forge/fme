@@ -114,6 +114,12 @@ modCost <- function (model, obs, x="time", y=NULL, err=NULL,
       if (length(ix) >0) xDat   <- obs[,1]
       obsdat    <- obs[,i]
     }
+    ii <- which (is.na(obsdat))
+    if (length(ii)>0) {
+      xDat <- xDat[-ii]
+      obsdat <- obsdat[-ii]
+    }
+
     if (length(ix) >0)
       ModVar   <- approx(xMod,yMod,xout=xDat)$y
     else {
@@ -179,8 +185,10 @@ plot.modCost<- function(x, legpos="topleft", ...) {
 
   dots$xlab <- if(is.null(dots$xlab)) "x" else dots$xlab
   dots$ylab <- if(is.null(dots$ylab)) "weighted residuals" else dots$ylab
-  dots$pch <- if(is.null(dots$pch)) c(16:24)[x$residuals$name] else dots$pch
-  dots$col <- if(is.null(dots$col)) c(1:nvar)[x$residuals$name] else dots$col
+  DotsPch <- if(is.null(dots$pch)) c(16:24) else dots$pch
+  dots$pch <- if(is.null(dots$pch)) c(16:24)[x$residuals$name] else dots$pch[x$residuals$name]
+  DotsCol <- if(is.null(dots$col)) c(1:nvar) else dots$col
+  dots$col <- if(is.null(dots$col)) c(1:nvar)[x$residuals$name] else dots$col[x$residuals$name]
 
   do.call("plot",c(alist(x$residuals$x, x$residuals$res),dots))
 
@@ -188,5 +196,5 @@ plot.modCost<- function(x, legpos="topleft", ...) {
 #     pch=c(16:24)[x$residuals$name],col=c(1:nvar)[x$residuals$name],...)
 
   if (! is.na(legpos))
-    legend(legpos,legend=x$var$name,col=dots$col,pch=dots$pch)
+    legend(legpos,legend=x$var$name,col=DotsCol,pch=DotsPch)
 }

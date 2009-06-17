@@ -230,7 +230,19 @@ plot.sensRange<-function(x, xyswap=FALSE, what=NULL,...) {
     }
   } else Select <- 1:length(var)
 
-  if (nx > 1)
+  if (nx > 1) {
+    if (! "mfrow" %in% nmdots) {
+      nv <- length(Select)
+      nc <- ceiling(sqrt(nv))
+      nr <- ceiling(nv/nc)
+      mfrow <- c(nr,nc)
+    } else mfrow <- dots$mfrow
+
+    if (! is.null(mfrow)) {
+      mf <- par(mfrow=mfrow)
+      on.exit(par(mf))
+    }
+
     for (i in Select){
       ii <- ((i-1)*nx+1):(i*nx)
 
@@ -241,6 +253,7 @@ plot.sensRange<-function(x, xyswap=FALSE, what=NULL,...) {
           do.call("matplot",c(alist(t(sens[,ii]),X),dots))
         }
     }  # end for
+  }
   else
     boxplot(sens[,Select],...)
 }
@@ -284,6 +297,18 @@ plot.summary.sensRange<-function(x, xyswap=FALSE, what=NULL,legpos="topleft",
   Dots$xlim<-NULL
 
   if (nx > 1)  {    # summary of a times series or a profile...
+    if (! "mfrow" %in% nmdots) {
+      nv <- length(Select)
+      nc <- ceiling(sqrt(nv))
+      nr <- ceiling(nv/nc)
+      mfrow <- c(nr,nc)
+    } else mfrow <- dots$mfrow
+
+    if (! is.null(mfrow)) {
+      mf <- par(mfrow=mfrow)
+      on.exit(par(mf))
+    }
+
     for (i in Select){
       ii <- ((i-1)*nx+1):(i*nx)
       X <- x[ii,]

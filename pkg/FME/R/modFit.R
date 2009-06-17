@@ -170,10 +170,14 @@ modFit <- function(f,p,...,lower=-Inf,upper=Inf,
 
   # mean square per varaible
   if (class(FF) == "modCost") {
-    names(res$residuals) <- FF$residuals$name
+    names(res$residuals)  <- FF$residuals$name
     res$var_ms            <- FF$var$SSR/FF$var$N
-    names(res$var_ms)  <- FF$var$name
-  } else res$var_ms <- NA
+    res$var_ms_unscaled   <- FF$var$SSR.unscaled/FF$var$N
+    res$var_ms_unweighted <- FF$var$SSR.unweighted/FF$var$N
+
+    names(res$var_ms_unweighted)  <-names(res$var_ms_unscaled)  <-
+          names(res$var_ms)  <- FF$var$name
+  } else res$var_ms <- res$var_ms_unweighted <- res$var_ms_unscaled<-NA
   
   res$rank <- np
   res$df.residual <- length(res$residuals) - res$rank

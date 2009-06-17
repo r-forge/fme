@@ -4,20 +4,3 @@
   
   ThPe-> ThPe: improve structure modFit a little bit?
     (try vectorization)
-
-  KS -> ThPe: (sensFun) 
-
-  **KS btw ** , in these plotting codes I check whether "main" is part
-  of the dots, and then adjust accordingly. Problem is that "main"
-  remains part of the dots, so I cannot pass the dots anymore to the
-  plot function.  To be really flexible, I would need to be able to
-  remove "main" from the dots. Is this possible? (and do you
-  understand what I mean?).
-
-  ThPe: yes I understand and yes, it's possible. My task.
-
-  
-  modMCMC
-  ThPe -> KS: Great!!! 
-  (but I still  need to order a book to understand all options)
-  

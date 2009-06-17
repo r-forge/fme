@@ -94,8 +94,15 @@
   }
   \item{ms }{the mean squared residuals, i.e. \code{ssr/length(residuals)}.
   }
-  \item{var_ms }{the mean squared residuals, per variable; only when \code{f}
+  \item{var_ms }{the weighted and scaled variable mean squared residuals,
+    one value per observed variable; only when \code{f}
     returns an element of class \emph{modCost} ; \code{NA} otherwise.
+  }
+  \item{var_ms_unscaled }{the weighted, but not scaled variable mean
+    squared residuals
+  }
+  \item{var_ms_unweighted }{the raw variable mean squared residuals,
+    unscaled and unweighted.
   }
   \item{... }{any other arguments returned by the called optimisation routine.
   }

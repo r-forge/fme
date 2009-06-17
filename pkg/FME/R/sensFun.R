@@ -64,9 +64,15 @@ sensFun <- function(func, parms, sensvar=NULL, senspar=names(parms),
         sensvar<-sv
     }
   }
-  if (is.null(map))
+  if (is.null(map)) {
     map   <- 1:nrow(yRef)
-  else map <- yRef[,map]
+    mname <- "x"
+    }
+  else {
+    mname <- colnames(yRef)[map]
+    if (is.null(mname)) mname <- "x"
+    map <- yRef[,map]
+  }
 
   nout  <- length(ivar)
   ndim  <- nrow(yRef)
@@ -134,6 +140,7 @@ sensFun <- function(func, parms, sensvar=NULL, senspar=names(parms),
     attr(Sens,"var") <- sensvar
     attr(Sens,"nx") <- length(map)
   }
+  attr(Sens,"xname")   <- mname
   attr(Sens,"x")   <- map
   attr(Sens,"Type") <- Type  # type 1: modCost
   return(Sens)
@@ -231,6 +238,7 @@ pairs.sensFun <- function (x, what=NULL, ...) {
 
 plot.sensFun<- function(x, what=NULL, legpos="topleft", ...) {
   nx  <-attr(x,"nx")
+  xname <- attr(x,"xname")
   var <-attr(x,"var")
   TYP <-attr(x,"Type")
 
@@ -243,32 +251,40 @@ plot.sensFun<- function(x, what=NULL, legpos="topleft", ...) {
   dots$ylab <- if(is.null(dots$ylab)) "sensitivity" else dots$ylab
   dots$type <- if(is.null(dots$type)) "l" else dots$type
   dots$col <- if(is.null(dots$col)) 1:nc else dots$col
+  dots$xlab <- if(is.null(dots$xlab))xname else dots$xlab
+  Allvars <- FALSE
+  Ylim <-is.null(dots$ylim)
 
   if (!is.null(what)) {
     if (! is.numeric(what)) {
-
       ln <- length(what)
-      Select <- which (var %in% what)
-      if(length(Select) != ln)
-        stop("not all variables in 'what' are in 'x'")
+      Select <- NULL
+      for (i in what) {  # use loop rather than which(...%in%) to keep ordering of "what"
+        ii <- which (var == i)
+        if (length(ii)==0)
+          stop(paste(" variable in 'what' is not in 'x':", i))
+        Select <- c(Select,ii)
+      }
     } else {     # index
       Select <- what
       if (max(Select) > nx)
         stop("index in 'what' too large")
     }
-    if(is.null(dots$ylim)) {
-      ii <- NULL
-      for (i in Select){
-        if (TYP == 1)
-          ii <- c(ii,((i-1)*nx):(i*nx))
-        else
-          ii <- c(ii,(nx[i]+1):nx[i+1])
-          dots$ylim <- range(x[ii,-(1:2)])
-      }
+    if (! "mfrow" %in% nmdots) {
+      nv <- length(Select)
+      ncc <- ceiling(sqrt(nv))
+      nr <- ceiling(nv/ncc)
+      mfrow <- c(nr,ncc)
+    } else mfrow <- dots$mfrow
+    if (! is.null(mfrow)) {
+      mf <- par(mfrow=mfrow)
+      on.exit(par(mf))
     }
   }  else {
     Select <- 1:length(var)
     dots$ylim <- if(is.null(dots$ylim)) range(x[,-(1:2)])
+    Ylim <- FALSE
+    Allvars <- TRUE
   }
   Lty <- is.null(dots$lty)
 
@@ -278,14 +294,18 @@ plot.sensFun<- function(x, what=NULL, legpos="topleft", ...) {
       ii <- ((i-1)*nx):(i*nx)
     else
       ii <- (nx[i]+1):nx[i+1]
-    if (Main) dots$main <- var[i]
+    if (Main)
+      if (! Allvars) dots$main <- var[i] else dots$main <- "All variables"
+
     sens<- x[ii,]
     dots$lty <- if(Lty) st
+    if (Ylim)  dots$ylim <- range(sens[-(1:2)])
+
     if (st==1)
       do.call("matplot",c(alist(sens$x,as.matrix( sens[,-(1:2)])),dots))
     else
       do.call("matlines",c(alist(sens$x,as.matrix( sens[,-(1:2)])),dots))
-    st <- st+1
+    if (Allvars) st <- st+1
   }
   if (! is.na(legpos))
     legend(legpos,names(x[,-(1:2)]),col=1:nc,lty=1)

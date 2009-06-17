@@ -143,17 +143,28 @@ sensFun(func,parms,sensvar=NULL,senspar=names(parms),
 
         \item Max: the maximal value of the sensitivity functions
       }
-    \item \emph{var }{the summary of the variables sensitivity functions, a
+    \item \emph{var }the summary of the variables sensitivity functions, a
       data.frame with the same columns as \code{model}
       and one row for each parameter + variable combination.
       This is only outputted if the variable names are effectively known
-    }
 
-    \item \emph{plot } plots the sensitivity functions for each parameter
+    \item \emph{plot } plots the sensitivity functions for each parameter;
+      each parameter has its own color.
+    
+      By default, the sensitivity functions for all variables are plotted
+      in one figure, unless \code{what} gives a selection of variables;
+      in that case, each variable will be plotted in a separate figure, and
+      the figures aligned in a rectangular grid, unless par \code{mfrow} is
+      passed as an argument.
 
     \item \emph{pairs } produces a pairs plot of the sensitivity results;
-      overrides the default \code{gap = 0}, \code{upper.panel = NA}, and
-      \code{diag.panel}
+      per parameter.
+
+      By default, the sensitivity functions for all variables are plotted
+      in one figure, unless \code{what} gives a selection of variables.
+      
+      Overrides the default \code{gap = 0}, \code{upper.panel = NA}, and
+      \code{diag.panel}.
   }
 }
 
@@ -199,6 +210,13 @@ head(SF)
 tail(SF)
 
 summary(SF, var = TRUE)
+
+plot(SF)
+plot(SF,what=c("Sub","Bact"))
+pm<-par(mfrow=c(1,3))
+plot(SF,what=c("Sub","Bact"),mfrow=NULL)
+plot(SF,mfrow=NULL)
+par(mfrow=pm)
 
 ## Bivariate sensitivity
 pairs(SnsBact)

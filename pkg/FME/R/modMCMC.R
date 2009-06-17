@@ -194,10 +194,10 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
       Fun <- function(p,...) {
         PPnew  <<- Prior(p)
         SSnew  <<- f(p,...)
-        SSnew  <<- SSnew$var$SSR
+        SSnew  <<- SSnew$var$SSR.unweighted ### KARLINE:CHECK THIS!
         return(0.5*(sum(SSnew*divsigma) + PPnew))
       }
-      SSold <- SSnew$var$SSR
+      SSold <- SSnew$var$SSR.unweighted
     }
   }
   
