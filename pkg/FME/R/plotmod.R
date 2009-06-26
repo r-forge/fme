@@ -39,7 +39,7 @@ plotmod <- function (mat,x=1,what=2:ncol(mat), trace=FALSE, ...) {
 
   if (! is.null(mfrow)) {
     mf <- par(mfrow=mfrow)
-    on.exit(par(mf))
+#    on.exit(par(mf))
   }
 
   Main <- is.null(dots$main)
@@ -83,7 +83,7 @@ histmod <- function (mat,what=2:ncol(mat),  ...) {
 
   if (! is.null(mfrow)) {
     mf <- par(mfrow=mfrow)
-    on.exit(par(mf))
+#    on.exit(par(mf))
   }
 
   Main <- is.null(dots$main)

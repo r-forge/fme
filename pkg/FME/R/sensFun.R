@@ -278,7 +278,7 @@ plot.sensFun<- function(x, what=NULL, legpos="topleft", ...) {
     } else mfrow <- dots$mfrow
     if (! is.null(mfrow)) {
       mf <- par(mfrow=mfrow)
-      on.exit(par(mf))
+#      on.exit(par(mf))
     }
   }  else {
     Select <- 1:length(var)

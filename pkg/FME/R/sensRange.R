@@ -240,7 +240,7 @@ plot.sensRange<-function(x, xyswap=FALSE, what=NULL,...) {
 
     if (! is.null(mfrow)) {
       mf <- par(mfrow=mfrow)
-      on.exit(par(mf))
+#      on.exit(par(mf))
     }
 
     for (i in Select){
@@ -306,7 +306,7 @@ plot.summary.sensRange<-function(x, xyswap=FALSE, what=NULL,legpos="topleft",
 
     if (! is.null(mfrow)) {
       mf <- par(mfrow=mfrow)
-      on.exit(par(mf))
+#      on.exit(par(mf))
     }
 
     for (i in Select){
@@ -348,7 +348,7 @@ plot.summary.sensRange<-function(x, xyswap=FALSE, what=NULL,legpos="topleft",
       }
     } # end i loop
     if (! is.null(legpos))
-       legend(legpos,fill=c(grey(0.9),grey(0.8)),
+       legend(legpos,fill=c(col[1],col[2]),
                legend=leg,bty="n")
   } else {            # nx =1 one summary per variable
     X <- x[Select,]

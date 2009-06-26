@@ -169,7 +169,7 @@ plot.modCRL<-function(x, what=NULL, trace = TRUE, ...) {
 
   if (! is.null(mfrow)) {
     mf <- par(mfrow=mfrow)
-    on.exit(par(mf))
+#    on.exit(par(mf))
   }
   Main <- is.null(dots$main)
   Xlab <- is.null(dots$xlab)

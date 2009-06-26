@@ -294,7 +294,7 @@ plot.modFit <- function(x,...) {
 
   if (! is.null(mfrow)) {
     mf <- par(mfrow=mfrow)
-    on.exit(par(mf))
+#    on.exit(par(mf))
   }
 
   if(! is.null(x$rsstrace))

@@ -696,7 +696,7 @@ plot.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars), trace=TRUE,
 
   if (! is.null(mfrow)) {
     mf <- par(mfrow=mfrow)
-    on.exit(par(mf))
+#    on.exit(par(mf))
   }
 
   mcmc <- x$pars
@@ -779,7 +779,7 @@ hist.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars),
 
   if (! is.null(mfrow)) {
     mf <- par(mfrow=mfrow)
-    on.exit(par(mf))
+#    on.exit(par(mf))
   }
   
   Main <- is.null(dots$main)
