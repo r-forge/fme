@@ -202,7 +202,7 @@ summary.sensRange<-function(object,...) {
 
 ## -----------------------------------------------------------------------------
 
-plot.sensRange<-function(x, xyswap=FALSE, what=NULL,...) {
+plot.sensRange<-function(x, xyswap=FALSE, which=NULL,...) {
   npar <- attr(x,"npar")
   nx  <-attr(x,"nx")
   var <-attr(x,"var")
@@ -216,17 +216,17 @@ plot.sensRange<-function(x, xyswap=FALSE, what=NULL,...) {
   Ylim <- is.null(dots$ylim)
   Xlim <- is.null(dots$xlim)
 
-  if (!is.null(what)) {
-    if (! is.numeric(what)) {
+  if (!is.null(which)) {
+    if (! is.numeric(which)) {
 
-      ln <- length(what)
-      Select <- which (var %in% what)
+      ln <- length(which)
+      Select <- which (var %in% which)
       if(length(Select) != ln)
-        stop("not all variables in 'what' are in 'x'")
+        stop("not all variables in 'which' are in 'x'")
     } else {
-      Select <- what
+      Select <- which
       if (max(Select) > nx)
-        stop("index in 'what' too large")
+        stop("index in 'which' too large")
     }
   } else Select <- 1:length(var)
 
@@ -260,7 +260,7 @@ plot.sensRange<-function(x, xyswap=FALSE, what=NULL,...) {
 
 ## -----------------------------------------------------------------------------
 
-plot.summary.sensRange<-function(x, xyswap=FALSE, what=NULL,legpos="topleft",
+plot.summary.sensRange<-function(x, xyswap=FALSE, which=NULL,legpos="topleft",
       col=c(grey(0.8),grey(0.7)), quant=FALSE, ...) {
   nx  <-attr(x,"nx")
   var <-attr(x,"var")
@@ -268,17 +268,17 @@ plot.summary.sensRange<-function(x, xyswap=FALSE, what=NULL,legpos="topleft",
   dots <- list(...)
   nmdots <- names(dots)
 
-  if (!is.null(what)) {
-    if (! is.numeric(what)) {
+  if (!is.null(which)) {
+    if (! is.numeric(which)) {
 
-      ln <- length(what)
-      Select <- which (var %in% what)
+      ln <- length(which)
+      Select <- which (var %in% which)
       if(length(Select) != ln)
-        stop("not all variables in 'what' are in 'x'")
+        stop("not all variables in 'which' are in 'x'")
     } else {
-      Select <- what
+      Select <- which
       if (max(Select) > nx)
-        stop("index in 'what' too large")
+        stop("index in 'which' too large")
     }
 
   } else Select <- 1:length(var)

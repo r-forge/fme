@@ -92,7 +92,7 @@ Sens<-summary(sensRange(func=sFun,parms=Parms[pselect],dist="latin",
                 parRange=parRange, isel=isel))
 ))
 
-plot(Sens,what=c("O2","NO3","NH3","ODU"),xyswap=TRUE,legpos="topright")
+plot(Sens,which=c("O2","NO3","NH3","ODU"),xyswap=TRUE,legpos="topright")
 head (Sens)
 
 mtext(side=3,line=-1,outer=TRUE,"Sensitivity to bioturbation and mixing depth",cex=1.15)
@@ -307,10 +307,10 @@ isel <- 1:100
 
 sR<-summary(sensRange(f=sFun,parInput=MCMC$pars,isel=isel))
 par(mfrow=c(2,2))
-plot(sR,what="O2",xyswap=TRUE,legpos="bottomright")
+plot(sR,which="O2",xyswap=TRUE,legpos="bottomright")
 points(O2data$O2,O2data$x,cex=2,pch=18)
-plot(sR,what="NO3",xyswap=TRUE,legpos="bottomright")
+plot(sR,which="NO3",xyswap=TRUE,legpos="bottomright")
 points(Ndata$NO3,Ndata$x,cex=2,pch=18)
-plot(sR,what="NH3",xyswap=TRUE,legpos=NULL)
+plot(sR,which="NH3",xyswap=TRUE,legpos=NULL)
 points(Ndata$NH3,Ndata$x,cex=2,pch=18)
-plot(sR,what="SDET",xyswap=TRUE,legpos=NULL)
+plot(sR,which="SDET",xyswap=TRUE,legpos=NULL)

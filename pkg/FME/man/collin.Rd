@@ -25,7 +25,7 @@
 }
 
 \usage{
-collin(sensfun, parset=NULL, N=NULL, what=NULL)
+collin(sensfun, parset=NULL, N=NULL, which=NULL)
 
 \method{print}{collin}(x, \ldots)
 
@@ -40,7 +40,7 @@ collin(sensfun, parset=NULL, N=NULL, what=NULL)
   \item{N }{the number of parameters in the set; if \code{NULL} then all
     combinations will be tried. Ignored if \code{parset} is not \code{NULL}
   }
-  \item{what }{the name or the index to the observed variables that should be
+  \item{which }{the name or the index to the observed variables that should be
     used. Default = all observed variables.
   }
   \item{x }{an object of class \code{collin}.

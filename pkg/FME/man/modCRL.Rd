@@ -30,11 +30,11 @@ modCRL(func,parms=NULL,sensvar=NULL,dist="unif",
 
 \method{summary}{modCRL}(object,  \dots)
 
-\method{plot}{modCRL}(x, what=NULL, trace=TRUE, \dots)
+\method{plot}{modCRL}(x, which=NULL, trace=TRUE, \dots)
 
-\method{pairs}{modCRL}(x, what = 1:ncol(x), nsample = NULL, \dots)
+\method{pairs}{modCRL}(x, which = 1:ncol(x), nsample = NULL, \dots)
 
-\method{hist}{modCRL}(x, what = 1:ncol(x), \dots)
+\method{hist}{modCRL}(x, which = 1:ncol(x), \dots)
 
 }
 \arguments{
@@ -89,7 +89,7 @@ modCRL(func,parms=NULL,sensvar=NULL,dist="unif",
   }
   \item{x }{an object of class \code{modCRL}.
   }
-  \item{what }{the name or the index to the variables and parameters that
+  \item{which }{the name or the index to the variables and parameters that
     should be plotted. Default = all variables and parameters.
   }
   \item{nsample }{the number of xy pairs to be plotted on the upper panel in
@@ -192,7 +192,7 @@ parRange
 CRL <- modCRL(func=SF,parRange=parRange)
 
 plot(CRL)  # plots both variables
-plot(CRL, what=c("eff","Bact"), trace =FALSE) #selects one
+plot(CRL, which=c("eff","Bact"), trace =FALSE) #selects one
 
 }
 \author{

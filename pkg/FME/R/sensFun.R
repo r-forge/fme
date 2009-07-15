@@ -193,22 +193,22 @@ print.summary.sensFun<-function(x,...)
 
 ## -----------------------------------------------------------------------------
 
-pairs.sensFun <- function (x, what=NULL, ...) {
+pairs.sensFun <- function (x, which=NULL, ...) {
 
-  if (!is.null(what)) {
+  if (!is.null(which)) {
     nx  <-attr(x,"nx")
     var <-attr(x,"var")
     TYP <-attr(x,"Type")
 
-    if (! is.numeric(what)) {
-      ln <- length(what)
-      Select <- which (var %in% what)
+    if (! is.numeric(which)) {
+      ln <- length(which)
+      Select <- which (var %in% which)
       if(length(Select) != ln)
-        stop("not all variables in 'what' are in 'x'")
+        stop("not all variables in 'which' are in 'x'")
     } else {
-       Select <- what
+       Select <- which
        if (max(Select) > nx)
-         stop("index in 'what' too large")
+         stop("index in 'which' too large")
     }
     ii <- NULL
     
@@ -236,7 +236,7 @@ pairs.sensFun <- function (x, what=NULL, ...) {
 
 ## -----------------------------------------------------------------------------
 
-plot.sensFun<- function(x, what=NULL, legpos="topleft", ...) {
+plot.sensFun<- function(x, which=NULL, legpos="topleft", ...) {
   nx  <-attr(x,"nx")
   xname <- attr(x,"xname")
   var <-attr(x,"var")
@@ -255,20 +255,20 @@ plot.sensFun<- function(x, what=NULL, legpos="topleft", ...) {
   Allvars <- FALSE
   Ylim <-is.null(dots$ylim)
 
-  if (!is.null(what)) {
-    if (! is.numeric(what)) {
-      ln <- length(what)
+  if (!is.null(which)) {
+    if (! is.numeric(which)) {
+      ln <- length(which)
       Select <- NULL
-      for (i in what) {  # use loop rather than which(...%in%) to keep ordering of "what"
+      for (i in which) {  # use loop rather than which(...%in%) to keep ordering of "which"
         ii <- which (var == i)
         if (length(ii)==0)
-          stop(paste(" variable in 'what' is not in 'x':", i))
+          stop(paste(" variable in 'which' is not in 'x':", i))
         Select <- c(Select,ii)
       }
     } else {     # index
-      Select <- what
+      Select <- which
       if (max(Select) > nx)
-        stop("index in 'what' too large")
+        stop("index in 'which' too large")
     }
     if (! "mfrow" %in% nmdots) {
       nv <- length(Select)

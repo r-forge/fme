@@ -28,9 +28,9 @@ sensFun(func,parms,sensvar=NULL,senspar=names(parms),
 
 \method{summary}{sensFun}(object, vars=FALSE, \dots)
 
-\method{pairs}{sensFun}(x, what=NULL, \dots)
+\method{pairs}{sensFun}(x, which=NULL, \dots)
 
-\method{plot}{sensFun}(x, what=NULL, legpos="topleft", \dots)
+\method{plot}{sensFun}(x, which=NULL, legpos="topleft", \dots)
 }
 
 \arguments{
@@ -78,7 +78,7 @@ sensFun(func,parms,sensvar=NULL,senspar=names(parms),
   \item{vars }{if FALSE: summaries per parameter are returned; if \code{TRUE},
     summaries per parameter and per variable are returned.
   }
-  \item{what }{the name or the index to the variables that should be plotted.
+  \item{which }{the name or the index to the variables that should be plotted.
     Default = all variables.
   }
   \item{legpos }{position of the legend; set to \code{NULL} to avoid plotting
@@ -152,7 +152,7 @@ sensFun(func,parms,sensvar=NULL,senspar=names(parms),
       each parameter has its own color.
     
       By default, the sensitivity functions for all variables are plotted
-      in one figure, unless \code{what} gives a selection of variables;
+      in one figure, unless \code{which} gives a selection of variables;
       in that case, each variable will be plotted in a separate figure, and
       the figures aligned in a rectangular grid, unless par \code{mfrow} is
       passed as an argument.
@@ -161,7 +161,7 @@ sensFun(func,parms,sensvar=NULL,senspar=names(parms),
       per parameter.
 
       By default, the sensitivity functions for all variables are plotted
-      in one figure, unless \code{what} gives a selection of variables.
+      in one figure, unless \code{which} gives a selection of variables.
       
       Overrides the default \code{gap = 0}, \code{upper.panel = NA}, and
       \code{diag.panel}.
@@ -212,9 +212,9 @@ tail(SF)
 summary(SF, var = TRUE)
 
 plot(SF)
-plot(SF,what=c("Sub","Bact"))
+plot(SF,which=c("Sub","Bact"))
 pm<-par(mfrow=c(1,3))
-plot(SF,what=c("Sub","Bact"),mfrow=NULL)
+plot(SF,which=c("Sub","Bact"),mfrow=NULL)
 plot(SF,mfrow=NULL)
 par(mfrow=pm)
 

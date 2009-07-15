@@ -61,14 +61,14 @@ summary.modCRL<-function(object,...) {
 }
 
 ## -----------------------------------------------------------------------------
-hist.modCRL<- function(x, what = 1:ncol(x),...) {
+hist.modCRL<- function(x, which = 1:ncol(x),...) {
   hh <- list()
   hh$pars <- x
-  hist.modMCMC(hh, what=what, Full=FALSE, ...)
+  hist.modMCMC(hh, which=which, Full=FALSE, ...)
 }
 
 ## -----------------------------------------------------------------------------
-pairs.modCRL<- function(x, what = 1:ncol(x), nsample = NULL, ...) {
+pairs.modCRL<- function(x, which = 1:ncol(x), nsample = NULL, ...) {
 
   panel.cor <- function(x, y,...)
     text(x = mean(range(x)), y = mean(range(y)),
@@ -88,19 +88,19 @@ pairs.modCRL<- function(x, what = 1:ncol(x), nsample = NULL, ...) {
     points(x[ii],y[ii],...)
 
   var <- colnames(x)
-  if (! is.numeric(what)) {
-      ln <- length(what)
-      Select <- which (var %in% what)
+  if (! is.numeric(which)) {
+      ln <- length(which)
+      Select <- which (var %in% which)
       if(length(Select) != ln)
-        stop("not all parameters in 'what' are in 'x'")
-      what <- Select
+        stop("not all parameters in 'which' are in 'x'")
+      which <- Select
   } else {
-      if (max(what) > ncol(x))
-        stop("index in 'what' too large")
-      if (min(what) < 1)
-        stop("index in 'what' should be >0")
+      if (max(which) > ncol(x))
+        stop("index in 'which' too large")
+      if (min(which) < 1)
+        stop("index in 'which' should be >0")
   }
-  X <- x[,what]
+  X <- x[,which]
 
   X<- as.matrix(X)
 
@@ -121,25 +121,25 @@ pairs.modCRL<- function(x, what = 1:ncol(x), nsample = NULL, ...) {
 }
 
 ## -----------------------------------------------------------------------------
-plot.modCRL<-function(x, what=NULL, trace = TRUE, ...) {
+plot.modCRL<-function(x, which=NULL, trace = TRUE, ...) {
   vars <- attr(x,"var")
 
   var <- colnames(x)
   NP  <- attr(x,"npar")
   parnames <- var[1:NP]
   varnames <- var[-(1:NP)]
-  if (!is.null(what)) {
-    if (! is.numeric(what)) {
-      ln <- length(what)
-      Select <- NP+which (varnames %in% what)
-      SelPar <- which (parnames %in% what)
+  if (!is.null(which)) {
+    if (! is.numeric(which)) {
+      ln <- length(which)
+      Select <- NP+which (varnames %in% which)
+      SelPar <- which (parnames %in% which)
       if(length(Select) +length(SelPar)!= ln)
-        stop("not all variables or parameters in 'what' are in 'x'")
+        stop("not all variables or parameters in 'which' are in 'x'")
     } else {
-      Select <- what[what> NP]
-      SelPar <- what[what<= NP]
-      if (max(what) > length(var))
-        stop("index in 'what' too large")
+      Select <- which[which> NP]
+      SelPar <- which[which<= NP]
+      if (max(which) > length(var))
+        stop("index in 'which' too large")
     }
   } else {
     Select <- NP+(1:length(varnames))

@@ -74,5 +74,5 @@ plot(MCMC2,Full=TRUE)
 pairs(MCMC2)
 MCMC2$count
 # show only the posterior model error and the function value
-hist (MCMC,Full=TRUE,what=NULL,col="darkgreen")
+hist (MCMC,Full=TRUE,which=NULL,col="darkgreen")
 

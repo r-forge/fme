@@ -27,12 +27,12 @@ sensRange(func,parms=NULL,sensvar=NULL,dist="unif",
 \method{summary}{sensRange}(object,  \dots)
 
 \method{plot}{summary.sensRange}(x, xyswap =FALSE,
-              what=NULL, legpos="topleft",
+              which=NULL, legpos="topleft",
               col=c(grey(0.8), grey(0.7)),
               quant =FALSE, \dots)
 
 \method{plot}{sensRange}(x, xyswap =FALSE,
-              what=NULL, \dots)
+              which=NULL, \dots)
 }
 
 \arguments{
@@ -102,7 +102,7 @@ sensRange(func,parms=NULL,sensvar=NULL,dist="unif",
   \item{xyswap }{if \code{TRUE}, then x-and y-values are swapped and the y-axis
     is from top to bottom. Useful for drawing vertical profiles.
   }
-  \item{what }{the name or the index to the variables that should be plotted.
+  \item{which }{the name or the index to the variables that should be plotted.
     Default = all variables.
   }
   \item{col }{the two colors of the polygons that should be plotted.
@@ -241,7 +241,7 @@ plot(Sens2,xlab="time, hour",ylab="molC/m3",
 par(mfrow=mf )
 
 # Select one variable for plotting; plot the quantiles
-plot(Sens2,xlab="time, hour",ylab="molC/m3", what="Bact", quant = TRUE)
+plot(Sens2,xlab="time, hour",ylab="molC/m3", which="Bact", quant = TRUE)
 
 }
 \author{

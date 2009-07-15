@@ -558,7 +558,7 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
 ## S3 methods of modMCMC
 ## -----------------------------------------------------------------------------
 
-pairs.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars),
+pairs.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars),
                            remove = NULL, nsample = NULL, ...) {
 
   panel.cor <- function(x, y,...)
@@ -579,19 +579,19 @@ pairs.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars),
     points(x[ii],y[ii],...)
 
   var <- colnames(x$pars)
-  if (! is.numeric(what)) {
-      ln <- length(what)
-      Select <- which (var %in% what)
+  if (! is.numeric(which)) {
+      ln <- length(which)
+      Select <- which (var %in% which)
       if(length(Select) != ln)
-        stop("not all parameters in 'what' are in 'x$pars'")
-      what <- Select
+        stop("not all parameters in 'which' are in 'x$pars'")
+      which <- Select
   } else {
-      if (max(what) > ncol(x$pars))
-        stop("index in 'what' too large")
-      if (min(what) < 1)
-        stop("index in 'what' should be >0")
+      if (max(which) > ncol(x$pars))
+        stop("index in 'which' too large")
+      if (min(which) < 1)
+        stop("index in 'which' should be >0")
   }
-  X <- x$pars[,what]
+  X <- x$pars[,which]
 
 
   if (is.vector(X)) X<- as.matrix(X)
@@ -628,24 +628,24 @@ pairs.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars),
 ## -----------------------------------------------------------------------------
 # This one not yet available ...
 
-cumuplot.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars),
+cumuplot.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars),
                               remove = NULL, ...) {
 
   var <- colnames(x$pars)
-  if (! is.numeric(what)) {
-      ln <- length(what)
-      Select <- which (var %in% what)
+  if (! is.numeric(which)) {
+      ln <- length(which)
+      Select <- which (var %in% which)
       if(length(Select) != ln)
-        stop("not all parameters in 'what' are in 'x$pars'")
-      what <- Select
+        stop("not all parameters in 'which' are in 'x$pars'")
+      which <- Select
   } else {
-      if (max(what) > ncol(x$pars))
-        stop("index in 'what' too large")
-      if (min(what) < 1)
-        stop("index in 'what' should be >0")
+      if (max(which) > ncol(x$pars))
+        stop("index in 'which' too large")
+      if (min(which) < 1)
+        stop("index in 'which' should be >0")
   }
 
-  mcmc <- x$pars[,what]
+  mcmc <- x$pars[,which]
   if (! is.null (remove)) {
     if (max(remove) > nrow(mcmc))
       stop("too many runs should be removed from modMCMC object")
@@ -663,23 +663,23 @@ cumuplot.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars),
 
 ## -----------------------------------------------------------------------------
 
-plot.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars), trace=TRUE,
+plot.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars), trace=TRUE,
                           remove=NULL, ...) {
 
   var <- colnames(x$pars)
-  if (! is.numeric(what)) {
-      ln <- length(what)
-      Select <- which (var %in% what)
+  if (! is.numeric(which)) {
+      ln <- length(which)
+      Select <- which (var %in% which)
       if(length(Select) != ln)
-        stop("not all parameters in 'what' are in 'x$pars'")
-      what <- Select
+        stop("not all parameters in 'which' are in 'x$pars'")
+      which <- Select
   } else {
-      if (max(what) > ncol(x$pars))
-        stop("index in 'what' too large")
-      if (min(what) < 1)
-        stop("index in 'what' should be >0")
+      if (max(which) > ncol(x$pars))
+        stop("index in 'which' too large")
+      if (min(which) < 1)
+        stop("index in 'which' should be >0")
   }
-  np <- NP <- length(what)
+  np <- NP <- length(which)
   if (Full)
     np <- np +1
   if (Full & !is.null(x$sig))
@@ -713,7 +713,7 @@ plot.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars), trace=TRUE,
   dots$ylab <- if(is.null(dots$ylab)) "" else dots$ylab
   dots$type <- if(is.null(dots$type)) "l" else dots$type
 
-  for(i in what) {
+  for(i in which) {
     if (Main) dots$main <- colnames(mcmc)[i]
     do.call("plot",c(alist(mcmc[,i]),dots))
     if (trace) lines(lowess(mcmc[,i]),col="darkgrey",lwd=2)
@@ -738,30 +738,30 @@ plot.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars), trace=TRUE,
 
 ## -----------------------------------------------------------------------------
 
-hist.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars),
+hist.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars),
                           remove=NULL, ...) {
                           
   iswhat <- TRUE
-  if (length(what) > 0)
-    if (any(is.na(what))) iswhat <- FALSE
-  if (iswhat & is.null(what)) iswhat <- FALSE
+  if (length(which) > 0)
+    if (any(is.na(which))) iswhat <- FALSE
+  if (iswhat & is.null(which)) iswhat <- FALSE
   np <- NP <- 0
   var <- colnames(x$pars)
 
   if (iswhat)  {
-    if (! is.numeric(what)) {
-      ln <- length(what)
-      Select <- which (var %in% what)
+    if (! is.numeric(which)) {
+      ln <- length(which)
+      Select <- which (var %in% which)
       if(length(Select) != ln)
-        stop("not all parameters in 'what' are in 'x$pars'")
-      what <- Select
+        stop("not all parameters in 'which' are in 'x$pars'")
+      which <- Select
     } else {
-      if (max(what) > ncol(x$pars))
-        stop("index in 'what' too large")
-      if (min(what) < 1)
-        stop("index in 'what' should be >0")
+      if (max(which) > ncol(x$pars))
+        stop("index in 'which' too large")
+      if (min(which) < 1)
+        stop("index in 'which' should be >0")
     }
-  np <- NP <- length(what)
+  np <- NP <- length(which)
   }
   if (Full)
     np <- np +1
@@ -798,7 +798,7 @@ hist.modMCMC <- function (x, Full=FALSE, what=1:ncol(x$pars),
   }
 
   if (iswhat)
-    for(i in what) {
+    for(i in which) {
     if (Main) dots$main <- colnames(mcmc)[i]
     do.call("hist",c(alist(mcmc[,i]),dots))
   }

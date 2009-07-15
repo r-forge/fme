@@ -782,9 +782,9 @@ MCMC2 <- modMCMC(f=Residuals,p=P$par,jump=Covar,niter=1000,
 @
 
 We plot only the residual sum of squares and the error variances;
-\code{what=NULL} does that (figure \ref{fig:Monmcmc2}).
+\code{which=NULL} does that (figure \ref{fig:Monmcmc2}).
 <<label=Monmcmc2, include=FALSE>>=
-plot(MCMC2,Full=TRUE,what=NULL)
+plot(MCMC2,Full=TRUE,which=NULL)
 @
 \setkeys{Gin}{width=0.8\textwidth}
 \begin{figure}

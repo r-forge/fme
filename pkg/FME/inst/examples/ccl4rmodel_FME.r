@@ -205,7 +205,7 @@ cov(MCMC$pars)
 sP$cov.scaled
 
 sR<-sensRange(parms=Pm,parInput=MCMC$pars,func=ccl4run)
-plot(SUMM<-summary(sR), what ="CP")
+plot(SUMM<-summary(sR), which ="CP")
 points(ChamberConc ~ time,data=Obs)
 
 # DRAM
@@ -214,6 +214,6 @@ MCMC2 <- modMCMC(f=Residuals,p=MrqFit$par,jump=0.5*MrqFit$par,niter=1000,ntrydr=
 plot(MCMC2,Full=TRUE)
 pairs(MCMC2)
 
-plot(summary(sensRange(parms=Pm,parInput=MCMC2$pars,func=ccl4run)), what ="CP")
+plot(summary(sensRange(parms=Pm,parInput=MCMC2$pars,func=ccl4run)), which ="CP")
 
 

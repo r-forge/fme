@@ -2,24 +2,24 @@
 ## Collinearity indices
 ## -----------------------------------------------------------------------------
 
-collin <- function(sensfun, parset=NULL, N=NULL, what=NULL) {
+collin <- function(sensfun, parset=NULL, N=NULL, which=NULL) {
 
   if (is.null(colnames(sensfun)))colnames(sensfun)<-1:ncol(sensfun)
 
-  if (!is.null(what)) {
+  if (!is.null(which)) {
     nx  <-attr(sensfun,"nx")
     var <-attr(sensfun,"var")
     TYP <-attr(sensfun,"Type")
 
-    if (! is.numeric(what)) {
-      ln <- length(what)
-      Select <- which (var %in% what)
+    if (! is.numeric(which)) {
+      ln <- length(which)
+      Select <- which (var %in% which)
       if(length(Select) != ln)
-        stop("not all variables in 'what' are in 'sensfun'")
+        stop("not all variables in 'which' are in 'sensfun'")
     } else {
-       Select <- what
+       Select <- which
        if (max(Select) > nx)
-         stop("index in 'what' too large")
+         stop("index in 'which' too large")
     }
     ii <- NULL
 

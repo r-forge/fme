@@ -18,17 +18,17 @@ modMCMC(f, p, ..., jump=NULL,  lower=-Inf, upper=+Inf, prior=NULL,
   burninlength=0, updatecov=niter, covscale = 2.4^2/length(p),
   ntrydr=1, drscale=NULL, verbose=TRUE)
 
-%%cumuplot.modMCMC(x, Full=FALSE, what=1:ncol(x$pars), ...)
+%%cumuplot.modMCMC(x, Full=FALSE, which=1:ncol(x$pars), ...)
 
 \method{summary}{modMCMC}(object,   remove = NULL, \dots)
 
-\method{pairs}{modMCMC}(x, Full=FALSE, what = 1:ncol(x$pars),
+\method{pairs}{modMCMC}(x, Full=FALSE, which = 1:ncol(x$pars),
   remove = NULL, nsample = NULL, \dots)
 
-\method{hist}{modMCMC}(x, Full=FALSE, what = 1:ncol(x$pars),
+\method{hist}{modMCMC}(x, Full=FALSE, which = 1:ncol(x$pars),
   remove = NULL, \dots)
 
-\method{plot}{modMCMC}(x, Full=FALSE, what = 1:ncol(x$pars), trace=TRUE,
+\method{plot}{modMCMC}(x, Full=FALSE, which = 1:ncol(x$pars), trace=TRUE,
   remove = NULL, \dots)
 }
 
@@ -103,7 +103,7 @@ modMCMC(f, p, ..., jump=NULL,  lower=-Inf, upper=+Inf, prior=NULL,
   \item{Full }{If TRUE then not only the parameters will be plotted, but
     also the function value and (if appropriate) the model variance(s).
   }
-  \item{what }{the name or the index to the parameters that should be plotted.
+  \item{which }{the name or the index to the parameters that should be plotted.
     Default = all parameters.
   }
   \item{trace }{if \code{TRUE}, adds smoothed line to the plot.
@@ -377,7 +377,7 @@ plot(MCMC2)
 hist(MCMC2,breaks=20)
 
 # Compare output of p3 with theoretical distribution
-hist(MCMC2,what="p3",breaks=20)
+hist(MCMC2,which="p3",breaks=20)
 lines(seq(1,3,0.1),dnorm(seq(1,3,0.1),mean=2.5,sd=0.5)/pnorm(3,2.5,0.5))
 summary(MCMC2)
 

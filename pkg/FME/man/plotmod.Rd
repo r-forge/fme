@@ -9,9 +9,9 @@
 }
 
 \usage{
-plotmod(mat, x=1, what = 2:ncol(mat), trace=FALSE, \dots)
+plotmod(mat, x=1, which = 2:ncol(mat), trace=FALSE, \dots)
 
-histmod(mat, what = 2:ncol(mat), \dots)
+histmod(mat, which = 2:ncol(mat), \dots)
 }
 
 \arguments{
@@ -20,7 +20,7 @@ histmod(mat, what = 2:ncol(mat), \dots)
   \item{x }{the name or the index to the column of \code{mat}, which should
     be used as x-values. Default = first column.
   }
-  \item{what }{the name or the index to the columns that should be plotted as
+  \item{which }{the name or the index to the columns that should be plotted as
     y-values. Default = all columns except the first.
   }
   \item{trace }{if \code{TRUE}, adds smoothed line to the plot.
@@ -47,7 +47,7 @@ mat<-data.frame(cbind(iter=1:n, norm=rnorm(n), unif=runif(n),
 plotmod(mat)
 
 histmod(mat,breaks=20,col="darkblue")
-histmod(mat,what=c("norm","lnorm"),mfrow=c(1,2))
+histmod(mat,which=c("norm","lnorm"),mfrow=c(1,2))
 
 }
 \author{

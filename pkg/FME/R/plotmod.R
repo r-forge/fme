@@ -1,4 +1,4 @@
-plotmod <- function (mat,x=1,what=2:ncol(mat), trace=FALSE, ...) {
+plotmod <- function (mat,x=1,which=2:ncol(mat), trace=FALSE, ...) {
 
   var <- colnames(mat)
   if (length(x) != 1) stop ("x should contain one value")
@@ -13,20 +13,20 @@ plotmod <- function (mat,x=1,what=2:ncol(mat), trace=FALSE, ...) {
         stop("index in 'x' should be >0")
   }
 
-  if (! is.numeric(what)) {
-      ln <- length(what)
-      Select <- which (var %in% what)
+  if (! is.numeric(which)) {
+      ln <- length(which)
+      Select <- which (var %in% which)
       if(length(Select) != ln)
-        stop("not all parameters in 'what' are in 'x$pars'")
-      what <- Select
+        stop("not all parameters in 'which' are in 'x$pars'")
+      which <- Select
   } else {
-      if (max(what) > ncol(mat))
-        stop("index in 'what' too large")
-      if (min(what) < 1)
-        stop("index in 'what' should be >0")
+      if (max(which) > ncol(mat))
+        stop("index in 'which' too large")
+      if (min(which) < 1)
+        stop("index in 'which' should be >0")
   }
 
-  np <- length(what)
+  np <- length(which)
 
   dots <- list(...)
   nmdots <- names(dots)
@@ -47,30 +47,30 @@ plotmod <- function (mat,x=1,what=2:ncol(mat), trace=FALSE, ...) {
   dots$xlab <- if(is.null(dots$xlab)) colnames(mat)[x]else dots$xlab
   dots$ylab <- if(is.null(dots$ylab)) ""  else dots$ylab
 
-  for(i in what) {
+  for(i in which) {
     if (Main) dots$main <- colnames(mat)[i]
     do.call("plot",c(alist(mat[,x],mat[,i]),dots))
     if (trace) lines(lowess(mat[,i]),col="darkgrey",lwd=2)
   }
 }
 
-histmod <- function (mat,what=2:ncol(mat),  ...) {
+histmod <- function (mat,which=2:ncol(mat),  ...) {
 
   var <- colnames(mat)
-  if (! is.numeric(what)) {
-      ln <- length(what)
-      Select <- which (var %in% what)
+  if (! is.numeric(which)) {
+      ln <- length(which)
+      Select <- which (var %in% which)
       if(length(Select) != ln)
-        stop("not all parameters in 'what' are in 'x$pars'")
-      what <- Select
+        stop("not all parameters in 'which' are in 'x$pars'")
+      which <- Select
   } else {
-      if (max(what) > ncol(mat))
-        stop("index in 'what' too large")
-      if (min(what) < 1)
-        stop("index in 'what' should be >0")
+      if (max(which) > ncol(mat))
+        stop("index in 'which' too large")
+      if (min(which) < 1)
+        stop("index in 'which' should be >0")
   }
 
-  np <- length(what)
+  np <- length(which)
 
   dots <- list(...)
   nmdots <- names(dots)
@@ -90,7 +90,7 @@ histmod <- function (mat,what=2:ncol(mat),  ...) {
 
   dots$ylab <- if(is.null(dots$ylab)) ""  else dots$ylab
 
-    for(i in what) {
+    for(i in which) {
     if (Main) dots$main <- colnames(mat)[i]
     do.call("hist",c(alist(mat[,i]),dots))
   }
