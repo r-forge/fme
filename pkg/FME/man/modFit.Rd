@@ -18,7 +18,7 @@
 \usage{modFit(f, p, ..., lower=-Inf, upper=Inf,
   method=c("Marq","Port","Newton",
            "Nelder-Mead","BFGS","CG","L-BFGS-B","SANN",
-           "Pseudo"),
+           "Pseudo"), jac = NULL,
   control=list(),hessian=TRUE)
 
 \method{summary}{modFit}(object, cov=TRUE,\dots)
@@ -55,6 +55,11 @@
   }
   \item{method }{The method to be used, one of "Marq","Port","Newton",
     "Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN", "Pseudo" - see details.
+  }
+  \item{jac }{A function that calculates the Jacobian; it should be called as
+    jac(x,...) and return the matrix with derivatives of the model residuals
+    as a function of the parameters. Supplying the jacobian can substantially
+    improve performance; see last example
   }
   \item{hessian }{TRUE if hessian is to be estimated. Note that, if set to
     \code{FALSE}, then a summary cannot be estimated.
@@ -234,6 +239,17 @@
     \item \link{df.residual} which returns the residual degrees of freedom
     \item print.summary, producing a nice printout of the summary.
   }
+  
+  Specifying a function to estimate the Jacobian matrix, via argument
+  \code{jac} may increase speed. The jacobian is used in the methods
+  "Marq", "BFGS", "CG", "L-BFGS", "Port", and is also used at the end,
+  to estimate the hessian at the optimum.
+
+  Specification of the \code{gradient} in routines "BFGS", "CG", "L-BFGS"
+  from \code{optim} and "port" from \code{nlminb} is not allowed here.
+  Within \code{modFit}, the gradient is rather estimated from the Jacobian
+  \code{jac} and the function \code{f}.
+
 }
 \seealso{
   \code{\link{constrOptim}} for constrained optimization.
@@ -241,7 +257,9 @@
 
 \examples{
 
-# logistic growth model
+## =======================================================================
+## logistic growth model
+## =======================================================================
 TT    <- seq(1,60,5)
 N0    <- 0.1
 r     <- 0.5
@@ -254,9 +272,9 @@ plot(TT, Data[,"N"], ylim=c(0, 120), pch=16, col="red",
      main = "logistic growth", xlab="time", ylab="N")
 
 
-####################################
+#===================================
 # Fitted with analytical solution  #
-####################################
+#===================================
 # initial "guess"
 parms <- c(r = 2, K = 10, N0=5)
 
@@ -280,9 +298,9 @@ times <- 0:60
 lines(times,model(Fita$par,times),lwd=2, col="blue")
 summary(Fita)
 
-####################################
+#===================================
 #  Fitted with numerical solution  #
-####################################
+#===================================
 ## numeric solution
 logist <- function(t, x, parms) {
   with(as.list(parms), {
@@ -310,6 +328,38 @@ legend("right",c("data","original","fitted analytical","fitted numerical"),
        pch=c(16,NA,NA,NA))
 summary(Fit)
 plot(residuals(Fit))
+
+## =======================================================================
+## the use of the Jacobian
+## =======================================================================
+
+# We use modFit to solve a set of linear equations
+A<- matrix(nr=30,nc=30,runif(900))
+X<- runif(30)
+B<- A\%*\%X
+
+# try to find vector "X"; the jacobian is matrix A
+
+# Function that returns the vector of residuals
+FUN <- function(x)
+  as.vector(A \%*\%x - B)
+
+# Function that returns the Jacobian
+JAC <- function(x) A
+
+# The port algorithm
+print(system.time(mf <- modFit(f=FUN,p=runif(30),method="Port")))
+print(system.time(mf <- modFit(f=FUN,p=runif(30),method="Port",jac=JAC)))
+max(abs(mf$par-X))  # should be very small
+
+# BFGS
+print(system.time(mf <- modFit(f=FUN,p=runif(30),method="BFGS")))
+print(system.time(mf <- modFit(f=FUN,p=runif(30),method="BFGS",jac=JAC)))
+max(abs(mf$par-X))
+
+# levenberg-Marquardt
+print(system.time(mf <- modFit(f=FUN,p=runif(30),jac=JAC)))
+max(abs(mf$par-X))
 }
 \author{
   Karline Soetaert <k.soetaert@nioo.knaw.nl>,

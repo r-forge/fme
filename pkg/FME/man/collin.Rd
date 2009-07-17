@@ -97,7 +97,9 @@ collin(sensfun, parset=NULL, N=NULL, which=NULL)
   See the paper by Omlin et al. (2001) for more information.
 }
 \examples{
-# Test collinearity
+## =======================================================================
+## Test collinearity values
+## =======================================================================
 
 # linearly related set...  => Infinity
 collin (cbind(1:5,2*(1:5)))
@@ -108,9 +110,9 @@ MM<- matrix(nr=4,nc=2,byrow=TRUE,data=c( -0.400, -0.374, 0.255,
 
 collin(MM)
 
-#========================================
-# Bacterial model from Soetaert and Herman, 2009
-#========================================
+## =======================================================================
+## Bacterial model as in Soetaert and Herman, 2009
+## =======================================================================
 
 pars <- list(gmax =0.5,eff = 0.5,
               ks =0.5, rB =0.01, dB =0.01)

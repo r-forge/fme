@@ -204,9 +204,9 @@ modCost(model, obs, x="time", y=NULL, err=NULL,
 
 \examples{
 
-#======================================#
-# Type 1 input:  name, time, value
-#======================================#
+## =======================================================================
+## Type 1 input:  name, time, value
+## =======================================================================
 
 ## Create new data: two observed variables, "a", "b"
 Data  <-data.frame(name=c(rep("a",4),rep("b",4)),
@@ -232,9 +232,9 @@ Dat2 <- cbind(Data, Err=Data$val*0.1)  # error=10% of value
 modCost(model=out,obs=Dat2,y="val",err="Err")
 
 
-#==============================================================#
-# Type 2 input:  Matrix format; column names = variable names
-#==============================================================#
+## =======================================================================
+## Type 2 input:  Matrix format; column names = variable names
+## =======================================================================
 
 ## logistic growth model
 TT    <- seq(1,100,2.5)
@@ -284,11 +284,10 @@ legend("right", ncol=2, title="SSR",
 
 compare
 
-#==============================================================#
-# Now suppose we do not know K and r and they are to be fitted...
-# The "observations" are the analytical solution
-#==============================================================#
-
+## =======================================================================
+## Now suppose we do not know K and r and they are to be fitted...
+## The "observations" are the analytical solution
+## =======================================================================
 
 ## Run the model with initial guess: K=10, r=2
 parms["K"]<-10

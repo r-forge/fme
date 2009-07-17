@@ -148,9 +148,9 @@ The following \emph{methods} are included:
 }
 \examples{
 
-#========================================
-# Model from Soetaert and Herman, 2009
-#========================================
+## =======================================================================
+## Bacterial growth model as in Soetaert and Herman, 2009
+## =======================================================================
 
 pars <- list(gmax =0.5,eff = 0.5,
               ks =0.5, rB =0.01, dB =0.01)

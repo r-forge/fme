@@ -2,10 +2,10 @@
 ## Fitting the Model to Data
 ## -----------------------------------------------------------------------------
 
-modFit <- function(f,p,...,lower=-Inf,upper=Inf,
+modFit <- function(f, p, ..., lower=-Inf, upper=Inf,
                    method=c("Marq","Port","Newton","Nelder-Mead", "BFGS", "CG",
-                   "L-BFGS-B", "SANN","Pseudo"),
-                   control=list(),hessian=TRUE) {
+                   "L-BFGS-B", "SANN","Pseudo"), jac=NULL,
+                   control=list(), hessian=TRUE) {
 
   # check if valid input...
   np <- length(p)
@@ -38,6 +38,28 @@ modFit <- function(f,p,...,lower=-Inf,upper=Inf,
     if (useCost) return (sum(FF^2)) else return(FF)
   }
 
+  # The methods cannot work with the "gradient function" - too confusing
+  # if jacobian is provided and the method is one of "", then the gradient
+  # function can be created from func and jac
+
+  dots <- list(...)
+  nmdots <- names(dots)
+  if (method %in% c("BFGS", "CG", "L-BFGS") & "gr" %in% nmdots)
+    stop ("cannot use gradient function 'gr' here; supply jacobian 'jac' instead")
+
+  if (method == "Port" & "gradient" %in% nmdots)
+    stop ("cannot use gradient function 'grad' here; supply jacobian 'jac' instead")
+
+  grad <- NULL
+  
+  if (! is.null(jac))
+   if (method %in% c("BFGS", "CG", "L-BFGS","Port") & ! is.null(jac))
+     { if (np ==1)  grad <- function (x) return(sum(2*f(x)* jac(x)))
+       else
+                    grad <- function (x) return(colSums(2*f(x,...)* jac(x,...)))
+     }
+     
+     
   Pars <- p
   estHess <- FALSE
   # Adapt function call if necessary
@@ -75,13 +97,13 @@ modFit <- function(f,p,...,lower=-Inf,upper=Inf,
 
   if (method %in% c("Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN")) {
     res <- optim(Pars,Fun,method=method,lower=lower,upper=upper,
-                 control=control,hessian=hessian,...)
+                 control=control, hessian=hessian, gr=grad, ...)
     names(res)[2] <- "ssr"          # called "value" here
   }
 
   else if (method == "Port") {
     res <- nlminb(start=Pars,objective=Fun,lower=lower,upper=upper,
-                  control=control,...)
+                  control=control, gradient=grad, ...)
     names(res)[2] <- "ssr"          # called "objective" here
     names(res)[6] <- "counts"
 
@@ -152,8 +174,9 @@ modFit <- function(f,p,...,lower=-Inf,upper=Inf,
     useCost <- FALSE
 
     Fun <- function(p,...) Func(p,...)
-
-    Jac <- gradient(Fun,res$par,centered=TRUE,...)
+    if (! is.null(jac))
+      Jac <- jac(res$par)
+    else Jac <- gradient(Fun,res$par,centered=TRUE,...)
     res$hessian <- 2 * t(Jac)%*%Jac
   }
 

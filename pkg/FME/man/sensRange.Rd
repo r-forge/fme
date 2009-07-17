@@ -182,10 +182,9 @@ sensRange(func,parms=NULL,sensvar=NULL,dist="unif",
 }
 \examples{
 
-#========================================
-# Model from Soetaert and Herman, 2009
-#========================================
-
+## =======================================================================
+## Bacterial growth model from Soetaert and Herman, 2009
+## =======================================================================
 
 pars <- list(gmax =0.5,eff = 0.5,
               ks =0.5, rB =0.01, dB =0.01)

@@ -70,6 +70,8 @@ A Flexible Modelling Environment for inverse modelling, sensitivity, identifiabi
 }
 \author{
   Karline Soetaert
+  
+  Thomas Petzoldt
 }
 %\references{
 %% to be filled

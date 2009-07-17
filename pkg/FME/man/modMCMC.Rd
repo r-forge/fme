@@ -336,18 +336,15 @@ where \eqn{\xi} is the measurement error, assumed normally distribution, then
 
 \examples{
 
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# Sampling a distribution
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-# test 1: sampling a 3-dimensional normal distribution,
+## =======================================================================
+## Sampling a 3-dimensional normal distribution,
+## =======================================================================
 # mean=1:3, sd = 0.1
 # f returns -2*log(probability) of the parameter values
 
-NN <- function(p)
-{
-mu <- c(1,2,3)
--2*sum(log(dnorm(p,mean=mu,sd=0.1)))      #-2*log(probability)
+NN <- function(p) {
+  mu <- c(1,2,3)
+  -2*sum(log(dnorm(p,mean=mu,sd=0.1)))      #-2*log(probability)
 }
 
 # simple metropolis-hastings
@@ -362,14 +359,14 @@ summary(MCMC)
 plot(MCMC)   # check convergence
 pairs(MCMC)
 
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# test 2: sampling a 3-D normal distribution, larger standard deviation...
-# noninformative priors, lower and upper bounds imposed on parameters
+## =======================================================================
+## test 2: sampling a 3-D normal distribution, larger standard deviation...
+## noninformative priors, lower and upper bounds imposed on parameters
+## =======================================================================
 
-NN <- function(p)
-{
-mu <- c(1,2,2.5)
--2*sum(log(dnorm(p,mean=mu,sd=0.5)))      #-2*log(probability)
+NN <- function(p) {
+  mu <- c(1,2,2.5)
+  -2*sum(log(dnorm(p,mean=mu,sd=0.5)))      #-2*log(probability)
 }
 MCMC2 <- modMCMC (f=NN,p=1:3,niter=3000,burninlength=500,updatecov=10,
                   jump=0.5, lower=c(0,2,1),upper=c(1,3,3))
@@ -386,13 +383,13 @@ cumuplot(as.mcmc(MCMC2$pars))
 summary(as.mcmc(MCMC2$pars))
 raftery.diag(MCMC2$pars)
 
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# test 3: sampling a log-normal distribution, log mean=1:4, log sd = 1
+## =======================================================================
+## test 3: sampling a log-normal distribution, log mean=1:4, log sd = 1
+## =======================================================================
 
-NL <- function(p)
-{
-mu <- 1:4
--2*sum(log(dlnorm(p,mean=mu,sd=1)))      #-2*log(probability)
+NL <- function(p) {
+  mu <- 1:4
+  -2*sum(log(dlnorm(p,mean=mu,sd=1)))      #-2*log(probability)
 }
 MCMCl <- modMCMC (f=NL,p=log(1:4),niter=10000,outputlength=1000,jump=5)
 plot(MCMCl)   # bad convergence
@@ -410,9 +407,9 @@ plot(MCMCl)
 colMeans(log(MCMCl$pars))
 sd(log(MCMCl$pars))
 
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# Fitting a Monod (Michaelis-Menten) function to data
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+## =======================================================================
+## Fitting a Monod (Michaelis-Menten) function to data
+## =======================================================================
 
 # the observations
 #---------------------
