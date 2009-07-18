@@ -2,7 +2,7 @@
 \alias{plotmod}
 \alias{histmod}
 \title{
-  plots model output in separate plots
+  Plot Model Outputs in Separate Plots
   }
 \description{
   Produces x-y plots or histograms of the columns from a matrix in separate figures

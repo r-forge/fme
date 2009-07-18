@@ -21,7 +21,7 @@
 \newcommand{\R}{\proglang{R}}
 
 \title{\proglang{R}-package \fme: inverse modelling, sensitivity,
-  monte carlo - applied to a nonlinear model}
+  Monte Carlo - applied to a nonlinear model}
 
 \Plaintitle{FME}
 
@@ -40,7 +40,7 @@ The Netherlands
 \Plainauthor{Karline Soetaert}
 
 \Abstract{ \R package \fme \citep{FME} contains functions for
-model calibration, sensitivity, identifiability, and monte carlo analysis
+model calibration, sensitivity, identifiability, and Monte Carlo analysis
 of nonlinear models.
 
 This vignette (\code{vignette("FMEother")}), applies the \fme functions to a
@@ -53,7 +53,7 @@ package \ds
 A third vignette, (\code{vignette("FMEsteady")}), applies \fme to a partial
 differential equation, solved with a steady-state solver from package \rs
 
-\code{vignette("FMEmcmc")} tests the markov chain monte carlo (MCMC)
+\code{vignette("FMEmcmc")} tests the Markov chain Monte Carlo (MCMC)
 implementation
 }
 
@@ -71,7 +71,7 @@ implementation
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% R/Sweave specific LaTeX commands.
 %% need no \usepackage{Sweave}
-%\VignetteIndexEntry{Sensitivity, calibration, identifiability, monte carlo analysis of a nonlinear model}
+%\VignetteIndexEntry{Sensitivity, calibration, identifiability, Monte Carlo analysis of a nonlinear model}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Begin of the document
 \begin{document}
@@ -167,7 +167,7 @@ For the initial model variance (\code{var0})
 we use the residual mean squares also returned by the \code{summary} function.
 We give equal weight to prior and modeled mean squares (\code{wvar0=1})
 
-The MCMC method adopted here is the metropolis-hastings algorithm; the MCMC is run
+The MCMC method adopted here is the Metropolis-Hastings algorithm; the MCMC is run
 for 3000 steps; we use the best-fit parameter set (\code{P$par}) to initiate the
 chain (\code{p}). A lower bound (0) is imposed on the parameters (\code{lower}).
 <<>>=

@@ -36,8 +36,8 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
     stop("burninlenght is larger than niter")
 
   ou <- ceiling((niter - burninlength)/outputlength)  # output interval
-  niter <- niter - (niter - burninlength)%%ou
-  outputlength <- (niter - burninlength)%/%ou
+  niter <- niter - (niter - burninlength) %% ou
+  outputlength <- (niter - burninlength) %/% ou
   ou1 <- burninlength + ou                          # first output iteration nr
 
   ## delayed rejection input
@@ -85,7 +85,7 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
     NewPars <- jump             # jump is a function
     if (ntrydr > 1) stop ("cannot combine jump function with delayed rejection")
   }
-  
+
 ##------------------------------------------------------------------------------
 ## Prior, absent or a function that returns -2 * log(prior parameter probability)
 
@@ -142,7 +142,7 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
       stop("length of 'var0' should either 1 or = length of model residuals as returned by 'f'")
 
     if (length(var0) == 1) {
-    
+
       Fun <- function(p,...) {
         PPnew  <<- Prior(p)
         SSnew  <<- f(p,...)
@@ -200,7 +200,7 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
       SSold <- SSnew$var$SSR.unweighted
     }
   }
-  
+
   ## parameter used in gamma draw.
   if (is.null(n0)) n0 <- wvar0*N
 
@@ -250,7 +250,7 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
     }
     return(accept)
   }
-  
+
 ##------------------------------------------------------------------------------
 ## The delayed rejection procedure ...  (based on matlab code)
 
@@ -318,7 +318,7 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
     }
     return(z)
   }
-  
+
 ##------------------------------------------------------------------------------
 ## the MCMC jumps...
 
@@ -740,7 +740,7 @@ plot.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars), trace=TRUE,
 
 hist.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars),
                           remove=NULL, ...) {
-                          
+
   iswhat <- TRUE
   if (length(which) > 0)
     if (any(is.na(which))) iswhat <- FALSE
@@ -781,7 +781,7 @@ hist.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars),
     mf <- par(mfrow=mfrow)
 #    on.exit(par(mf))
   }
-  
+
   Main <- is.null(dots$main)
   dots$xlab    <- if(is.null(dots$xlab))    ""    else dots$xlab
   dots$freq    <- if(is.null(dots$freq))    FALSE else dots$freq

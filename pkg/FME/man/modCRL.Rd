@@ -5,7 +5,7 @@
 \alias{pairs.modCRL}
 \alias{hist.modCRL}
 \title{
-  Monte Carlo analysis
+  Monte Carlo Analysis
 }
 \description{
   Given a model consisting of differential equations, estimates

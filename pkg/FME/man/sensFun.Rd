@@ -5,7 +5,7 @@
 \alias{pairs.sensFun}
 
 \title{
-  Local sensitivity analysis
+  Local Sensitivity Analysis
 }
 
 \description{

@@ -22,10 +22,10 @@
 \title{\proglang{R}-package \fme: MCMC tests}
 \Plaintitle{FME - MCMC tests}
 
-\Keywords{markov chain monte carlo, delayed rejection, adapative metropolis,
+\Keywords{Markov chain Monte Carlo, delayed rejection, adapative Metropolis,
 MCMC, DRAM,  \proglang{R}}
 
-\Plainkeywords{markov chain monte carlo, delayed rejection, adapative metropolis,
+\Plainkeywords{Markov chain Monte Carlo, delayed rejection, adapative Metropolis,
 MCMC, DRAM,  R}
 
 
@@ -40,10 +40,10 @@ Finland
 
 \Plainauthor{Karline Soetaert and Marko Laine}
 
-\Abstract{This vignette tests the markov chain monte carlo (MCMC) implementation
+\Abstract{This vignette tests the Markov chain Monte Carlo (MCMC) implementation
 of \R package \fme \citep{FME}.
 
-It includes the delayed rejection and adaptive metropolis algorithm \citep{Haario06}}
+It includes the delayed rejection and adaptive Metropolis algorithm \citep{Haario06}}
 
 %% The address of (at least) one author should be given
 %% in the following format:
@@ -66,7 +66,7 @@ It includes the delayed rejection and adaptive metropolis algorithm \citep{Haari
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% R/Sweave specific LaTeX commands.
 %% need no \usepackage{Sweave}
-%\VignetteIndexEntry{FME - tests of the markov chain monte carlo implementation}
+%\VignetteIndexEntry{FME - tests of the Markov chain Monte Carlo implementation}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Begin of the document
 \begin{document}
@@ -83,8 +83,8 @@ options(width=70)
 
 \section{Introduction}
 Function \code{modMCMC} from package \fme \citep{FME}
-implements a markov chain monte carlo
-(MCMC) algorithm using a delayed rejection and adaptive metropolis procedure
+implements a Markov chain Monte Carlo
+(MCMC) algorithm using a delayed rejection and adaptive Metropolis procedure
 \citep{Haario06}.
 
 In this vignette , the DRAM MCMC function is tested  on several functions.
@@ -107,7 +107,7 @@ following vignettes:
 \end{itemize}
 
 \section{Function modMCMC}
-\subsection{The markov chain monte carlo method}
+\subsection{The Markov chain Monte Carlo method}
 The implemented MCMC method is designed to be applied to nonlinear models,
 and taking into account both the uncertainty in the model parameters and in
 the model output.
@@ -302,7 +302,7 @@ plot(MCMCl)
 <<logp1>>
 @
 \end{center}
-\caption{The trace of the log normal distribution -metropolis algorithm -
+\caption{The trace of the log normal distribution -Metropolis algorithm -
  see text for \R-code}
 \label{fig:logp1}
 \end{figure}
@@ -325,7 +325,7 @@ plot(MCMCl)
 <<logp>>
 @
 \end{center}
-\caption{The trace of the log normal distribution -  adaptive metropolis -  see text for \R-code}
+\caption{The trace of the log normal distribution -  adaptive Metropolis -  see text for \R-code}
 \label{fig:logp2}
 \end{figure}
 The histograms show the posterior densities (figure \ref{fig:histlogp}).
@@ -407,7 +407,7 @@ in item \code{count} of its return element.
 
 \subsection{Metropolis Hastings algorithm}
 
-The First Markov chain is generated with the simple metropolis hastings (MH)
+The First Markov chain is generated with the simple Metropolis Hastings (MH)
 algorithm
 <<>>=
 MCMC <- modMCMC(f=BananaSS, p=c(0,0.5), jump=diag(nrow=2,x=5),
@@ -417,7 +417,7 @@ MCMC$count
 
 \subsection{Adaptive Metropolis algorithm}
 
-Next we use the adaptive metropolis (AM) algorithm and update the proposal every
+Next we use the adaptive Metropolis (AM) algorithm and update the proposal every
 100 runs (\code{updatecov})
 <<>>=
 MCMC2 <- modMCMC(f=BananaSS, p=c(0,0.5), jump=diag(nrow=2,x=5),
@@ -426,7 +426,7 @@ MCMC2$count
 @
 
 \subsection{Delayed Rejection algorithm}
-Then the metropolis algorithm with delayed rejection (DR) is applied; upon rejection
+Then the Metropolis algorithm with delayed rejection (DR) is applied; upon rejection
 one next parameter cadidate is tried (\code{ntrydr}). (note \code{ntrydr=1} means
 no delayed rejection steps).
 <<>>=
@@ -438,7 +438,7 @@ MCMC3$count
 is the number of times the algorithm has entered the acceptance function for
 delayed rejection.
 \subsection{Delayed Rejection Adaptive Metropolis algorithm}
-Finally the adaptive metropolis with delayed rejection (DRAM) is used. (Here we
+Finally the adaptive Metropolis with delayed rejection (DRAM) is used. (Here we
 also estimate the elapsed CPU time, in seconds -
 \code{print(system.time())} does this)
 <<>>=
@@ -595,7 +595,7 @@ plot(MCMC,Full=TRUE)
 \label{fig:ABMCMC}
 \end{figure}
 
-Better convergence is achieved by the adaptive metropolis, updating the proposal
+Better convergence is achieved by the adaptive Metropolis, updating the proposal
 every 100 runs (figure \ref{fig:ABMCMC2})
 <<>>=
 MCMC2<- modMCMC(f=residual, p=Fit$par, jump=Cov, updatecov=100, lower=c(0,0),
@@ -739,7 +739,7 @@ For the initial model variance (\code{var0})
 we use the residual mean squares \code{P$ms}, returned by the \code{modFit}
 function. We give low weight to the prior (\code{wvar0=0.1})
 
-The adoptive metropolis MCMC is run for 1000 steps; the best-fit parameter set
+The adoptive Metropolis MCMC is run for 1000 steps; the best-fit parameter set
 (\code{P$par}) is used to initiate the chain (\code{p}).
 A lower bound (0) is imposed on the parameters (\code{lower}).
 
@@ -796,7 +796,7 @@ plot(MCMC2,Full=TRUE,which=NULL)
 \caption{The mcmc chain, separate error variance per data set - see text for \R-code}
 \label{fig:Monmcmc2}
 \end{figure}
-The summaries for both markov chains show only small differences.
+The summaries for both Markov chains show only small differences.
 <<>>=
 summary(MCMC)
 summary(MCMC2)

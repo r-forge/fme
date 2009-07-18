@@ -19,7 +19,7 @@
   method=c("Marq","Port","Newton",
            "Nelder-Mead","BFGS","CG","L-BFGS-B","SANN",
            "Pseudo"), jac = NULL,
-  control=list(),hessian=TRUE)
+  control=list(),Hessian=TRUE)
 
 \method{summary}{modFit}(object, cov=TRUE,\dots)
 
@@ -58,10 +58,10 @@
   }
   \item{jac }{A function that calculates the Jacobian; it should be called as
     jac(x,...) and return the matrix with derivatives of the model residuals
-    as a function of the parameters. Supplying the jacobian can substantially
+    as a function of the parameters. Supplying the Jacobian can substantially
     improve performance; see last example
   }
-  \item{hessian }{TRUE if hessian is to be estimated. Note that, if set to
+  \item{Hessian }{TRUE if Hessian is to be estimated. Note that, if set to
     \code{FALSE}, then a summary cannot be estimated.
   }
   \item{control }{additional control arguments passed to the optimisation
@@ -91,7 +91,7 @@
   \item{ssr }{the sum of squared residuals, evaluated at the best set of
     parameters.
   }
-  \item{hessian }{A symmetric matrix giving an estimate of the Hessian
+  \item{Hessian }{A symmetric matrix giving an estimate of the Hessian
     at the solution found. - see note.
   }
   \item{residuals }{the result of the last \code{f} evaluation; that is, the
@@ -190,7 +190,7 @@
 
   In case parameters are transformed, (all methods), or in case the
   \code{method} \code{Port}, \code{Pseudo} or \code{Marq} is selected,
-  the \emph{hessian} is approximated as \eqn{2*J^T*J}, where J is the Jacobian,
+  the \emph{Hessian} is approximated as \eqn{2*J^T*J}, where J is the Jacobian,
   estimated by finite differences.
 
   This ignores the second derivative terms, but this is reasonable if the method
@@ -201,7 +201,7 @@
   In case the Levenberg-Marquard method (\code{Marq}) is used, and parameters
   are not transformed, 0.5 times the Hessian of the least squares problem is
   returned by \code{nls.lm}, the original marquardt algorithm. To make it
-  compatible, this value is multiplied with 2 and the TRUE hessian is thus
+  compatible, this value is multiplied with 2 and the TRUE Hessian is thus
   returned by \code{modFit}.
 }
 
@@ -212,7 +212,7 @@
   treated as if it were a linear least squares problem, linearizing around
   the parameter values that minimize \eqn{Chi^2}.
 
-  The covariance matrix is estimated as 1/(0.5*hessian)
+  The covariance matrix is estimated as 1/(0.5*Hessian)
 
   This computation relies on several things, i.e.
 
@@ -228,7 +228,7 @@
   confidence intervals derived from it may be worthless if the assumptions
   behind the covariance computation are invalid.
 
-  If in doubt about the validity of the summary computations, use monte carlo
+  If in doubt about the validity of the summary computations, use Monte Carlo
   fitting instead, or run a \code{\link{modMCMC}}.
 
   Other methods included are:
@@ -241,9 +241,9 @@
   }
   
   Specifying a function to estimate the Jacobian matrix, via argument
-  \code{jac} may increase speed. The jacobian is used in the methods
+  \code{jac} may increase speed. The Jacobian is used in the methods
   "Marq", "BFGS", "CG", "L-BFGS", "Port", and is also used at the end,
-  to estimate the hessian at the optimum.
+  to estimate the Hessian at the optimum.
 
   Specification of the \code{gradient} in routines "BFGS", "CG", "L-BFGS"
   from \code{optim} and "port" from \code{nlminb} is not allowed here.
@@ -338,7 +338,7 @@ A<- matrix(nr=30,nc=30,runif(900))
 X<- runif(30)
 B<- A\%*\%X
 
-# try to find vector "X"; the jacobian is matrix A
+# try to find vector "X"; the Jacobian is matrix A
 
 # Function that returns the vector of residuals
 FUN <- function(x)

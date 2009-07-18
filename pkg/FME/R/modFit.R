@@ -30,6 +30,7 @@ modFit <- function(f, p, ..., lower=-Inf, upper=Inf,
   useCost <- method != "Marq" # marquardt uses residuals, others model cost
 
   Func <- function(p,...) {
+    ## ThPe: this is awful and must be fixed, but I currently don't understand your logic here
     FF<<- f(p,...)
     cM      <- class(FF) == "modCost"
 
@@ -160,8 +161,8 @@ modFit <- function(f, p, ..., lower=-Inf, upper=Inf,
     if(hessian)
       estHess<-TRUE
   }
-  
-  
+
+
   if (limits) {
     respar <- res$par
     res$par[lu]<-Lower[lu]+(Upper[lu]-Lower[lu])*(atan(respar[lu])/pi + 0.5)
@@ -201,7 +202,7 @@ modFit <- function(f, p, ..., lower=-Inf, upper=Inf,
     names(res$var_ms_unweighted)  <-names(res$var_ms_unscaled)  <-
           names(res$var_ms)  <- FF$var$name
   } else res$var_ms <- res$var_ms_unweighted <- res$var_ms_unscaled<-NA
-  
+
   res$rank <- np
   res$df.residual <- length(res$residuals) - res$rank
   if(!useCost & length(res$residuals)<=1)

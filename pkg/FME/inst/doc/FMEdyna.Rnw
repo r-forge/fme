@@ -21,7 +21,7 @@
 \newcommand{\R}{\proglang{R}}
 
 \title{\proglang{R}-package \fme: inverse modelling, sensitivity,
-  monte carlo - applied to a dynamic simulation model}
+  Monte Carlo - applied to a dynamic simulation model}
 
 \Plaintitle{FME}
 
@@ -53,7 +53,7 @@ differential equation, solved with a steady-state solver from package \rs
 A third vignette (\code{vignette("FMEother")}), applies the functions to a
 simple nonlinear model
 
-\code{vignette("FMEmcmc")} tests the Markov Chain Monte Carlo (MCMC)
+\code{vignette("FMEmcmc")} tests the Markov chain Monte Carlo (MCMC)
 implementation
 
 }
@@ -72,7 +72,7 @@ implementation
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% R/Sweave specific LaTeX commands.
 %% need no \usepackage{Sweave}
-%\VignetteIndexEntry{Sensitivity, calibration, identifiability, monte carlo analysis of a dynamic simulation model}
+%\VignetteIndexEntry{Sensitivity, calibration, identifiability, Monte Carlo analysis of a dynamic simulation model}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Begin of the document
 \begin{document}
@@ -420,7 +420,7 @@ pairs(CRL2)
 <<crl2>>
 @
 \end{center}
-\caption{Multivariate monte carlo analysis - see text for \R-code}
+\caption{Multivariate Monte Carlo analysis - see text for \R-code}
 \label{fig:crl2}
 \end{figure}
 
@@ -666,7 +666,7 @@ plot(Cost, xlab="time",ylab="",main="residuals")
 
 We can use the results of the fit to run a MCMC \citep{Gelman}.
 Function \code{modMCMC} implements the delayed rejection (DR) adaptive
-metropolis (AM) algorithm \citep{Haario06}.
+Metropolis (AM) algorithm \citep{Haario06}.
 
 The \code{summary} method of the best fit returns several useful values:
 

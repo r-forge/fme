@@ -3,7 +3,7 @@
 \alias{FME}
 \docType{package}
 \title{
-A Flexible Modelling Environment for inverse modelling, sensitivity, identifiability, monte carlo analysis.
+A Flexible Modelling Environment for Inverse Modelling, Sensitivity, Identifiability, Monte Carlo analysis.
 }
 \description{
   R-package FME contains functions to run complex applications of models that
@@ -47,8 +47,8 @@ A Flexible Modelling Environment for inverse modelling, sensitivity, identifiabi
       as a function of the sensitivity parameters. This function can
       be used to run simple "what-if" scenarios
 
-    \item Function \code{modMCMC} runs a markov chain monte carlo (Bayesian
-      analysis). It implements the delayed rejection - adaptive metropolis
+    \item Function \code{modMCMC} runs a Markov chain Monte Carlo (Bayesian
+      analysis). It implements the delayed rejection - adaptive Metropolis
       (DRAM) algorithm.
 
     \item FME also contains functions to generate multiple parameter values

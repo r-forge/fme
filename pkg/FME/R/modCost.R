@@ -9,12 +9,12 @@ modCost <- function (model, obs, x="time", y=NULL, err=NULL,
   if (is.vector(obs)) {
     cn <- names(obs)
     obs   <- matrix(nr=1,obs)
-    colnames(obs)  <-cn
+    colnames(obs)  <- cn
   }
   if (is.vector(model)) {
     cn <- names(model)
     model <- matrix(nr=1,model)
-    colnames(model)<-cn
+    colnames(model) <- cn
   }
 
   #================================
@@ -29,7 +29,7 @@ modCost <- function (model, obs, x="time", y=NULL, err=NULL,
 
     if (! is.character(x))
       stop ("'x' should be the *name* of the column with the independent variable in 'obs' or NULL")
-    ix  <- which(colnames(obs)%in%x)
+    ix  <- which(colnames(obs) %in% x)
     if (length(ix)!=length(x))
       stop(paste("Independent variable column not found in observations",x))
   } else ix  <-NULL

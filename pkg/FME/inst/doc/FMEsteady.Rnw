@@ -21,7 +21,7 @@
 \newcommand{\R}{\proglang{R}}
 
 \title{\proglang{R}-package \fme: inverse modelling, sensitivity,
-  monte carlo - applied to a steady-state model}
+  Monte Carlo - applied to a steady-state model}
 
 \Plaintitle{FME}
 
@@ -40,7 +40,7 @@ The Netherlands
 \Plainauthor{Karline Soetaert}
 
 \Abstract{ \R package \fme \citep{FME} contains functions for
-model calibration, sensitivity, identifiability, and monte carlo analysis
+model calibration, sensitivity, identifiability, and Monte Carlo analysis
 of nonlinear models.
 
 This vignette, (\code{vignette("FMEsteady")}), applies \fme to a partial
@@ -53,7 +53,7 @@ package \ds
 A third vignette (\code{vignette("FMEother")}), applies the functions to a
 simple nonlinear model
 
-\code{vignette("FMEmcmc")} tests the markov chain monte carlo (MCMC)
+\code{vignette("FMEmcmc")} tests the Markov chain Monte Carlo (MCMC)
 implementation
 
 }
@@ -72,7 +72,7 @@ implementation
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% R/Sweave specific LaTeX commands.
 %% need no \usepackage{Sweave}
-%\VignetteIndexEntry{Sensitivity, calibration, identifiability, monte carlo analysis of a steady-state model}
+%\VignetteIndexEntry{Sensitivity, calibration, identifiability, Monte Carlo analysis of a steady-state model}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Begin of the document
 \begin{document}
@@ -365,7 +365,7 @@ lines(modO2$O2,modO2$X)
 \label{fig:fit}
 \end{figure}
 
-\section{Running a Markov Chain Monte Carlo}
+\section{Running a Markov chain Monte Carlo}
 
 We use the parameter covariances of previous fit to update parameters, while
 the mean squared residual of the fit is use as prior fo the model variance.
@@ -373,7 +373,7 @@ the mean squared residual of the fit is use as prior fo the model variance.
 Covar   <- SFit$cov.scaled * 2.4^2/3
 s2prior <- SFit$modVariance
 @
-We run an adaptive metropolis, making sure that ks does not become negative...
+We run an adaptive Metropolis, making sure that ks does not become negative...
 <<>>=
 print(system.time(
 MCMC <- modMCMC(f=Objective,p=Fit$par,jump=Covar,niter=1000,ntrydr=2,
@@ -447,7 +447,7 @@ points(O2depth$y,O2depth$x)
 \label{fig:mcmcran2}
 \end{figure}
 
-\section{finally}
+\section{Finally}
 This vignette is made with Sweave \citep{Leisch02}.
 
 \bibliography{vignettes}

@@ -1,6 +1,35 @@
   ToDo
 
-  ThPe-> ThPe: improve example "mcystmodel.R" accordingly
-  
-  ThPe-> ThPe: improve structure modFit a little bit?
-    (try vectorization)
+
+ThPe --> KS?
+
+ - is it possible to avoid "global" assignments with "<<-" in modFit,
+   collin, modMCMC?
+
+ - note also that <<- does not necessarily assign to globals
+
+ - I don't understand the logic why this was unavoidable ... and this
+   misunderstanding is quite natural as <<- is known to break
+   structure and exactly due to this reason I (until now)
+   avoided this.
+
+ - on the other hand, <<- seems to be not uncommon if used in local
+   functions and also standard functions of R use it this way.
+
+
+See the following for a discussion
+
+https://stat.ethz.ch/pipermail/r-help/2005-September/078419.html
+
+
+==> only a comment to consider.
+
+
+modFit.R
+========
+
+ThPe:
+
+ - make overrule a general usable (but not exported) function in FME
+ - can I do this?
+

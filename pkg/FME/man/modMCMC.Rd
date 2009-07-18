@@ -8,7 +8,7 @@
 \title{
   Constrained Markov Chain Monte Carlo}
 \description{
-  Performs a Markov Chain Monte Carlo simulation, using an adaptive metropolis
+  Performs a Markov Chain Monte Carlo simulation, using an adaptive Metropolis
   (AM) algorithm and including a delayed rejection (DR) procedure
 }
 
@@ -120,7 +120,7 @@ modMCMC(f, p, ..., jump=NULL,  lower=-Inf, upper=+Inf, prior=NULL,
 }
 \value{
   a list of class \emph{modMCMC} containing the results as returned from the
-  markov chain.
+  Markov chain.
   
   This includes the following:
   
@@ -244,7 +244,7 @@ where \eqn{\xi} is the measurement error, assumed normally distribution, then
 
   Two methods are implemented to increase the number of accepted runs.
   \enumerate{
-    \item In the \emph{"adaptive metropolis"} method, new parameters are
+    \item In the \emph{"adaptive Metropolis"} method, new parameters are
       generated with a covariance matrix that is estimated from the parameters
       generated (and saved) thus far.
       The idea behind this is that the MCMC method is more efficient if the
@@ -347,7 +347,7 @@ NN <- function(p) {
   -2*sum(log(dnorm(p,mean=mu,sd=0.1)))      #-2*log(probability)
 }
 
-# simple metropolis-hastings
+# simple Metropolis-Hastings
 MCMC <- modMCMC (f=NN,p=0:2, niter=10000,
                  outputlength=1000,jump=0.5)
 
@@ -459,7 +459,7 @@ raftery.diag(as.mcmc(MCMC$pars))
 cor(MCMC$pars)
 
 cov(MCMC$pars)   # covariances by MCMC
-sP$cov.scaled    # covariances by hessian of fit
+sP$cov.scaled    # covariances by Hessian of fit
 
 x  <- 1:400
 SR <- summary(sensRange(parInput=MCMC$pars,func=Model,x=x))
