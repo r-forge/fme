@@ -15,11 +15,11 @@
   Fitting a model to data, with lower and/or upper bounds
 }
 
-\usage{modFit(f, p, ..., lower=-Inf, upper=Inf,
-  method=c("Marq","Port","Newton",
-           "Nelder-Mead","BFGS","CG","L-BFGS-B","SANN",
+\usage{modFit(f, p, ..., lower = -Inf, upper = Inf,
+  method = c("Marq", "Port", "Newton",
+           "Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN",
            "Pseudo"), jac = NULL,
-  control=list(),Hessian=TRUE)
+  control = list(), hessian = TRUE)
 
 \method{summary}{modFit}(object, cov=TRUE,\dots)
 
@@ -61,7 +61,7 @@
     as a function of the parameters. Supplying the Jacobian can substantially
     improve performance; see last example
   }
-  \item{Hessian }{TRUE if Hessian is to be estimated. Note that, if set to
+  \item{hessian }{TRUE if Hessian is to be estimated. Note that, if set to
     \code{FALSE}, then a summary cannot be estimated.
   }
   \item{control }{additional control arguments passed to the optimisation
