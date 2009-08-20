@@ -21,7 +21,7 @@
   Function \code{collin} estimates the collinearity, or identifiability of all
   parameter sets or of one parameter set.
 
-  In general a collinearity value less than about 20 is "identifiable"
+  As a rule of thumb, a collinearity value less than about 20 is "identifiable"
 }
 
 \usage{

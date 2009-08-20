@@ -205,7 +205,8 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
   if (is.null(n0)) n0 <- wvar0*N
 
   if (updateSigma)
-      divsigma <- rgamma(lenvar0,shape=0.5*(n0+N),rate=0.5*(n0*var0+SSold))
+      divsigma <- rgamma(lenvar0,shape=0.5*(n0+N),
+         rate=0.5*(n0*var0+SSold))
 
 
 ##------------------------------------------------------------------------------
@@ -561,20 +562,6 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
 pairs.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars),
                            remove = NULL, nsample = NULL, ...) {
 
-  panel.cor <- function(x, y,...)
-    text(x = mean(range(x)), y = mean(range(y)),
-        labels = format(cor(x, y), digits = 2))
-  panel.hist <- function(x,...) {
-    usr <- par("usr")
-    on.exit(par(usr))
-    par(usr = c(usr[1:2], 0, 2))
-    h <- hist(x, plot = FALSE)
-    breaks <- h$breaks
-    nB <- length(breaks)
-    y <- h$counts
-    y <- y/max(y)
-    rect(breaks[-nB], 0, breaks[-1], y, col = "grey")
-  }
   panel.main <- function(x,y,...)
     points(x[ii],y[ii],...)
 
@@ -664,7 +651,7 @@ cumuplot.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars),
 ## -----------------------------------------------------------------------------
 
 plot.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars), trace=TRUE,
-                          remove=NULL, ...) {
+                          remove=NULL, ask = NULL, ...) {
 
   var <- colnames(x$pars)
   if (! is.numeric(which)) {
@@ -688,16 +675,14 @@ plot.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars), trace=TRUE,
   dots <- list(...)
   nmdots <- names(dots)
 
-  if (! "mfrow" %in% nmdots) {
-    nc <- ceiling(sqrt(np))
-    nr <- ceiling(np/nc)
-    mfrow <- c(nr,nc)
-  } else mfrow <- dots$mfrow
+  ## Set par(mfrow) and ask.
+  ask <- setplotpar (nmdots,dots,np,ask)
 
-  if (! is.null(mfrow)) {
-    mf <- par(mfrow=mfrow)
-#    on.exit(par(mf))
-  }
+  ## interactively wait if there are remaining figures
+  if (ask) {
+        oask <- devAskNewPage(TRUE)
+ 	      on.exit(devAskNewPage(oask))
+    }
 
   mcmc <- x$pars
   if (! is.null (remove)) {
@@ -739,7 +724,7 @@ plot.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars), trace=TRUE,
 ## -----------------------------------------------------------------------------
 
 hist.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars),
-                          remove=NULL, ...) {
+                          remove=NULL, ask = NULL, ...) {
 
   iswhat <- TRUE
   if (length(which) > 0)
@@ -771,16 +756,14 @@ hist.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars),
   dots <- list(...)
   nmdots <- names(dots)
 
-  if (! "mfrow" %in% nmdots) {
-    nc <- ceiling(sqrt(np))
-    nr <- ceiling(np/nc)
-    mfrow <- c(nr,nc)
-  } else mfrow <- dots$mfrow
+  ## Set par mfrow and ask.
+  ask <- setplotpar (nmdots,dots,np,ask)
 
-  if (! is.null(mfrow)) {
-    mf <- par(mfrow=mfrow)
-#    on.exit(par(mf))
-  }
+  ## interactively wait if there are remaining figures
+  if (ask) {
+        oask <- devAskNewPage(TRUE)
+ 	      on.exit(devAskNewPage(oask))
+    }
 
   Main <- is.null(dots$main)
   dots$xlab    <- if(is.null(dots$xlab))    ""    else dots$xlab

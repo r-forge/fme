@@ -66,11 +66,9 @@ collin <- function(sensfun, parset = NULL, N = NULL, which = NULL) {
       psub[ii] <- 1
       n        <- ncol(cc)
       ## thpe: changed to avoid <<-
-      # Collin   <<- rbind(Collin, c(psub, n, id))
-      Collin   <- rbind(Collin, c(psub, n, id))
+      Collset   <- rbind(Collin, c(psub, n, id))
     }
-    ## thpe: added to avoid <<-
-    return(Collin)
+    return(Collset)
   }
   if (is.null(parset)) {
 
@@ -91,7 +89,7 @@ collin <- function(sensfun, parset = NULL, N = NULL, which = NULL) {
         cc  <- combin(n, pset)
         ## thpe: changed to avoid <<-
         # collFun(cc)
-        Collin <- rbind(Collin, collFun(cc))
+        Collin <- collFun(cc)
       }
     }
   } else {
@@ -107,8 +105,7 @@ collin <- function(sensfun, parset = NULL, N = NULL, which = NULL) {
 
     parset <- matrix(nr = 1, parset)
     ## thpe: changed to avoid <<-
-    #collFun(parset)
-    Collin <- rbind(collFun(parset))
+    Collin <- collFun(parset)
   }
 
   Collin <- as.data.frame(Collin)

@@ -26,10 +26,10 @@ modMCMC(f, p, ..., jump=NULL,  lower=-Inf, upper=+Inf, prior=NULL,
   remove = NULL, nsample = NULL, \dots)
 
 \method{hist}{modMCMC}(x, Full=FALSE, which = 1:ncol(x$pars),
-  remove = NULL, \dots)
+  remove = NULL, ask = NULL, \dots)
 
 \method{plot}{modMCMC}(x, Full=FALSE, which = 1:ncol(x$pars), trace=TRUE,
-  remove = NULL, \dots)
+  remove = NULL, ask = NULL, \dots)
 }
 
 \arguments{
@@ -116,6 +116,12 @@ modMCMC(f, p, ..., jump=NULL,  lower=-Inf, upper=+Inf, prior=NULL,
     in case the graph becomes too dense (and the exported picture too large).
     This does not affect the histograms on the diagonal plot
    (which are estimated using all MCMC draws).
+  }
+  \item{ask }{logical; if \code{TRUE}, the user is \emph{ask}ed before
+    each plot, if \code{NULL} the user is only asked if more than one
+    page of plots is necessary and the current graphics device is set
+    interactive, see \code{\link{par}(ask=.)} and
+    \code{\link{dev.interactive}}.
   }
 }
 \value{

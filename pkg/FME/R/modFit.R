@@ -299,7 +299,7 @@ print.summary.modFit <- function (x, digits = max(3, getOption("digits") - 3),
 
 ## -----------------------------------------------------------------------------
 
-plot.modFit <- function(x,...) {
+plot.modFit <- function(x, ask = NULL, ...) {
 
   vn  <- unique(names(x$residuals))
   lvn <- max(1,length(vn))
@@ -310,16 +310,14 @@ plot.modFit <- function(x,...) {
   dots   <- list(...)
   nmdots <- names(dots)
 
-  if (! "mfrow" %in% nmdots) {
-    nc <- ceiling(sqrt(np))
-    nr <- ceiling(np/nc)
-    mfrow <- c(nr,nc)
-  } else mfrow <- dots$mfrow
+   ## Set par mfrow and ask.
+  ask <- setplotpar (nmdots,dots,np,ask)
 
-  if (! is.null(mfrow)) {
-    mf <- par(mfrow=mfrow)
-#    on.exit(par(mf))
-  }
+  ## interactively wait if there are remaining figures
+  if (ask) {
+        oask <- devAskNewPage(TRUE)
+ 	      on.exit(devAskNewPage(oask))
+    }
 
   if(! is.null(x$rsstrace))
     plot(x$rsstrace,main="residual sum of squares",xlab="iteration",

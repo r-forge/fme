@@ -9,9 +9,9 @@
 }
 
 \usage{
-plotmod(mat, x=1, which = 2:ncol(mat), trace=FALSE, \dots)
+plotmod(mat, x=1, which = 2:ncol(mat), trace=FALSE, ask = NULL, \dots)
 
-histmod(mat, which = 2:ncol(mat), \dots)
+histmod(mat, which = 2:ncol(mat), ask = NULL, \dots)
 }
 
 \arguments{
@@ -24,6 +24,12 @@ histmod(mat, which = 2:ncol(mat), \dots)
     y-values. Default = all columns except the first.
   }
   \item{trace }{if \code{TRUE}, adds smoothed line to the plot.
+  }
+  \item{ask }{logical; if \code{TRUE}, the user is \emph{ask}ed before
+    each plot, if \code{NULL} the user is only asked if more than one
+    page of plots is necessary and the current graphics device is set
+    interactive, see \code{\link{par}(ask=.)} and
+    \code{\link{dev.interactive}}.
   }
   \item{...}{additional arguments passed to function \code{plot}.
   }

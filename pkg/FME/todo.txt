@@ -1,6 +1,16 @@
   ToDo
+Ks -> ThPe
+ - made S3 plot methods the same as in deSolve.
+ - (ask and mfrow/mfcol settings)
+    -> wrote a generic function, in utilities.R
 
-
+ - Need to keep plotmod and histmod?? (the former is now better
+   in plot.deSolve..., but histmod does not (yet) exist)
+ 
+ - Need to put this one on CRAN fast; many of our other packages start depending
+ on it (e.g. BCE); the modMCMC is very efficient.
+ 
+ 
 ThPe --> KS?
 
  - is it possible to avoid "global" assignments with "<<-" in modFit,
@@ -25,6 +35,44 @@ https://stat.ethz.ch/pipermail/r-help/2005-September/078419.html
 ==> only a comment to consider.
 
 
+KS -> ThPe
+   ######
+ - it was already done in collin; I have slightly adapted it. This was
+   simple to avoid
+
+ - in modFit it says:
+   ######
+   FF      <- NULL
+  ...
+   Func <- function(p,...) {
+    ## ThPe: this is awful and must be fixed, but I currently don't understand your logic here
+    FF  <<- f(p,...)
+    ....
+    if (useCost) return (sum(FF^2)) else return(FF)
+  }
+
+and yes, thomas, it is awful - but if I avoid it,
+I will need to make another function call after the optimisation,
+to estimate FF itself, at the best set of parameters
+
+This is needed to extract the residuals, variable ssr etc...
+
+By using the ugly <<-, this FF is already known...
+The information in FF is not retained by any of
+the optimisation routines...
+
+For now I do not see a way out... unless, one extra function call is
+done (but time is money).
+
+
+####
+in modMCMC:
+  - in principle possible, but I tried and modMCMC did not work anymore
+    so it is not that simple; modMCMC is a quite intricate function; not
+    simple..
+  - So I left this one as it is
+
+
 modFit.R
 ========
 
@@ -32,4 +80,6 @@ ThPe:
 
  - make overrule a general usable (but not exported) function in FME
  - can I do this?
+ 
+Ks->ThPe; it is but a small function; yes you can.
 

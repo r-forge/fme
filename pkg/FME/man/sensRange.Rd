@@ -29,10 +29,10 @@ sensRange(func,parms=NULL,sensvar=NULL,dist="unif",
 \method{plot}{summary.sensRange}(x, xyswap =FALSE,
               which=NULL, legpos="topleft",
               col=c(grey(0.8), grey(0.7)),
-              quant =FALSE, \dots)
+              quant =FALSE, ask = NULL, \dots)
 
 \method{plot}{sensRange}(x, xyswap =FALSE,
-              which=NULL, \dots)
+              which=NULL, ask=NULL, \dots)
 }
 
 \arguments{
@@ -109,7 +109,13 @@ sensRange(func,parms=NULL,sensvar=NULL,dist="unif",
   }
   \item{quant }{if \code{TRUE}, then the median surrounded by the quantiles
     q25-q75 and q95-q95 are plotted, else the min-max and mean+- sd are plotted.
-    }
+  }
+  \item{ask }{logical; if \code{TRUE}, the user is \emph{ask}ed before
+    each plot, if \code{NULL} the user is only asked if more than one
+    page of plots is necessary and the current graphics device is set
+    interactive, see \code{\link{par}(ask=.)} and
+    \code{\link{dev.interactive}}.
+  }
   \item{... }{additional arguments passed to \code{func} or to the methods.
   }
 }

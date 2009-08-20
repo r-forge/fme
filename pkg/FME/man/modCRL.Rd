@@ -30,11 +30,11 @@ modCRL(func,parms=NULL,sensvar=NULL,dist="unif",
 
 \method{summary}{modCRL}(object,  \dots)
 
-\method{plot}{modCRL}(x, which=NULL, trace=TRUE, \dots)
+\method{plot}{modCRL}(x, which=NULL, trace=TRUE, ask = NULL, \dots)
 
 \method{pairs}{modCRL}(x, which = 1:ncol(x), nsample = NULL, \dots)
 
-\method{hist}{modCRL}(x, which = 1:ncol(x), \dots)
+\method{hist}{modCRL}(x, which = 1:ncol(x), ask = NULL, \dots)
 
 }
 \arguments{
@@ -99,6 +99,12 @@ modCRL(func,parms=NULL,sensvar=NULL,dist="unif",
    (which are estimated using all values).
   }
   \item{trace }{if \code{TRUE}, adds smoothed line to the plot.
+  }
+  \item{ask }{logical; if \code{TRUE}, the user is \emph{ask}ed before
+    each plot, if \code{NULL} the user is only asked if more than one
+    page of plots is necessary and the current graphics device is set
+    interactive, see \code{\link{par}(ask=.)} and
+    \code{\link{dev.interactive}}.
   }
   \item{... }{additional arguments passed to function \code{func} or to
     the methods.

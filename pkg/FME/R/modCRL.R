@@ -61,29 +61,15 @@ summary.modCRL<-function(object,...) {
 }
 
 ## -----------------------------------------------------------------------------
-hist.modCRL<- function(x, which = 1:ncol(x),...) {
+hist.modCRL<- function(x, which = 1:ncol(x), ask = NULL, ...) {
   hh <- list()
   hh$pars <- x
-  hist.modMCMC(hh, which=which, Full=FALSE, ...)
+  hist.modMCMC(hh, which=which, Full=FALSE, ask = ask, ...)
 }
 
 ## -----------------------------------------------------------------------------
 pairs.modCRL<- function(x, which = 1:ncol(x), nsample = NULL, ...) {
 
-  panel.cor <- function(x, y,...)
-    text(x = mean(range(x)), y = mean(range(y)),
-        labels = format(cor(x, y), digits = 2))
-  panel.hist <- function(x,...) {
-    usr <- par("usr")
-    on.exit(par(usr))
-    par(usr = c(usr[1:2], 0, 2))
-    h <- hist(x, plot = FALSE)
-    breaks <- h$breaks
-    nB <- length(breaks)
-    y <- h$counts
-    y <- y/max(y)
-    rect(breaks[-nB], 0, breaks[-1], y, col = "grey")
-  }
   panel.main <- function(x,y,...)
     points(x[ii],y[ii],...)
 
@@ -121,7 +107,8 @@ pairs.modCRL<- function(x, which = 1:ncol(x), nsample = NULL, ...) {
 }
 
 ## -----------------------------------------------------------------------------
-plot.modCRL<-function(x, which=NULL, trace = TRUE, ...) {
+plot.modCRL<-function(x, which=NULL, trace = TRUE, ask = NULL, ...) {
+
   vars <- attr(x,"var")
 
   var <- colnames(x)
@@ -160,17 +147,15 @@ plot.modCRL<-function(x, which=NULL, trace = TRUE, ...) {
   nmdots <- names(dots)
 
   nv <- max(nvar,np)
-  if (! "mfrow" %in% nmdots) {
+  ## Set par mfrow and ask.
+    ask <- setplotpar (nmdots,dots,nv,ask)
 
-    nc <- ceiling(sqrt(nv))
-    nr <- ceiling(nv/nc)
-    mfrow <- c(nr,nc)
-  } else mfrow <- dots$mfrow
+  ## interactively wait if there are remaining figures
+    if (ask) {
+        oask <- devAskNewPage(TRUE)
+ 	      on.exit(devAskNewPage(oask))
+    }
 
-  if (! is.null(mfrow)) {
-    mf <- par(mfrow=mfrow)
-#    on.exit(par(mf))
-  }
   Main <- is.null(dots$main)
   Xlab <- is.null(dots$xlab)
   dots$ylab    <- if(is.null(dots$ylab))  ""     else dots$ylab

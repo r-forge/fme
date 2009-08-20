@@ -1,4 +1,5 @@
-plotmod <- function (mat,x=1,which=2:ncol(mat), trace=FALSE, ...) {
+plotmod <- function (mat,x=1,which=2:ncol(mat), trace=FALSE,
+  ask = NULL, ...) {
 
   var <- colnames(mat)
   if (length(x) != 1) stop ("x should contain one value")
@@ -31,16 +32,14 @@ plotmod <- function (mat,x=1,which=2:ncol(mat), trace=FALSE, ...) {
   dots <- list(...)
   nmdots <- names(dots)
 
-  if (! "mfrow" %in% nmdots) {
-    nc <- ceiling(sqrt(np))
-    nr <- ceiling(np/nc)
-    mfrow <- c(nr,nc)
-  } else mfrow <- dots$mfrow
+  ## Set par mfrow and ask.
+    ask <- setplotpar (nmdots,dots,np,ask)
 
-  if (! is.null(mfrow)) {
-    mf <- par(mfrow=mfrow)
-#    on.exit(par(mf))
-  }
+  ## interactively wait if there are remaining figures
+    if (ask) {
+        oask <- devAskNewPage(TRUE)
+ 	      on.exit(devAskNewPage(oask))
+    }
 
   Main <- is.null(dots$main)
 
@@ -54,7 +53,7 @@ plotmod <- function (mat,x=1,which=2:ncol(mat), trace=FALSE, ...) {
   }
 }
 
-histmod <- function (mat,which=2:ncol(mat),  ...) {
+histmod <- function (mat,which=2:ncol(mat), ask = NULL, ...) {
 
   var <- colnames(mat)
   if (! is.numeric(which)) {
@@ -75,16 +74,14 @@ histmod <- function (mat,which=2:ncol(mat),  ...) {
   dots <- list(...)
   nmdots <- names(dots)
 
-  if (! "mfrow" %in% nmdots) {
-    nc <- ceiling(sqrt(np))
-    nr <- ceiling(np/nc)
-    mfrow <- c(nr,nc)
-  } else mfrow <- dots$mfrow
+  ## Set par mfrow and ask.
+    ask <- setplotpar (nmdots,dots,np,ask)
 
-  if (! is.null(mfrow)) {
-    mf <- par(mfrow=mfrow)
-#    on.exit(par(mf))
-  }
+  ## interactively wait if there are remaining figures
+    if (ask) {
+        oask <- devAskNewPage(TRUE)
+ 	      on.exit(devAskNewPage(oask))
+    }
 
   Main <- is.null(dots$main)
 

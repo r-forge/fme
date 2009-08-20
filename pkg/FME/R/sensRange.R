@@ -202,7 +202,8 @@ summary.sensRange<-function(object,...) {
 
 ## -----------------------------------------------------------------------------
 
-plot.sensRange<-function(x, xyswap=FALSE, which=NULL,...) {
+plot.sensRange<-function(x, xyswap=FALSE, which=NULL,
+  ask = NULL, ...) {
   npar <- attr(x,"npar")
   nx  <-attr(x,"nx")
   var <-attr(x,"var")
@@ -231,16 +232,14 @@ plot.sensRange<-function(x, xyswap=FALSE, which=NULL,...) {
   } else Select <- 1:length(var)
 
   if (nx > 1) {
-    if (! "mfrow" %in% nmdots) {
-      nv <- length(Select)
-      nc <- ceiling(sqrt(nv))
-      nr <- ceiling(nv/nc)
-      mfrow <- c(nr,nc)
-    } else mfrow <- dots$mfrow
 
-    if (! is.null(mfrow)) {
-      mf <- par(mfrow=mfrow)
-#      on.exit(par(mf))
+  ## Set par mfrow and ask.
+    ask <- setplotpar (nmdots,dots,length(Select),ask)
+
+  ## interactively wait if there are remaining figures
+    if (ask) {
+        oask <- devAskNewPage(TRUE)
+ 	      on.exit(devAskNewPage(oask))
     }
 
     for (i in Select){
@@ -260,8 +259,9 @@ plot.sensRange<-function(x, xyswap=FALSE, which=NULL,...) {
 
 ## -----------------------------------------------------------------------------
 
-plot.summary.sensRange<-function(x, xyswap=FALSE, which=NULL,legpos="topleft",
-      col=c(grey(0.8),grey(0.7)), quant=FALSE, ...) {
+plot.summary.sensRange<-function(x, xyswap=FALSE, which=NULL,
+   legpos="topleft", col=c(grey(0.8),grey(0.7)), quant=FALSE,
+   ask = NULL, ...) {
   nx  <-attr(x,"nx")
   var <-attr(x,"var")
 
@@ -297,16 +297,13 @@ plot.summary.sensRange<-function(x, xyswap=FALSE, which=NULL,legpos="topleft",
   Dots$xlim<-NULL
 
   if (nx > 1)  {    # summary of a times series or a profile...
-    if (! "mfrow" %in% nmdots) {
-      nv <- length(Select)
-      nc <- ceiling(sqrt(nv))
-      nr <- ceiling(nv/nc)
-      mfrow <- c(nr,nc)
-    } else mfrow <- dots$mfrow
+  ## Set par mfrow and ask.
+    ask <- setplotpar (nmdots,dots,length(Select),ask)
 
-    if (! is.null(mfrow)) {
-      mf <- par(mfrow=mfrow)
-#      on.exit(par(mf))
+  ## interactively wait if there are remaining figures
+    if (ask) {
+        oask <- devAskNewPage(TRUE)
+ 	      on.exit(devAskNewPage(oask))
     }
 
     for (i in Select){

@@ -223,8 +223,6 @@ pairs.sensFun <- function (x, which=NULL, ...) {
   if (colnames(x)[1]=="x" && colnames(x)[2] == "var")
     X <- x[ii,-(1:2)] else X<-x[ii,]
 
-  panel.cor <- function(x, y) text(x = mean(range(x)), y = mean(range(y)),
-       labels = format(cor(x, y), digits = 2))
   dots <- list(...)
 
   dots$diag.panel <- if(is.null(dots$diag.panel)) NULL else dots$diag.panel
@@ -236,7 +234,8 @@ pairs.sensFun <- function (x, which=NULL, ...) {
 
 ## -----------------------------------------------------------------------------
 
-plot.sensFun<- function(x, which=NULL, legpos="topleft", ...) {
+plot.sensFun<- function(x, which=NULL, legpos="topleft",
+  ask = NULL, ...) {
   nx  <-attr(x,"nx")
   xname <- attr(x,"xname")
   var <-attr(x,"var")
@@ -270,22 +269,25 @@ plot.sensFun<- function(x, which=NULL, legpos="topleft", ...) {
       if (max(Select) > nx)
         stop("index in 'which' too large")
     }
-    if (! "mfrow" %in% nmdots) {
-      nv <- length(Select)
-      ncc <- ceiling(sqrt(nv))
-      nr <- ceiling(nv/ncc)
-      mfrow <- c(nr,ncc)
-    } else mfrow <- dots$mfrow
-    if (! is.null(mfrow)) {
-      mf <- par(mfrow=mfrow)
-#      on.exit(par(mf))
-    }
+    
+  ## Set par mfrow and ask.
+    ask <- setplotpar (nmdots,dots,length(Select),ask)
+
   }  else {
     Select <- 1:length(var)
     dots$ylim <- if(is.null(dots$ylim)) range(x[,-(1:2)])
     Ylim <- FALSE
     Allvars <- TRUE
+    if (is.null(ask))
+      ask <- prod(par("mfrow")) < length(which) && dev.interactive()
   }
+
+   ## interactively wait if there are remaining figures
+  if (ask) {
+        oask <- devAskNewPage(TRUE)
+ 	      on.exit(devAskNewPage(oask))
+    }
+
   Lty <- is.null(dots$lty)
 
   st <- 1

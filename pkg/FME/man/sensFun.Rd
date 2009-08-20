@@ -30,7 +30,7 @@ sensFun(func,parms,sensvar=NULL,senspar=names(parms),
 
 \method{pairs}{sensFun}(x, which=NULL, \dots)
 
-\method{plot}{sensFun}(x, which=NULL, legpos="topleft", \dots)
+\method{plot}{sensFun}(x, which=NULL, legpos="topleft", ask=NULL, \dots)
 }
 
 \arguments{
@@ -83,6 +83,12 @@ sensFun(func,parms,sensvar=NULL,senspar=names(parms),
   }
   \item{legpos }{position of the legend; set to \code{NULL} to avoid plotting
   a legend.
+  }
+  \item{ask }{logical; if \code{TRUE}, the user is \emph{ask}ed before
+    each plot, if \code{NULL} the user is only asked if more than one
+    page of plots is necessary and the current graphics device is set
+    interactive, see \code{\link{par}(ask=.)} and
+    \code{\link{dev.interactive}}.
   }
 }
 \value{
