@@ -2,6 +2,7 @@
 \alias{sensFun}
 \alias{summary.sensFun}
 \alias{plot.sensFun}
+\alias{plot.summary.sensFun}
 \alias{pairs.sensFun}
 
 \title{
@@ -31,6 +32,9 @@ sensFun(func,parms,sensvar=NULL,senspar=names(parms),
 \method{pairs}{sensFun}(x, which=NULL, \dots)
 
 \method{plot}{sensFun}(x, which=NULL, legpos="topleft", ask=NULL, \dots)
+
+\method{plot}{summary.sensFun}(x, which = 1:nrow(x), \dots)
+
 }
 
 \arguments{
@@ -211,6 +215,7 @@ SnsBact <- sensFun(func = solveBact, parms = pars,
 head(SnsBact)
 plot(SnsBact)
 summary(SnsBact)
+plot(summary(SnsBact))
 
 SF <- sensFun(func = solveBact, parms = pars,
              sensvar = c("Bact", "Sub"), varscale = 1)
@@ -227,7 +232,9 @@ plot(SF,mfrow=NULL)
 par(mfrow=pm)
 
 ## Bivariate sensitivity
-pairs(SnsBact)
+pairs(SF)  # same color
+pairs(SF,which="Bact",col="green",pch=15)
+pairs(SF,which=c("Bact","Sub"),col=c("green","blue"))
 mtext(outer = TRUE, side = 3, line = -2,
       "Sensitivity functions", cex = 1.5)
 

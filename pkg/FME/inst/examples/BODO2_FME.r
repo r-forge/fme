@@ -137,7 +137,6 @@ crl <-modCRL(parms=pars,func=crlmodel,dist="grid",
                 parRange=parRange,num=100)
 
 head(crl)
-par(mfrow=c(1,2))
 plot(crl,xlab="velocity,m/day")
 
 ##===============================================================##

@@ -55,7 +55,10 @@ SnsBact <- sensFun(func=solveBact,parms=pars,
                    sensvar="Bact",varscale=1)
 head(SnsBact)
 plot(SnsBact)
+plot(SnsBact,which="Bact")
+
 summary(SnsBact)
+plot(summary(SnsBact))
 
 SF<- sensFun(func=solveBact,parms=pars,
              sensvar=c("Bact","Sub"),varscale=1)

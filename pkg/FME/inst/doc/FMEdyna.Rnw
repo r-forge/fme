@@ -858,10 +858,28 @@ deviance      & modFit  & model deviance (sum of squared residuals) \\  \hline
 coef          & modFit  & values of fitted parameters               \\  \hline
 residuals     & modFit  & residuals of model and data               \\  \hline
 df.residual   & modFit  & degrees of freedom                        \\  \hline
+plot          & modFit  & plots results of the fitting              \\  \hline
 print.summary & modFit  & printout of model summary                 \\  \hline
-summary       & modMCMC & Summary statisticsof sampled parameters   \\  \hline
+plot          & modCost & plots model-data residuals                \\  \hline
+summary       & modMCMC & Summary statistics of sampled parameters  \\  \hline
 plot          & modMCMC & Plots all sampled parameters              \\  \hline
 pairs         & modMCMC & Pairwise plots all sampled parameters     \\  \hline
+hist          & modMCMC & Histogram of all sampled parameters       \\  \hline
+summary       & modCRL  & Summary statistics of monte carlo variables  \\  \hline
+plot          & modCRL  & Plots monte carlo variables               \\  \hline
+pairs         & modCRL  & Pairwise plots of monte carlo variables   \\  \hline
+hist          & modCRL  & Histogram of monte carlo variables        \\  \hline
+summary       & sensFun & Summary statistics of sensitivity functions   \\  \hline
+plot          & sensFun & Plots sensitivity functions               \\  \hline
+pairs         & sensFun & Pairwise plots of sensitivity functions   \\  \hline
+print.summary & sensFun & Prints summary of sensitivity functions   \\  \hline
+plot.summary  & sensFun & Plots summary of sensitivity functions    \\  \hline
+summary       & sensRange & Summary statistics of sensitivity range \\  \hline
+plot          & sensRange & Plots sensitivity ranges                \\  \hline
+plot.summary  & sensRange & Plots summary of sensitivity ranges     \\  \hline
+print         & collin  & Prints collinearity results               \\  \hline
+plot          & collin  & Plots collinearity results                \\  \hline
+
 \hline
 \end{tabular}
 \end{table*}

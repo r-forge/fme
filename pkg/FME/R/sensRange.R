@@ -217,19 +217,7 @@ plot.sensRange<-function(x, xyswap=FALSE, which=NULL,
   Ylim <- is.null(dots$ylim)
   Xlim <- is.null(dots$xlim)
 
-  if (!is.null(which)) {
-    if (! is.numeric(which)) {
-
-      ln <- length(which)
-      Select <- which (var %in% which)
-      if(length(Select) != ln)
-        stop("not all variables in 'which' are in 'x'")
-    } else {
-      Select <- which
-      if (max(Select) > nx)
-        stop("index in 'which' too large")
-    }
-  } else Select <- 1:length(var)
+  Select <- selectvar(which, var, Nall = TRUE)
 
   if (nx > 1) {
 
@@ -268,20 +256,7 @@ plot.summary.sensRange<-function(x, xyswap=FALSE, which=NULL,
   dots <- list(...)
   nmdots <- names(dots)
 
-  if (!is.null(which)) {
-    if (! is.numeric(which)) {
-
-      ln <- length(which)
-      Select <- which (var %in% which)
-      if(length(Select) != ln)
-        stop("not all variables in 'which' are in 'x'")
-    } else {
-      Select <- which
-      if (max(Select) > nx)
-        stop("index in 'which' too large")
-    }
-
-  } else Select <- 1:length(var)
+  Select <- selectvar(which, var, Nall = TRUE)
 
   Main <- is.null(dots$main)
   Ylim <- is.null(dots$ylim)

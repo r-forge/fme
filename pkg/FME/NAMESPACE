@@ -8,8 +8,9 @@ S3method("deviance",    "modFit")
 S3method("coef",        "modFit")
 S3method("residuals",   "modFit")
 S3method("df.residual", "modFit")
-
+S3method("plot",        "modFit")
 S3method("print", "summary.modFit")
+
 S3method("pairs",   "modMCMC")
 S3method("plot",    "modMCMC")
 S3method("hist",    "modMCMC")
@@ -22,6 +23,7 @@ S3method("summary", "sensFun")
 S3method("plot",    "sensFun")
 S3method("pairs",   "sensFun")
 S3method("print", "summary.sensFun")
+S3method("plot", "summary.sensFun")
 
 S3method("summary", "sensRange")
 S3method("plot",    "sensRange")
@@ -33,4 +35,3 @@ S3method("hist",    "modCRL")
 S3method("pairs",   "modCRL")
 
 S3method("plot","modCost")
-S3method("plot","modFit")

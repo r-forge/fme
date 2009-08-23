@@ -566,18 +566,8 @@ pairs.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars),
     points(x[ii],y[ii],...)
 
   var <- colnames(x$pars)
-  if (! is.numeric(which)) {
-      ln <- length(which)
-      Select <- which (var %in% which)
-      if(length(Select) != ln)
-        stop("not all parameters in 'which' are in 'x$pars'")
-      which <- Select
-  } else {
-      if (max(which) > ncol(x$pars))
-        stop("index in 'which' too large")
-      if (min(which) < 1)
-        stop("index in 'which' should be >0")
-  }
+  which <- selectvar(which,var,"x$pars", Nall=FALSE)
+
   X <- x$pars[,which]
 
 
@@ -619,18 +609,7 @@ cumuplot.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars),
                               remove = NULL, ...) {
 
   var <- colnames(x$pars)
-  if (! is.numeric(which)) {
-      ln <- length(which)
-      Select <- which (var %in% which)
-      if(length(Select) != ln)
-        stop("not all parameters in 'which' are in 'x$pars'")
-      which <- Select
-  } else {
-      if (max(which) > ncol(x$pars))
-        stop("index in 'which' too large")
-      if (min(which) < 1)
-        stop("index in 'which' should be >0")
-  }
+  which <- selectvar(which,var,"x$pars",Nall=FALSE)
 
   mcmc <- x$pars[,which]
   if (! is.null (remove)) {
@@ -654,18 +633,8 @@ plot.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars), trace=TRUE,
                           remove=NULL, ask = NULL, ...) {
 
   var <- colnames(x$pars)
-  if (! is.numeric(which)) {
-      ln <- length(which)
-      Select <- which (var %in% which)
-      if(length(Select) != ln)
-        stop("not all parameters in 'which' are in 'x$pars'")
-      which <- Select
-  } else {
-      if (max(which) > ncol(x$pars))
-        stop("index in 'which' too large")
-      if (min(which) < 1)
-        stop("index in 'which' should be >0")
-  }
+  which <- selectvar(which,var,"x$pars",Nall=FALSE)
+
   np <- NP <- length(which)
   if (Full)
     np <- np +1
@@ -734,19 +703,8 @@ hist.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars),
   var <- colnames(x$pars)
 
   if (iswhat)  {
-    if (! is.numeric(which)) {
-      ln <- length(which)
-      Select <- which (var %in% which)
-      if(length(Select) != ln)
-        stop("not all parameters in 'which' are in 'x$pars'")
-      which <- Select
-    } else {
-      if (max(which) > ncol(x$pars))
-        stop("index in 'which' too large")
-      if (min(which) < 1)
-        stop("index in 'which' should be >0")
-    }
-  np <- NP <- length(which)
+    which <- selectvar(which,var,"x$pars",Nall = FALSE)
+    np <- NP <- length(which)
   }
   if (Full)
     np <- np +1

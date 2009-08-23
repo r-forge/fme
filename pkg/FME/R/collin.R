@@ -53,6 +53,7 @@ collin <- function(sensfun, parset = NULL, N = NULL, which = NULL) {
   ## for a given set of parameter combinations
 
   collFun <- function(cc) {
+    Collset <- NULL
     for (i in 1:nrow(cc)) {
       ii    <- cc[i,]
       S     <- normSens[,ii]
@@ -66,9 +67,9 @@ collin <- function(sensfun, parset = NULL, N = NULL, which = NULL) {
       psub[ii] <- 1
       n        <- ncol(cc)
       ## thpe: changed to avoid <<-
-      Collset   <- rbind(Collin, c(psub, n, id))
+      Collset   <- rbind(Collset, c(psub, n, id))
     }
-    return(Collset)
+    return(rbind(Collin,Collset))
   }
   if (is.null(parset)) {
 

@@ -1,17 +1,3 @@
-## private function
-
-findvar <- function(var1, var2, str="var") {
-  if (is.character(var2[[1]])){
-    ivar  <- which (names(var1)%in%var2)
-    if (length(ivar)!= length(var2))
-      stop(paste("cannot proceed: not all sensitivity", str,"are known"))
-    return(ivar)
-  } else {
-  if (max(var2)>length(var1))
-    stop (paste("cannot proceed: index to sensitivity ", str, "too large"))
-  return(var2)
-  }
-}
 
 ## -----------------------------------------------------------------------------
 ## Sensitivity functions
@@ -86,6 +72,9 @@ sensFun <- function(func, parms, sensvar=NULL, senspar=names(parms),
 
   yRef  <- as.vector(yRef[,ivar])
 
+  if (is.null(senspar))
+    senspar <- 1:length(parms)
+    
   ## 3. sensitivity parameters/
   npar  <- length(senspar)
   if (npar ==0)
@@ -195,35 +184,40 @@ print.summary.sensFun<-function(x,...)
 
 pairs.sensFun <- function (x, which=NULL, ...) {
 
+  dots <- list(...)
+  if(is.null(dots$pch)) dots$pch <- 16
+
   if (!is.null(which)) {
     nx  <-attr(x,"nx")
     var <-attr(x,"var")
     TYP <-attr(x,"Type")
 
-    if (! is.numeric(which)) {
-      ln <- length(which)
-      Select <- which (var %in% which)
-      if(length(Select) != ln)
-        stop("not all variables in 'which' are in 'x'")
-    } else {
-       Select <- which
-       if (max(Select) > nx)
-         stop("index in 'which' too large")
-    }
+    Select <- selectvar(which, var, Nall = TRUE)
+    Nr <- length(var)
     ii <- NULL
-    
+    ij <- NULL
     if (TYP == 1)
-     for (i in Select)
-       ii <- c(ii,((i-1)*nx):(i*nx))
-    else  for (i in Select)
-       ii <- c(ii,(nx[i]+1):nx[i+1])
+      for (i in Select) {
+        In <- ((i-1)*nx):(i*nx)
+        ij <- c(ij,rep(i,length(In)))
+        ii <- c(ii,In)
+      }
+      else  for (i in Select) {
+        In <- (nx[i]+1):nx[i+1]
+        ij <- c(ij,rep(i,length(In)))
+        ii <- c(ii,In)
+      }
+    if(!is.null(dots$bg)) dots$bg <- dots$bg[ij]
+    if(is.null(dots$col)) dots$col <- (1:Nr)[ij]
+    else dots$col <- dots$col[ij]
     }
-  else ii <- 1:nrow(x)
+
+  else {ii <- 1:nrow(x)
+        ij <- rep(1,nrow(x))
+       }
 
   if (colnames(x)[1]=="x" && colnames(x)[2] == "var")
     X <- x[ii,-(1:2)] else X<-x[ii,]
-
-  dots <- list(...)
 
   dots$diag.panel <- if(is.null(dots$diag.panel)) NULL else dots$diag.panel
   dots$lower.panel <- if(is.null(dots$lower.panel)) panel.cor else dots$lower.panel
@@ -254,27 +248,14 @@ plot.sensFun<- function(x, which=NULL, legpos="topleft",
   Allvars <- FALSE
   Ylim <-is.null(dots$ylim)
 
-  if (!is.null(which)) {
-    if (! is.numeric(which)) {
-      ln <- length(which)
-      Select <- NULL
-      for (i in which) {  # use loop rather than which(...%in%) to keep ordering of "which"
-        ii <- which (var == i)
-        if (length(ii)==0)
-          stop(paste(" variable in 'which' is not in 'x':", i))
-        Select <- c(Select,ii)
-      }
-    } else {     # index
-      Select <- which
-      if (max(Select) > nx)
-        stop("index in 'which' too large")
-    }
-    
+  ## Find selected variables
+   Select <- selectvar(which,var,Nall = TRUE)
+
   ## Set par mfrow and ask.
+  if (! is.null(which)) {
     ask <- setplotpar (nmdots,dots,length(Select),ask)
 
   }  else {
-    Select <- 1:length(var)
     dots$ylim <- if(is.null(dots$ylim)) range(x[,-(1:2)])
     Ylim <- FALSE
     Allvars <- TRUE
@@ -291,6 +272,19 @@ plot.sensFun<- function(x, which=NULL, legpos="topleft",
   Lty <- is.null(dots$lty)
 
   st <- 1
+  
+  ## xlim
+  if (is.null(dots$xlim)) {
+    is <- NULL
+    for (i in Select){
+      if (TYP == 1)
+        ii <- ((i-1)*nx):(i*nx)
+      else
+        ii <- (nx[i]+1):nx[i+1]
+     is <- c(is,ii)
+    }
+    dots$xlim <- range(x[is,1])
+  }
   for (i in Select){
     if (TYP == 1)
       ii <- ((i-1)*nx):(i*nx)
@@ -316,26 +310,24 @@ plot.sensFun<- function(x, which=NULL, legpos="topleft",
 
 ## -----------------------------------------------------------------------------
 
-plot.summary.sensFun<- function(x,...) {
+plot.summary.sensFun<- function(x, which = 1:nrow(x), ...) {
   dots <- list(...)
   nmdots <- names(dots)
 
-  nr <- nrow(x)
-  dots$main <- if(is.null(dots$main)) "sensitivity" else dots$main
-  dots$labels<- if(is.null(dots$labels)) rownames(x) else dots$labels
-  dots$xlim <- if(is.null(dots$xlim)) range(c(x$Min,x$Max)) else dots$xlim
-  dots$pch <- if(is.null(dots$pch)) 1 else dots$pch
-  dots$col <- if(is.null(dots$col)) "black" else dots$col
+  mf <- par (mfrow = c(2,3))
+  Names <- names(x)
+  X <- as.matrix(x[,1:8])
+  
+  ii <- selectvar(which,rownames(x),Nall = TRUE)
+  setnames <- is.null(dots$main)
+  for (i in 3:7)  {
+    dots$main <- if(setnames) Names[i] else dots$main
+    dots$pch <- if(is.null(dots$pch)) 16 else dots$pch
+    dots$col <- if(is.null(dots$col)) "black" else dots$col
 
-  do.call("dotchart",c(alist(c(x$Mean,Inf)),dots))
-
-  # add ranges
-  for (i in 1:nr) {
-    segments(x$Min[i],i,x$Max[i],i,lty=1)
+    do.call("dotchart",c(alist(X[ii,i]),dots))
+    abline(v=0, lty=3)
   }
-  points(x$L1,1:nr,pch=16,col="red")
-  points(x$L2,1:nr,pch=18,col="blue")
 
-  legend("top",legend=c("L1","L2","Mean"),pch=c(dots$pch ,16,18),
-          col=c(dots$col,"red","blue"),ncol=3)
+  par (mfrow = mf)
 }

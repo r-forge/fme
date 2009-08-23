@@ -30,7 +30,7 @@ modCRL(func,parms=NULL,sensvar=NULL,dist="unif",
 
 \method{summary}{modCRL}(object,  \dots)
 
-\method{plot}{modCRL}(x, which=NULL, trace=TRUE, ask = NULL, \dots)
+\method{plot}{modCRL}(x, which=NULL, trace=FALSE, ask = NULL, \dots)
 
 \method{pairs}{modCRL}(x, which = 1:ncol(x), nsample = NULL, \dots)
 

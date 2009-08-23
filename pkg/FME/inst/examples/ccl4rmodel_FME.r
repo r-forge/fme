@@ -4,7 +4,7 @@
 ##################################################################
 ##################################################################
 
-par(mfrow=c(2,2))
+#par(mfrow=c(2,2))
 require(FME)
 ##===============================================================##
 ##===============================================================##
@@ -103,6 +103,8 @@ Sens <- sensFun(func=ccl4run,parms=Pm,varscale=1)
 ## univariate sensitivity
 ##====================================
 (SF<-summary(Sens))
+plot(SF)
+
 
 # select the ones with highest sensitivity
 pselect <- names(Pm)[which (SF$L2>1.5)]
@@ -126,8 +128,8 @@ tail(Coll)
 plot(Coll,log="y")
 abline(h=20,col="red")
 
-# 'identifiable parameter combinations' with 7 parameters
-Coll[which(Coll$N==7 & Coll$collinearity < 20),]
+# 'identifiable parameter combinations'
+Coll[which( Coll$collinearity < 20),]
 
 ##===============================================================##
 ##===============================================================##

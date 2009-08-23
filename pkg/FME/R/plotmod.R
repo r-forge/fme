@@ -14,18 +14,7 @@ plotmod <- function (mat,x=1,which=2:ncol(mat), trace=FALSE,
         stop("index in 'x' should be >0")
   }
 
-  if (! is.numeric(which)) {
-      ln <- length(which)
-      Select <- which (var %in% which)
-      if(length(Select) != ln)
-        stop("not all parameters in 'which' are in 'x$pars'")
-      which <- Select
-  } else {
-      if (max(which) > ncol(mat))
-        stop("index in 'which' too large")
-      if (min(which) < 1)
-        stop("index in 'which' should be >0")
-  }
+  Select <- selectvar(which, var, Nall=TRUE)
 
   np <- length(which)
 
@@ -56,18 +45,8 @@ plotmod <- function (mat,x=1,which=2:ncol(mat), trace=FALSE,
 histmod <- function (mat,which=2:ncol(mat), ask = NULL, ...) {
 
   var <- colnames(mat)
-  if (! is.numeric(which)) {
-      ln <- length(which)
-      Select <- which (var %in% which)
-      if(length(Select) != ln)
-        stop("not all parameters in 'which' are in 'x$pars'")
-      which <- Select
-  } else {
-      if (max(which) > ncol(mat))
-        stop("index in 'which' too large")
-      if (min(which) < 1)
-        stop("index in 'which' should be >0")
-  }
+
+  Select <- selectvar(which, var, Nall = TRUE)
 
   np <- length(which)
 

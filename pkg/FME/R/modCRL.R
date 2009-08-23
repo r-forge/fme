@@ -74,18 +74,8 @@ pairs.modCRL<- function(x, which = 1:ncol(x), nsample = NULL, ...) {
     points(x[ii],y[ii],...)
 
   var <- colnames(x)
-  if (! is.numeric(which)) {
-      ln <- length(which)
-      Select <- which (var %in% which)
-      if(length(Select) != ln)
-        stop("not all parameters in 'which' are in 'x'")
-      which <- Select
-  } else {
-      if (max(which) > ncol(x))
-        stop("index in 'which' too large")
-      if (min(which) < 1)
-        stop("index in 'which' should be >0")
-  }
+  which <- selectvar(which,var,"x",Nall = TRUE)
+
   X <- x[,which]
 
   X<- as.matrix(X)
@@ -107,7 +97,7 @@ pairs.modCRL<- function(x, which = 1:ncol(x), nsample = NULL, ...) {
 }
 
 ## -----------------------------------------------------------------------------
-plot.modCRL<-function(x, which=NULL, trace = TRUE, ask = NULL, ...) {
+plot.modCRL<-function(x, which=NULL, trace = FALSE, ask = NULL, ...) {
 
   vars <- attr(x,"var")
 
@@ -115,6 +105,8 @@ plot.modCRL<-function(x, which=NULL, trace = TRUE, ask = NULL, ...) {
   NP  <- attr(x,"npar")
   parnames <- var[1:NP]
   varnames <- var[-(1:NP)]
+  
+# which selection has to stay the way it is: selecting from TWO sets...
   if (!is.null(which)) {
     if (! is.numeric(which)) {
       ln <- length(which)

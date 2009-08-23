@@ -104,7 +104,8 @@ modMCMC(f, p, ..., jump=NULL,  lower=-Inf, upper=+Inf, prior=NULL,
     also the function value and (if appropriate) the model variance(s).
   }
   \item{which }{the name or the index to the parameters that should be plotted.
-    Default = all parameters.
+    Default = all parameters. If \code{Full=TRUE}, setting \code{which =NULL}
+    will plot only the function value and the model variance.
   }
   \item{trace }{if \code{TRUE}, adds smoothed line to the plot.
   }

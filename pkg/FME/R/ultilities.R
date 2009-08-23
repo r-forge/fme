@@ -42,3 +42,50 @@ panel.hist <- function(x,...) {
     rect(breaks[-nB], 0, breaks[-1], y, col = "grey")
 }
 
+## =============================================================================
+## Find a certain variable
+## =============================================================================
+
+findvar <- function(var1, var2, str="var") {
+  if (is.character(var2[[1]])){
+    ivar  <- which (names(var1)%in%var2)
+    if (length(ivar)!= length(var2))
+      stop(paste("cannot proceed: not all sensitivity", str,"are known"))
+    return(ivar)
+  } else {
+  if (max(var2)>length(var1))
+    stop (paste("cannot proceed: index to sensitivity ", str, "too large"))
+  return(var2)
+  }
+}
+
+## =============================================================================
+## Selecting numbers from "which"...
+## =============================================================================
+
+selectvar <- function (which, var, nm = "x", Nall = FALSE) { # var = list from which to select...
+  if (!is.null(which)) {
+    if (! is.numeric(which)) {
+      ln <- length(which)
+      Select <- NULL
+      for (i in which) {  # use loop rather than which(...%in%) to keep ordering of "which"
+        ii <- which (var == i)
+        if (length(ii)==0)
+          stop(paste(" variable in 'which' is not in", nm, ":", i))
+        Select <- c(Select,ii)
+      }
+    } else {     # index
+      Select <- which
+      if (max(Select) > length(var))
+        stop("index in 'which' too large")
+      if (min(Select) < 1)
+        stop("index in 'which' should be > 0")
+    }
+  } else if (is.null(which))
+    if (Nall)
+      Select <- 1:length(var)
+    else
+      Select <- NULL
+
+  return(Select)
+}

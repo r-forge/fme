@@ -85,6 +85,8 @@ O2sens <- sensFun(func=O2fun,parms=pars)
 
 # univariate sensitivity
 summary(O2sens)
+plot(O2sens)
+plot(summary(O2sens))
 
 # bivariate sensitivity
 pairs(O2sens)
@@ -149,8 +151,11 @@ Objective <- function (x)
 }
 # 2. collinearity of the parameters
 sF<-sensFun(Objective,parms=c(upO2=360,lowO2=10,cons=80,ks=1,D=1))
+plot(sF)
 
 summary(sF)
+plot(summary(sF))
+
 collin(sF)
 
 
@@ -187,7 +192,7 @@ Covar   <- SFit$cov.scaled * 2.4^2/4
 s2prior <- Fit$ms
 
 # adaptive metropolis
-MCMC <- modMCMC(f=Objective,p=Fit$par,jump=Covar,niter=100,ntrydr=3,
+MCMC <- modMCMC(f=Objective,p=Fit$par,jump=Covar,niter=1000,ntrydr=3,
                 var0=s2prior,wvar0=1,updatecov=100,lower=c(NA,0,NA,0))
 
 plot(MCMC,Full=TRUE)
