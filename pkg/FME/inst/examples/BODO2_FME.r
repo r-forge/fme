@@ -1,6 +1,10 @@
-##################################################################
-######    Applications of the BOD + O2 in a river model     ######
-##################################################################
+## =============================================================================
+##
+## A model of BOD + O2 in a river
+##
+## checked 24-08-09
+## =============================================================================
+
 # Biochemical Oxygen Demand (BOD) and oxygen (O2) dynamics
 # in a river - example from function steady.1D in rootSolve
 
@@ -153,6 +157,8 @@ summary(Sens)
 
 # bivariate sensitivity
 pairs(Sens)
+pairs(Sens,which=c("O2","BOD","BODrate"))
+
 mtext(outer=TRUE,side=3,line=-1.5,
       "Sensitivity functions",cex=1.5)
 

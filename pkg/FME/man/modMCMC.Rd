@@ -321,11 +321,11 @@ where \eqn{\xi} is the measurement error, assumed normally distribution, then
 \note{
   The following S3 methods are provided:
   \itemize{
-    \item{summary }{produces summary statistics of the MCMC results}
-    \item{plot }{plots the MCMC results, for all parameters. Use it to
-      check convergence}
-    \item{pairs }{produces a pairs plot of the MCMC results; overrides
-      the default \code{gap = 0}, \code{upper.panel = NA}, and \code{diag.panel}}
+    \item summary, produces summary statistics of the MCMC results
+    \item plot, plots the MCMC results, for all parameters. Use it to
+      check convergence.
+    \item pairs, produces a pairs plot of the MCMC results; overrides
+      the default \code{gap = 0}, \code{upper.panel = NA}, and \code{diag.panel}.
   }
 
 %%\code{cumuplot.modMCMC} invokes \code{\link[coda]{cumuplot}} from the \code{coda} package.

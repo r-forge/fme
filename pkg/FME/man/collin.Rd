@@ -27,9 +27,9 @@
 \usage{
 collin(sensfun, parset = NULL, N = NULL, which = NULL)
 
-\method{print}{collin}(x, \ldots)
+\method{print}{collin}(x, ...)
 
-\method{plot}{collin}(x, \ldots)
+\method{plot}{collin}(x, ...)
 }
 \arguments{
   \item{sensfun }{model sensitivity functions as estimated by \code{SensFun}.

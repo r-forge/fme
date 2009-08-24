@@ -60,40 +60,28 @@ modCost(model, obs, x="time", y=NULL, err=NULL,
   \item{var}{ the variable costs, a data.frame with, for each observed variable
     the following (see details):
     \itemize{
-      \item{name }{ the name of the observed variable.
-      }
-      \item{scale }{, the scale-factor used to weigh the variable cost,
+      \item name, the name of the observed variable.
+      \item scale, the scale-factor used to weigh the variable cost,
         either 1 or 1/(number observations), defaults to 1.
-      }
-      \item{N }{ the number of data points per observed variable.
-      }
-      \item{SSR.unweighted }{ the sum of squared residuals per observed
+      \item N, the number of data points per observed variable.
+      \item SSR.unweighted } the sum of squared residuals per observed
         variable, unweighted.
-      }
-      \item{SSR }{ the sum of weighted squared residuals per observed
+      \item SSR, the sum of weighted squared residuals per observed
         variable(see details).
-      }
     }
-  }
+
   \item{residuals }{the data residual, a data.frame with several columns:
     \itemize{
-      \item{name }{, the name of the observed variable.
-      }
-      \item{x }{, the value of the independent variable (if present).
-      }
-      \item{obs }{, the observed variable value.
-      }
-      \item{mod }{, the corresponding modeled value.
-      }
-      \item{weight }{, the factor used to weigh the residuals, 1/error,
+      \item name, the name of the observed variable.
+      \item x, the value of the independent variable (if present).
+      \item obs, the observed variable value.
+      \item mod, the corresponding modeled value.
+      \item weight, the factor used to weigh the residuals, 1/error,
         defaults to 1.
-      }
-      \item{res }{, the weighted residuals between model and observations
+      \item res, the weighted residuals between model and observations
         (mod-obs)*weight.
-      }
-      \item{res.unweighted }{, the residuals between model and observations
+      \item res.unweighted, the residuals between model and observations
         (mod-obs).
-      }
     }
   }
 }

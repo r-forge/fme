@@ -1,14 +1,16 @@
-#===============================================================================
-# chemical example: kinetics of the reaction A<->B with forward reaction rate
-# k1, and backward reaction rate k2.
-# the equations: dA/dt=-k1*A + k2*B and dB/dt = k1*A - k2*B
-# with initial conditions (at t=0): A0=1, B0=0.
-# the analytical solution is:
-# A(t) = k2/(k1+k2) + (A0-k2)/(k1+k2))*exp(-k1+k2)*t
-#
-# example from Haario et al. 2005
-#
-#===============================================================================
+## =============================================================================
+## chemical example: kinetics of the reaction A<->B with forward reaction rate
+## k1, and backward reaction rate k2.
+## the equations: dA/dt=-k1*A + k2*B and dB/dt = k1*A - k2*B
+## with initial conditions (at t=0): A0=1, B0=0.
+## the analytical solution is:
+## A(t) = k2/(k1+k2) + (A0-k2)/(k1+k2))*exp(-k1+k2)*t
+##
+## example from Haario et al. 2005
+##
+## Checked 24-08-09
+## =============================================================================
+
 require(FME)
 
 # Analytic function calculates the values of A at "times".

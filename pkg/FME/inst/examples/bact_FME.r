@@ -1,9 +1,11 @@
 
-##################################################################
-# A simple model of bacteria, growing on a substrate
-# in a batch culture
-# Model from Soetaert and Herman, 2009
-##################################################################
+## =============================================================================
+## A simple model of bacteria, growing on a substrate
+## in a batch culture
+## Model from Soetaert and Herman, 2009
+## Checked 24-08-09
+## =============================================================================
+
 mf <- par(mfrow=c(2,2))
 require(FME)
 
@@ -65,6 +67,9 @@ SF<- sensFun(func=solveBact,parms=pars,
 head(SF)
 tail(SF)
 plot(SF,legpos="bottomright")
+
+pairs(SF, which=c("Bact","Sub"))
+pairs(SF, which=c("Sub","Bact"))
 
 summary(SF,var=TRUE)
 

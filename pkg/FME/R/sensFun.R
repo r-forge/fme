@@ -198,7 +198,7 @@ pairs.sensFun <- function (x, which=NULL, ...) {
     ij <- NULL
     if (TYP == 1)
       for (i in Select) {
-        In <- ((i-1)*nx):(i*nx)
+        In <- (((i-1)*nx+1)):(i*nx)
         ij <- c(ij,rep(i,length(In)))
         ii <- c(ii,In)
       }
@@ -278,7 +278,7 @@ plot.sensFun<- function(x, which=NULL, legpos="topleft",
     is <- NULL
     for (i in Select){
       if (TYP == 1)
-        ii <- ((i-1)*nx):(i*nx)
+        ii <- ((i-1)*nx+1):(i*nx)
       else
         ii <- (nx[i]+1):nx[i+1]
      is <- c(is,ii)
