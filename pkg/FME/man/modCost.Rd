@@ -64,7 +64,7 @@ modCost(model, obs, x="time", y=NULL, err=NULL,
       \item scale, the scale-factor used to weigh the variable cost,
         either 1 or 1/(number observations), defaults to 1.
       \item N, the number of data points per observed variable.
-      \item SSR.unweighted } the sum of squared residuals per observed
+      \item SSR.unweighted, the sum of squared residuals per observed
         variable, unweighted.
       \item SSR, the sum of weighted squared residuals per observed
         variable(see details).
