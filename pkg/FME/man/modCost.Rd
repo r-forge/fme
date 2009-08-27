@@ -69,7 +69,7 @@ modCost(model, obs, x="time", y=NULL, err=NULL,
       \item SSR, the sum of weighted squared residuals per observed
         variable(see details).
     }
-
+  }
   \item{residuals }{the data residual, a data.frame with several columns:
     \itemize{
       \item name, the name of the observed variable.
