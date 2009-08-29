@@ -2,11 +2,11 @@
 ## Set the mfrow parameters and whether to "ask" for opening a new device
 ## =============================================================================
 
-setplotpar <- function(nmdots,dots,nv,ask) {
+setplotpar <- function(nmdots, dots, nv, ask) {
     if (!any(match(nmdots, c("mfrow", "mfcol"), nomatch = 0))) {
       nc <- min(ceiling(sqrt(nv)),3)
       nr <- min(ceiling(nv/nc),3)
-      mfrow <- c(nr,nc)
+      mfrow <- c(nr, nc)
     }
     else if ("mfcol" %in% nmdots)
         mfrow <- rev(dots$mfcol)
@@ -46,14 +46,14 @@ panel.hist <- function(x,...) {
 ## Find a certain variable
 ## =============================================================================
 
-findvar <- function(var1, var2, str="var") {
+findvar <- function(var1, var2, str = "var") {
   if (is.character(var2[[1]])){
-    ivar  <- which (names(var1)%in%var2)
+    ivar  <- which (names(var1) %in% var2)
     if (length(ivar)!= length(var2))
       stop(paste("cannot proceed: not all sensitivity", str,"are known"))
     return(ivar)
   } else {
-  if (max(var2)>length(var1))
+  if (max(var2) > length(var1))
     stop (paste("cannot proceed: index to sensitivity ", str, "too large"))
   return(var2)
   }
@@ -70,9 +70,9 @@ selectvar <- function (which, var, nm = "x", Nall = FALSE) { # var = list from w
       Select <- NULL
       for (i in which) {  # use loop rather than which(...%in%) to keep ordering of "which"
         ii <- which (var == i)
-        if (length(ii)==0)
+        if (length(ii) == 0)
           stop(paste(" variable in 'which' is not in", nm, ":", i))
-        Select <- c(Select,ii)
+        Select <- c(Select, ii)
       }
     } else {     # index
       Select <- which

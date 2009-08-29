@@ -66,10 +66,9 @@ collin <- function(sensfun, parset = NULL, N = NULL, which = NULL) {
       psub     <- rep(0, npar)
       psub[ii] <- 1
       n        <- ncol(cc)
-      ## thpe: changed to avoid <<-
-      Collset   <- rbind(Collset, c(psub, n, id))
+      Collset <- rbind(Collset, c(psub, n, id))
     }
-    return(rbind(Collin,Collset))
+    return(rbind(Collin, Collset))
   }
   if (is.null(parset)) {
 
@@ -88,8 +87,6 @@ collin <- function(sensfun, parset = NULL, N = NULL, which = NULL) {
       numcomb <- choose(npar, n)
       if (numcomb < 5000) {
         cc  <- combin(n, pset)
-        ## thpe: changed to avoid <<-
-        # collFun(cc)
         Collin <- collFun(cc)
       }
     }
@@ -105,7 +102,6 @@ collin <- function(sensfun, parset = NULL, N = NULL, which = NULL) {
     }
 
     parset <- matrix(nr = 1, parset)
-    ## thpe: changed to avoid <<-
     Collin <- collFun(parset)
   }
 

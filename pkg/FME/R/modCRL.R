@@ -2,9 +2,9 @@
 ## Monte Carlo runs
 ## -----------------------------------------------------------------------------
 
-modCRL <- function( func, parms=NULL, sensvar=NULL, dist="unif",
-                   parInput=NULL, parRange=NULL, parMean=NULL,
-                   parCovar=NULL, num = 100, ...) {
+modCRL <- function(func, parms = NULL, sensvar = NULL, dist = "unif",
+                   parInput = NULL, parRange = NULL, parMean = NULL,
+                   parCovar = NULL, num = 100, ...) {
 
   if (is.null(parms) & ! is.null(parInput))
     parms <- parInput[1,]
@@ -20,7 +20,7 @@ modCRL <- function( func, parms=NULL, sensvar=NULL, dist="unif",
   if (is.matrix(parms) && nrow(parms)>1)
     stop ("'parms' should be a vector")
 
-  Solve <- function(parms) func(parms,...)
+  Solve <- function(parms) func(parms, ...)
 
   if (! is.null(parInput)) {
     dist<-"input"
@@ -28,25 +28,25 @@ modCRL <- function( func, parms=NULL, sensvar=NULL, dist="unif",
     num <- min(num,nr)
     if (num == nr)
       ii <- 1: nr
-    else ii <- sample(1:nr,size=num,replace=FALSE)
+    else ii <- sample(1:nr, size = num, replace = FALSE)
 
-    parset <-as.matrix(parInput[ii,])
+    parset <- as.matrix(parInput[ii,])
     if(is.null(parms)) parms <- parInput[1,]
   }
 
   Parms <- parms
 
-  # reference run
-  yRef  <- func(parms,...)
+  ## reference run
+  yRef  <- func(parms, ...)
 
   if (is.matrix(yRef) | is.data.frame(yRef))
     if(nrow(yRef)>1)
       stop("func should return a vector or a matrix/data.frame with one row")
 
-  sens <- sensRange(func,parms,sensvar,dist,parInput,parRange,parMean,
-                  parCovar,map=NULL,num=num,...)
+  sens <- sensRange(func, parms, sensvar, dist, parInput, parRange, parMean,
+                  parCovar, map = NULL, num = num, ...)
 
-  class(sens) <- c("modCRL","data.frame")
+  class(sens) <- c("modCRL", "data.frame")
   return (sens)
 }
 
@@ -54,21 +54,21 @@ modCRL <- function( func, parms=NULL, sensvar=NULL, dist="unif",
 ## S3 methods of modCRL
 ## -----------------------------------------------------------------------------
 
-summary.modCRL<-function(object,...) {
-  SumSens <- summary.sensRange(object,...)
-  class(SumSens)<-c("summary.modCRL","data.frame")
+summary.modCRL <- function(object, ...) {
+  SumSens <- summary.sensRange(object, ...)
+  class(SumSens) <- c("summary.modCRL", "data.frame")
   return(SumSens)
 }
 
 ## -----------------------------------------------------------------------------
-hist.modCRL<- function(x, which = 1:ncol(x), ask = NULL, ...) {
+hist.modCRL <- function(x, which = 1:ncol(x), ask = NULL, ...) {
   hh <- list()
   hh$pars <- x
-  hist.modMCMC(hh, which=which, Full=FALSE, ask = ask, ...)
+  hist.modMCMC(hh, which = which, Full = FALSE, ask = ask, ...)
 }
 
 ## -----------------------------------------------------------------------------
-pairs.modCRL<- function(x, which = 1:ncol(x), nsample = NULL, ...) {
+pairs.modCRL <- function(x, which = 1:ncol(x), nsample = NULL, ...) {
 
   panel.main <- function(x,y,...)
     points(x[ii],y[ii],...)

@@ -42,11 +42,11 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
 
   ## delayed rejection input
   ntrydr <- max(1,ntrydr)
-  if(is.null (drscale) )
+  if(is.null (drscale))
     drscale=c(1/5,1/4,1/3)
   ldr <- length(drscale)
   if (ldr < ntrydr)
-    drscale <- c(drscale, rep(drscale[ldr],ntrydr-ldr))
+    drscale <- c(drscale, rep(drscale[ldr], ntrydr - ldr))
 
   ## adaptive metropolis input
   if (updatecov == 0)
@@ -68,10 +68,10 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
   ## Check jump input (to generate new parameters)
   if (is.null(jump)) {                     # default is a sd of 0.1
     jump  <- 0.1*abs(p)
-    NewPars <- function(p,...) p + rnorm(npar,sd=jump)
+    NewPars <- function(p, ...) p + rnorm(npar, sd = jump)
     R <- diag(jump)
   }
-  else if (is.matrix (jump)) {             # covariance matrix
+  else if (is.matrix(jump)) {             # covariance matrix
     R       <- chol(jump)
     NewPars <- NewParsMN
   }
@@ -79,7 +79,7 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
     NewPars <- function(p,...) p + rnorm(npar,sd=jump)
     ii <- which (jump<0)
     jump[ii] <- 0.1*abs(p[ii])
-    R <- diag(nr=npar,jump)
+    R <- diag(nr = npar, jump)
   }
   else {
     NewPars <- jump             # jump is a function
@@ -100,7 +100,7 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
 ## model variance: initial value and accurracy...
 
   ## if 'var0' has a value, it is used to scale the SSR; divsigma = 1/var
-  useSigma    <- !is.null(var0)
+  useSigma <- !is.null(var0)
 
   if (useSigma)
     divsigma <- 1/var0
@@ -117,7 +117,7 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
 ## (note:SSnew, PPnew, divsigma are globals...)
 
 ## First function call ...
-  SSnew  <- f(p,...)
+  SSnew <- f(p,...)
 
   ## type I: numeric value , no model variance
   if (is.numeric(SSnew)& !useSigma) {
@@ -126,8 +126,8 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
       stop("if 'var0' is NULL, 'f' should either return -2*log of the model probability, OR an instance of class 'modCost'")
 
     Fun <- function(p,...) {
-      PPnew   <<- Prior(p)
-      SSnew   <<- f(p,...)
+      PPnew  <<- Prior(p)
+      SSnew  <<- f(p,...)
       return(0.5*(SSnew + PPnew))     #-log(p_model*p_params)
     }
     SSold <- SSnew
@@ -136,7 +136,7 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
   ## type II: numeric value, + model variance -> f returns model residuals
   else if (is.numeric(SSnew)& useSigma) {
     N <- length(SSnew)
-    if (N ==1)
+    if (N == 1)
       stop("if 'var0' has a value, 'f' should return the model residuals OR an instance of class 'modCost'")
     if (length(var0) != 1 && length(var0) != N)
       stop("length of 'var0' should either 1 or = length of model residuals as returned by 'f'")
@@ -167,8 +167,8 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
     N <- nrow(SSnew$residuals)    # total number of data points
 
     Fun <- function(p,...)  {
-      PPnew   <<- Prior(p)
-      SSnew   <<- f(p,...)$minlogp    # select -2*log(probability)
+      PPnew  <<- Prior(p)
+      SSnew  <<- f(p,...)$minlogp    # select -2*log(probability)
       return(0.5*(SSnew + PPnew))     #-log(p_model*p_params)
     }
     SSold <- SSnew$minlogp
@@ -191,9 +191,9 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
     else {
       N <- SSnew$var$N            # number of data points per variable
 
-      Fun <- function(p,...) {
+      Fun <- function(p, ...) {
         PPnew  <<- Prior(p)
-        SSnew  <<- f(p,...)
+        SSnew  <<- f(p, ...)
         SSnew  <<- SSnew$var$SSR.unweighted ### KARLINE:CHECK THIS!
         return(0.5*(sum(SSnew*divsigma) + PPnew))
       }
@@ -205,8 +205,8 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
   if (is.null(n0)) n0 <- wvar0*N
 
   if (updateSigma)
-      divsigma <- rgamma(lenvar0,shape=0.5*(n0+N),
-         rate=0.5*(n0*var0+SSold))
+      divsigma <- rgamma(lenvar0, shape = 0.5*(n0 + N),
+         rate = 0.5*(n0*var0 + SSold))
 
 
 ##------------------------------------------------------------------------------
@@ -244,8 +244,8 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
     else accept <- (runif(1) < tst)
 
     if (accept) {
-      SSold <<- SSnew
-      PPold <<- PPnew
+      SSold  <<- SSnew
+      PPold  <<- PPnew
       if (useSigma)
         sigold <<- divsigma
     }
@@ -290,10 +290,10 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
     pri2 <- arg[[stage+1]]$pri
     pri1 <- arg[[1]]$pri
 
-    y  <- -0.5*(sum((ss2-ss1)*divsigma) + (pri2-pri1))
+    y  <- -0.5*(sum((ss2 - ss1)*divsigma) + (pri2 - pri1))
 
     for (k in 1:stage)
-      y <- y + qfun(k,arg)
+      y <- y + qfun(k, arg)
 
     y <- min(1, exp(y)*a2/a1)
 
@@ -301,7 +301,7 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
   }
 
   ## gaussian n-th stage log proposal ratio
-  ## log of q_i(yn,... yn-j)/q_i(x,y1,...yj)
+  ## log of q_i(yn,... yn-j)/q_i(x, y1, ...yj)
 
   qfun <- function(iq,arg) {
     LL <- function(x) sum(x*x)
@@ -347,7 +347,7 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
 
   ## keep initial runs during burnin, if adaptive metropolis algorithm (isR)
   if (isR & burninlength>0) {
-    SaveIni    <- TRUE
+    SaveIni     <- TRUE
     naccsave2   <- 0
     burnupdate  <- updatecov
   } else SaveIni <- FALSE
@@ -375,15 +375,14 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
     } else {
 
       funpnew <- Fun(parnew,...)        # probability of new parameter set
-      if (is.infinite(funpnew)){
-        alpha  <- 0
-        accept <- FALSE
+        if (is.infinite(funpnew)){
+          alpha  <- 0
+          accept <- FALSE
+        } else  {
+          alpha  <- Test(funpnew, funpold)
+          accept <- Accept(alpha)
+        }
       }
-      else  {
-        alpha  <- Test(funpnew , funpold)
-        accept <- Accept(alpha)
-      }
-    }
 
 ##------------------------------------------------------------------------------
 ##  delayed rejection
@@ -401,7 +400,7 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
       trypath[[1]] <- x
       trypath[[2]] <- y
 
-     ## Create new R's and the inverse of R, scaled - ONLY IF R HAS CHANGED
+      ## Create new R's and the inverse of R, scaled - ONLY IF R HAS CHANGED
       if (Rnew != Rold) {
         invR[[1]] <- ginv(R)
         Rw[[1]]   <- R
@@ -415,7 +414,7 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
       while (! accept & itry < ntrydr) {
         itry <- itry + 1
 
-        parnew  <- NewPars(parold,Rw[[itry]])
+        parnew  <- NewPars(parold, Rw[[itry]])
         z$p <- parnew
 
         if (any(parnew < lower) | any(parnew > upper)) {
@@ -423,7 +422,7 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
           z$pri<- 0
           z$ss <- Inf
         } else {
-          funpnew <- Fun(parnew,...)  # probability of new parameter set
+          funpnew <- Fun(parnew, ...)  # probability of new parameter set
           z$pri <- PPnew
           z$ss  <- SSnew
         }
@@ -434,7 +433,7 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
           break
         }
         else {
-          alpha <- AlphaFun(trypath[1:(itry+1)])
+          alpha <- AlphaFun(trypath[1:(itry + 1)])
           dr_steps <- dr_steps +1
           accept <- Accept(alpha)
         }
@@ -451,25 +450,25 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
     }
 
     if(updateSigma)
-      divsigma <- rgamma(lenvar0,shape=0.5*(n0+N),rate=0.5*(n0*var0+SSold))
+      divsigma <- rgamma(lenvar0, shape = 0.5*(n0 + N), rate = 0.5*(n0*var0 + SSold))
 
 ## -----  during burnin: SaveIni will be true
     if (SaveIni) {  # use burnin to update covariance...
-      ipos <- ipos+1
+      ipos <- ipos + 1
       if (ipos > outputlength) {
         ipos <- 1
         icov <- outputlength
       }
-      pars[,ipos]  <-parold
+      pars[,ipos] <-parold
 
       if (accept)
-        naccsave2 <- naccsave2+1
+        naccsave2 <- naccsave2 + 1
 
-      if (i> burnupdate & naccsave2 > 5 ) {  #  5 is arbitrary...
-        jj <- max(ipos,icov)
+      if (i > burnupdate & naccsave2 > 5 ) {  #  5 is arbitrary...
+        jj <- max(ipos, icov)
         if (npar > 1)
-          Covar <- (cov(t(pars[,1:jj]))  + diag(1e-16,npar)) * covscale
-        else Covar <- var(pars[,1:jj])  + 1e-16 * covscale
+          Covar <- (cov(t(pars[,1:jj])) + diag(1e-16,npar)) * covscale
+        else Covar <- var(pars[,1:jj]) + 1e-16 * covscale
         RR    <- try(chol(Covar))
         if (is.numeric(RR) ) {
           R <- RR
@@ -485,27 +484,27 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
     if (i == ou1) {
       if (SaveIni)
         isR <- FALSE
-      SaveIni    <- FALSE
-      ii         <-ii+1
-      pars[,ii]  <-parold
-      SSpars[ii]   <- sum(SSold)
-      priorpars[ii]<- PPold
+      SaveIni       <- FALSE
+      ii            <- ii + 1
+      pars[,ii]     <- parold
+      SSpars[ii]    <- sum(SSold)
+      priorpars[ii] <- PPold
       if (accept)
-        naccsave<- naccsave+1
+        naccsave <- naccsave+1
       ou1 <- i + ou
 
       if (useSigma)
-        sig[ii,]<- 1/sigold
+        sig[ii,] <- 1/sigold
 
    ## update jump parameters by estimating param covariance.. only if > 5 accepted ones!
       if (isR & ii > nupdate & naccsave > 5) {
-        ie <- max(ipos,icov,ii)
+        ie <- max(ipos, icov, ii)
         if (npar > 1)
-          Covar <- (cov(t(pars[,1:ie]))  + diag(1e-16,npar)) * covscale
-        else Covar <- var(pars[,1:ie])  + 1e-16 * covscale
+          Covar <- (cov(t(pars[,1:ie])) + diag(1e-16, npar)) * covscale
+        else Covar <- var(pars[,1:ie]) + 1e-16 * covscale
         RR     <- try(chol(Covar))
 
-         if (is.numeric(RR) ) {
+         if (is.numeric(RR)) {
            R <- RR
            NewPars <- NewParsMN   # this function becomes the default update function
            nupdate <- ii + updatecov
@@ -519,17 +518,17 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
 ## 3. finalisation
 
   if (is.null(pnames))
-    pnames <- paste("p",1:npar,sep="")
+    pnames <- paste("p", 1:npar,sep="")
   if (useSigma) {
     if (length(var0) == ncol(sig))
        colnames(sig) <- names(var0)
-    else colnames(sig) <- paste("var",1:ncol(sig),del="")
+    else colnames(sig) <- paste("var", 1:ncol(sig), del = "")
   }
 
   if (updateSigma)
-     settings <- data.frame(var0=var0,n0=n0,N=N)
+     settings <- data.frame(var0 = var0, n0 = n0, N = N)
   else if (useSigma)
-     settings <- paste("constant variance =",var0)
+     settings <- paste("constant variance =", var0)
   else
      settings <- "Constant variance = 1"
 
@@ -540,16 +539,16 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
             " out of ", niter, " (", 100 * naccepted/niter,
               "%) \n", sep = "")
 
-  count <- c(dr_steps=dr_steps, Alfasteps = A_count,num_accepted=naccepted,
-             num_covupdate=Rnew-1)
+  count <- c(dr_steps = dr_steps, Alfasteps = A_count, num_accepted = naccepted,
+             num_covupdate = Rnew - 1)
 
   if (! is.null(sig)) {
-    if (is.null(colnames(sig))) colnames(sig)<-rep("model",ncol(sig))
-    colnames(sig) <- paste("var_",colnames(sig),sep="")
+    if (is.null(colnames(sig))) colnames(sig) <- rep("model", ncol(sig))
+    colnames(sig) <- paste("var_", colnames(sig), sep = "")
   }
-  res <-list(pars=t(pars),SS=SSpars,naccepted=naccepted,sig=sig,
-             bestpar= bestPar,bestfunp=bestfunp,prior=priorpars,
-             count=count,settings=settings)
+  res <-list(pars = t(pars), SS = SSpars, naccepted = naccepted, sig = sig,
+             bestpar = bestPar, bestfunp = bestfunp, prior = priorpars,
+             count = count, settings = settings)
 
   class(res) <- "modMCMC"
   return(res)
@@ -566,7 +565,7 @@ pairs.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars),
     points(x[ii],y[ii],...)
 
   var <- colnames(x$pars)
-  which <- selectvar(which,var,"x$pars", Nall=FALSE)
+  which <- selectvar(which, var, "x$pars", Nall = FALSE)
 
   X <- x$pars[,which]
 
@@ -574,11 +573,11 @@ pairs.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars),
   if (is.vector(X)) X<- as.matrix(X)
   if (is.null(nsample))
     ii <- 1:nrow(X) else
-    ii <- sample((1:nrow(X)),nsample)
+    ii <- sample((1:nrow(X)), nsample)
   if (Full)
-    X <- cbind(X,SSR=x$SS)
+    X <- cbind(X, SSR = x$SS)
   if (Full & !is.null(x$sig))
-    X <- cbind(X,x$sig)
+    X <- cbind(X, x$sig)
 
   if (! is.null (remove)) {
     if (max(remove) > nrow(X))
@@ -598,7 +597,7 @@ pairs.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars),
   dots$gap <- if(is.null(dots$gap)) 0 else dots$gap
   dots$labels <- if(is.null(dots$labels)) labels else dots$labels
 
-  do.call("pairs",c(alist(X),dots))
+  do.call("pairs", c(alist(X), dots))
 
 }
 
@@ -609,7 +608,7 @@ cumuplot.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars),
                               remove = NULL, ...) {
 
   var <- colnames(x$pars)
-  which <- selectvar(which,var,"x$pars",Nall=FALSE)
+  which <- selectvar(which, var, "x$pars", Nall = FALSE)
 
   mcmc <- x$pars[,which]
   if (! is.null (remove)) {
@@ -621,19 +620,19 @@ cumuplot.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars),
   }
 
 
-  if (Full) mcmc <- cbind(mcmc,x$SS)
+  if (Full) mcmc <- cbind(mcmc, x$SS)
   if (Full & !is.null(x$sig))
-      mcmc <- cbind(mcmc,x$sig)
-  cumuplot(as.mcmc(mcmc),...)
+      mcmc <- cbind(mcmc, x$sig)
+  cumuplot(as.mcmc(mcmc), ...)
 }
 
 ## -----------------------------------------------------------------------------
 
-plot.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars), trace=TRUE,
-                          remove=NULL, ask = NULL, ...) {
+plot.modMCMC <- function (x, Full = FALSE, which = 1:ncol(x$pars), trace = TRUE,
+                          remove = NULL, ask = NULL, ...) {
 
   var <- colnames(x$pars)
-  which <- selectvar(which,var,"x$pars",Nall=FALSE)
+  which <- selectvar(which, var, "x$pars", Nall = FALSE)
 
   np <- NP <- length(which)
   if (Full)
@@ -645,16 +644,16 @@ plot.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars), trace=TRUE,
   nmdots <- names(dots)
 
   ## Set par(mfrow) and ask.
-  ask <- setplotpar (nmdots,dots,np,ask)
+  ask <- setplotpar(nmdots, dots, np, ask)
 
   ## interactively wait if there are remaining figures
   if (ask) {
-        oask <- devAskNewPage(TRUE)
- 	      on.exit(devAskNewPage(oask))
-    }
+      oask <- devAskNewPage(TRUE)
+      on.exit(devAskNewPage(oask))
+  }
 
   mcmc <- x$pars
-  if (! is.null (remove)) {
+  if (! is.null(remove)) {
     if (max(remove) > nrow(mcmc))
       stop("too many runs should be removed from modMCMC object")
     if (min(remove) < 1)
@@ -669,13 +668,13 @@ plot.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars), trace=TRUE,
 
   for(i in which) {
     if (Main) dots$main <- colnames(mcmc)[i]
-    do.call("plot",c(alist(mcmc[,i]),dots))
-    if (trace) lines(lowess(mcmc[,i]),col="darkgrey",lwd=2)
+    do.call("plot", c(alist(mcmc[,i]), dots))
+    if (trace) lines(lowess(mcmc[,i]), col = "darkgrey", lwd = 2)
   }
 
   if (Full) {
-    plot(x$SS,type="l",main="SSR",xlab="iter",ylab="")
-    if (trace) lines(lowess(x$SS),col="darkgrey",lwd=2)
+    plot(x$SS, type="l", main = "SSR", xlab = "iter", ylab = "")
+    if (trace) lines(lowess(x$SS), col = "darkgrey", lwd = 2)
   }
 
   if (Full & !is.null(x$sig))
@@ -683,10 +682,10 @@ plot.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars), trace=TRUE,
        Name <- if(!is.null(colnames(x$sig)))colnames(x$sig)[i]
          else
            { if (ncol(x$sig) == 1) "Model" else paste("variable",i)}
-       plot(x$sig[,i],type="l",main=Name,
-                    xlab="iter",ylab="variance",log="y")
+       plot(x$sig[,i], type = "l", main = Name,
+                    xlab = "iter", ylab = "variance", log = "y")
        if (trace)
-         lines(lowess(x$sig[,i]),col="darkgrey",lwd=2)
+         lines(lowess(x$sig[,i]), col = "darkgrey", lwd = 2)
     }
 }
 
@@ -715,13 +714,13 @@ hist.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars),
   nmdots <- names(dots)
 
   ## Set par mfrow and ask.
-  ask <- setplotpar (nmdots,dots,np,ask)
+  ask <- setplotpar(nmdots, dots, np, ask)
 
   ## interactively wait if there are remaining figures
   if (ask) {
-        oask <- devAskNewPage(TRUE)
- 	      on.exit(devAskNewPage(oask))
-    }
+      oask <- devAskNewPage(TRUE)
+      on.exit(devAskNewPage(oask))
+  }
 
   Main <- is.null(dots$main)
   dots$xlab    <- if(is.null(dots$xlab))    ""    else dots$xlab
@@ -740,19 +739,19 @@ hist.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars),
 
   if (iswhat)
     for(i in which) {
-    if (Main) dots$main <- colnames(mcmc)[i]
-    do.call("hist",c(alist(mcmc[,i]),dots))
+      if (Main) dots$main <- colnames(mcmc)[i]
+      do.call("hist", c(alist(mcmc[,i]), dots))
   }
   if (Full) {
     dots$main <- "SSR"
-    do.call("hist",c(alist(x$SS),dots))
+    do.call("hist", c(alist(x$SS), dots))
   }
 
   if (Full & !is.null(x$sig)) {
     for ( i in 1:ncol(x$sig))  {
-      if (Main) dots$main <- paste("error",colnames(x$sig)[i])
+      if (Main) dots$main <- paste("error", colnames(x$sig)[i])
       dots$ylab <- colnames(x$sig)[i]
-      do.call("hist",c(alist(x$sig[,i]),dots))
+      do.call("hist", c(alist(x$sig[,i]), dots))
     }
   }
 }
@@ -770,25 +769,25 @@ summary.modMCMC <- function (object, remove = NULL, ...) {
     mcmc <- mcmc[-remove,]
   }
   Res <- data.frame(rbind(
-    mean=apply(mcmc,2,mean),
-    sd  =apply(mcmc,2,sd),
-    min =apply(mcmc,2,min),
-    max =apply(mcmc,2,max),
-    q025 =apply(mcmc,2,quantile,probs=0.25),
-    q050 =apply(mcmc,2,quantile,probs=0.5),
-    q075 =apply(mcmc,2,quantile,probs=0.75)
-    ))
+    mean=apply(mcmc, 2, mean),
+    sd  =apply(mcmc, 2, sd),
+    min =apply(mcmc, 2, min),
+    max =apply(mcmc, 2, max),
+    q025 =apply(mcmc, 2, quantile, probs = 0.25),
+    q050 =apply(mcmc, 2, quantile, probs = 0.5),
+    q075 =apply(mcmc, 2, quantile, probs = 0.75)
+  ))
 
   if (!is.null(object$sig))
     Res <- data.frame(Res,
-        sig=rbind(
-        mean=apply(object$sig,2,mean),
-        sd  =apply(object$sig,2,sd),
-        min =apply(object$sig,2,min),
-        max =apply(object$sig,2,max),
-        q025 =apply(object$sig,2,quantile,probs=0.25),
-        q050 =apply(object$sig,2,quantile,probs=0.5),
-        q075 =apply(object$sig,2,quantile,probs=0.75)
+      sig=rbind(
+      mean=apply(object$sig, 2, mean),
+      sd  =apply(object$sig, 2, sd),
+      min =apply(object$sig, 2, min),
+      max =apply(object$sig, 2, max),
+      q025 =apply(object$sig, 2, quantile, probs = 0.25),
+      q050 =apply(object$sig, 2, quantile, probs = 0.5),
+      q075 =apply(object$sig, 2, quantile, probs = 0.75)
     ))
   return(Res)
 }

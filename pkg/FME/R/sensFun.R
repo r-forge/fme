@@ -3,25 +3,25 @@
 ## Sensitivity functions
 ## -----------------------------------------------------------------------------
 
-sensFun <- function(func, parms, sensvar=NULL, senspar=names(parms),
+sensFun <- function(func, parms, sensvar = NULL, senspar = names(parms),
                     varscale = NULL, parscale = NULL,
-                    tiny=1e-8, map = 1, ...) {
+                    tiny = 1e-8, map = 1, ...) {
   ## 1. The solver
-  Solve <- function(parms) func(parms,...)
+  Solve <- function(parms) func(parms, ...)
 
   yRef  <- Solve(parms)
   Type <- 1
-  if (class(yRef)=="modCost") {
+  if (class(yRef) == "modCost") {
     Res    <- yRef$residuals
     ynames <- Res$name
-    yRef <- cbind(Res$x,Res$mod)
+    yRef <- cbind(Res$x, Res$mod)
     names(yRef) <- ynames
     Type <- 2
     sensvar <- NULL   # input of sensvar not allowed for modCost type
 
     Solve <- function(parms) {
-      Res<- func(parms,...)$residuals
-      cbind(Res$x,Res$mod)
+      Res<- func(parms, ...)$residuals
+      cbind(Res$x, Res$mod)
     }
 
   }
@@ -29,25 +29,25 @@ sensFun <- function(func, parms, sensvar=NULL, senspar=names(parms),
   if (is.data.frame(yRef)) yRef <- as.matrix(yRef)
   if (is.vector(yRef)) {
     ynames <- names(yRef)
-    yRef <- matrix(nr=1,yRef)
+    yRef <- matrix(nr = 1, yRef)
     colnames(yRef) <- ynames
   }
   
   ## 2. sensitivity variables
   if (is.null(sensvar)) {
-    ivar    <- 1:ncol(yRef)
+    ivar <- 1:ncol(yRef)
     if (! is.null(map))
       ivar <- ivar[-map]
     sensvar <- colnames(yRef)[ivar]
     if(is.null(sensvar))
       sensvar <- ivar
   } else {
-    ivar  <- findvar(yRef[1,],sensvar,"variables")
+    ivar  <- findvar(yRef[1,], sensvar, "variables")
     if (! is.character(sensvar)) { # try to create names rather than nrs
       sv <- sensvar
-      sensvar<-colnames(yRef)[ivar]
+      sensvar <- colnames(yRef)[ivar]
       if (is.null(sensvar))
-        sensvar<-sv
+        sensvar <- sv
     }
   }
   if (is.null(map)) {
@@ -62,9 +62,9 @@ sensFun <- function(func, parms, sensvar=NULL, senspar=names(parms),
 
   nout  <- length(ivar)
   ndim  <- nrow(yRef)
-  if (Type ==1)
+  if (Type == 1)
     grvar <- expand.grid(map,sensvar)
-  else grvar<-data.frame(x=map,var=ynames)
+  else grvar<-data.frame(x = map, var = ynames)
 
   if (ndim ==1)
     svar <- sensvar
@@ -77,61 +77,61 @@ sensFun <- function(func, parms, sensvar=NULL, senspar=names(parms),
     
   ## 3. sensitivity parameters/
   npar  <- length(senspar)
-  if (npar ==0)
+  if (npar == 0)
     stop ("cannot proceed: there are no sensitivity parameters")
 
-  ipar <- findvar(parms,senspar,"parameters")
+  ipar <- findvar(parms, senspar, "parameters")
   pp    <- unlist(parms)[ipar]
 
   ## 4. perturbed parameters - perturbations always positive
-  dp        <- abs(pp*tiny)
-  dp[dp==0] <- tiny
-  ii        <- which (dp<tiny)
-  dp[ii]    <- tiny
+  dp          <- abs(pp*tiny)
+  dp[dp == 0] <- tiny
+  ii          <- which (dp < tiny)
+  dp[ii]      <- tiny
 
   if (is.null(parscale))
     parscale <- pp
-  else parscale<-rep(parscale,npar)
+  else parscale<-rep(parscale, npar)
 
   if (is.null(varscale))
     varscale <- yRef
-  else varscale <- rep (varscale,length(yRef))
+  else varscale <- rep (varscale, length(yRef))
 
   ## 0 is set equal to a very small number
-  varscale[varscale == 0]<-1e-20
-  parscale[parscale == 0]<-1e-20
+  varscale[varscale == 0] <- 1e-20
+  parscale[parscale == 0] <- 1e-20
 
-  Sens    <- matrix(nrow=length(yRef),ncol=npar,NA)
+  Sens    <- matrix(nrow = length(yRef), ncol = npar,NA)
 
   ## 5. Loop over all parameters
   for (i in 1:length(ipar)) {
-    dval    <- pp[i]+dp[i]
+    dval    <- pp[i] + dp[i]
     parms[ipar[i]] <- dval
     Yres    <- Solve(parms)
     if (is.vector(Yres))
       yPert <- Yres[ivar]
     else yPert <- as.vector(unlist(Yres[,ivar]))
-    Sens[,i]<- (yPert-yRef)/dp[i] *parscale[i] /varscale
+    Sens[,i] <- (yPert-yRef)/dp[i] * parscale[i] /varscale
     parms[ipar[i]] <- pp[i]
   }
 
   ## 6. Finally
   colnames(Sens) <- names(pp)
-  Sens <- data.frame(x=grvar[,1],var=as.character(grvar[,2]),Sens)
-  attr(Sens,"class") <- c("sensFun","data.frame")
-  attr(Sens,"pars") <- pp
-  attr(Sens,"parscale") <- parscale
-  attr(Sens,"varscale") <- varscale
-  if (Type==2) {
-    attr(Sens,"var") <- as.vector(unique(ynames))
-    attr(Sens,"nx") <- c(0,cumsum(as.vector(table(ynames))))  #start of each var
+  Sens <- data.frame(x = grvar[,1], var = as.character(grvar[,2]), Sens)
+  attr(Sens, "class") <- c("sensFun", "data.frame")
+  attr(Sens, "pars") <- pp
+  attr(Sens, "parscale") <- parscale
+  attr(Sens, "varscale") <- varscale
+  if (Type == 2) {
+    attr(Sens, "var") <- as.vector(unique(ynames))
+    attr(Sens, "nx")  <- c(0,cumsum(as.vector(table(ynames))))  #start of each var
   } else {
-    attr(Sens,"var") <- sensvar
-    attr(Sens,"nx") <- length(map)
+    attr(Sens, "var") <- sensvar
+    attr(Sens, "nx")  <- length(map)
   }
-  attr(Sens,"xname")   <- mname
-  attr(Sens,"x")   <- map
-  attr(Sens,"Type") <- Type  # type 1: modCost
+  attr(Sens, "xname") <- mname
+  attr(Sens, "x")     <- map
+  attr(Sens, "Type" ) <- Type  # type 1: modCost
   return(Sens)
 }
 
@@ -148,19 +148,19 @@ summary.sensFun <- function(object,vars=FALSE,...) {
   if (vars) { # summaries per variable
     Vars <- object[,2]
     out <- data.frame(
-         L1  =unlist(aggregate(abs(Sens),by=list(Vars),FUN=mean)[,-1]),
-         L2  =unlist(aggregate(Sens*Sens,by=list(Vars),FUN=sum)[,-1]),
-         Mean=unlist(aggregate(Sens,by=list(Vars),FUN=mean)[,-1]),
-         Min =unlist(aggregate(Sens,by=list(Vars),FUN=min)[,-1]),
-         Max =unlist(aggregate(Sens,by=list(Vars),FUN=max)[,-1]),
-         N   =unlist(aggregate(Sens,by=list(Vars),FUN=length)[,-1])
+         L1  =unlist(aggregate(abs(Sens), by = list(Vars), FUN = mean)[,-1]),
+         L2  =unlist(aggregate(Sens*Sens, by = list(Vars), FUN = sum)[,-1]),
+         Mean=unlist(aggregate(Sens, by = list(Vars), FUN = mean)[,-1]),
+         Min =unlist(aggregate(Sens, by = list(Vars), FUN = min)[,-1]),
+         Max =unlist(aggregate(Sens, by = list(Vars), FUN = max)[,-1]),
+         N   =unlist(aggregate(Sens, by = list(Vars), FUN = length)[,-1])
       )
     out$L2 <- sqrt(out$L2/out$N)
     out$var <- unique(Vars)
     np <- length(pp)
     nv <- length(unique(Vars))
-    out <- data.frame(cbind(value=rep(pp,times=rep(nv,np)),
-                      scale=rep(parscale,times=rep(nv,np)),out))
+    out <- data.frame(cbind(value = rep(pp, times=rep(nv,np)),
+                      scale=rep(parscale, times=rep(nv,np)),out))
   } else {  # global summaries
     L1   <- colMeans(abs(Sens))
     L2   <- sqrt(colSums(Sens*Sens))/nout
@@ -283,13 +283,13 @@ plot.sensFun<- function(x, which=NULL, legpos="topleft",
         ii <- (nx[i]+1):nx[i+1]
      is <- c(is,ii)
     }
-    dots$xlim <- range(x[is,1])
+    dots$xlim <- range(x[is, 1])
   }
   for (i in Select){
     if (TYP == 1)
-      ii <- ((i-1)*nx):(i*nx)
+      ii <- ((i - 1)*nx):(i*nx)
     else
-      ii <- (nx[i]+1):nx[i+1]
+      ii <- (nx[i] + 1):nx[i+1]
     if (Main)
       if (! Allvars) dots$main <- var[i] else dots$main <- "All variables"
 

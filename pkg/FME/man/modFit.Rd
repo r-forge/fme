@@ -187,7 +187,7 @@
   Before the optimisation routine is called, the original parameter values, as
   given by argument \code{p} are mapped from [lower,upper] to [-Inf,Inf] by:
 
-  \deqn{p' = \tan(\pi/2 \cdot (2 p - upper - lower) / (upper - lower)) }{%
+  \deqn{p' = \tan(\pi/2 \cdot (2 p - upper - lower) / (upper - lower))}{%
        p' = tan(pi/2 * (2 * p - upper - lower) / (upper - lower))}
 
 
@@ -266,13 +266,16 @@
 ## =======================================================================
 ## logistic growth model
 ## =======================================================================
-TT    <- seq(1,60,5)
+TT    <- seq(1, 60, 5)
 N0    <- 0.1
 r     <- 0.5
 K     <- 100
 
 ## perturbed analytical solution
-Data <- data.frame(time=TT,N=K/(1+(K/N0-1)*exp(-r*TT))*(1+rnorm(length(TT),sd=0.01)))
+Data <- data.frame(
+          time = TT,
+          N = K / (1+(K/N0-1) * exp(-r*TT)) * (1 + rnorm(length(TT), sd = 0.01))
+        )
 
 plot(TT, Data[,"N"], ylim=c(0, 120), pch=16, col="red",
      main = "logistic growth", xlab="time", ylab="N")
@@ -282,26 +285,25 @@ plot(TT, Data[,"N"], ylim=c(0, 120), pch=16, col="red",
 # Fitted with analytical solution  #
 #===================================
 # initial "guess"
-parms <- c(r = 2, K = 10, N0=5)
+parms <- c(r = 2, K = 10, N0 = 5)
 
 # analytical solution
 model <- function(parms,time)
-  with (as.list(parms),return(K/(1+(K/N0-1)*exp(-r*time))))
+  with (as.list(parms), return(K/(1+(K/N0-1)*exp(-r*time))))
 
 # run the model with initial guess and plot results
-lines (TT, model(parms,TT) ,lwd=2,col="green")
+lines(TT, model(parms, TT), lwd = 2,col = "green")
 
 # FITTING algorithm 1
-ModelCost <- function(P)
-{
- out <-model(P,TT)
+ModelCost <- function(P) {
+ out <- model(P,TT)
  return(Data$N-out)  # residuals
 }
 
-(Fita <- modFit(f=ModelCost,p=parms))
+(Fita <- modFit(f = ModelCost, p = parms))
 
 times <- 0:60
-lines(times,model(Fita$par,times),lwd=2, col="blue")
+lines(times, model(Fita$par, times), lwd = 2, col = "blue")
 summary(Fita)
 
 #===================================
@@ -310,18 +312,15 @@ summary(Fita)
 ## numeric solution
 logist <- function(t, x, parms) {
   with(as.list(parms), {
-
     dx <- r * x[1] * (1 - x[1]/K)
-
     list(dx)
   })
 }
 
-# model cost,
-ModelCost2 <- function(P)
-{
- out <- ode(y=c(N=P[["N0"]]),func=logist,parms=P,times=c(0,TT))
- return(modCost(out,Data))  # object of class modCost
+## model cost,
+ModelCost2 <- function(P) {
+ out <- ode(y = c(N = P[["N0"]]), func = logist, parms = P, times = c(0, TT))
+ return(modCost(out, Data))  # object of class modCost
 }
 
 Fit <- modFit(f=ModelCost2,p=parms,lower=rep(0,3),upper=c(5,150,10))
@@ -340,9 +339,9 @@ plot(residuals(Fit))
 ## =======================================================================
 
 # We use modFit to solve a set of linear equations
-A<- matrix(nr=30,nc=30,runif(900))
-X<- runif(30)
-B<- A\%*\%X
+A <- matrix(nr=30,nc=30,runif(900))
+X <- runif(30)
+B <- A \%*\% X
 
 # try to find vector "X"; the Jacobian is matrix A
 
