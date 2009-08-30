@@ -68,9 +68,9 @@ sensFun <- function(func, parms, sensvar = NULL, senspar = names(parms),
 
   if (ndim ==1)
     svar <- sensvar
-  else svar <- paste(grvar[,2],grvar[,1],sep="")
+  else svar <- paste(grvar[,2], grvar[,1], sep = "")
 
-  yRef  <- as.vector(yRef[,ivar])
+  yRef <- as.vector(yRef[,ivar])
 
   if (is.null(senspar))
     senspar <- 1:length(parms)
@@ -163,34 +163,34 @@ summary.sensFun <- function(object,vars=FALSE,...) {
                       scale=rep(parscale, times=rep(nv,np)),out))
   } else {  # global summaries
     L1   <- colMeans(abs(Sens))
-    L2   <- sqrt(colSums(Sens*Sens))/nout
+    L2   <- sqrt(colSums(Sens*Sens)) / nout
     Mean <- colMeans(Sens)
-    Min  <- apply(Sens,2,min)
-    Max  <- apply(Sens,2,max)
-    N  <- apply(Sens,2,length)
-    out  <- data.frame(cbind(value=pp,scale=parscale,L1,L2,Mean,Min,Max,N))
+    Min  <- apply(Sens, 2, min)
+    Max  <- apply(Sens, 2, max)
+    N    <- apply(Sens, 2, length)
+    out  <- data.frame(cbind(value = pp, scale = parscale, L1, L2, Mean, Min, Max, N))
     rownames(out) <- names(pp)
   }
-  class(out) <- c("summary.sensFun","data.frame")
+  class(out) <- c("summary.sensFun", "data.frame")
   return(out)
 }
 
 ## -----------------------------------------------------------------------------
 
-print.summary.sensFun<-function(x,...)
-  print(format(x,digits=2))
+print.summary.sensFun<-function(x, ...)
+  print(format(x, digits = 2))
 
 ## -----------------------------------------------------------------------------
 
-pairs.sensFun <- function (x, which=NULL, ...) {
+pairs.sensFun <- function (x, which = NULL, ...) {
 
   dots <- list(...)
   if(is.null(dots$pch)) dots$pch <- 16
 
   if (!is.null(which)) {
-    nx  <-attr(x,"nx")
-    var <-attr(x,"var")
-    TYP <-attr(x,"Type")
+    nx  <-attr(x, "nx")
+    var <-attr(x, "var")
+    TYP <-attr(x, "Type")
 
     Select <- selectvar(which, var, Nall = TRUE)
     Nr <- length(var)
@@ -198,12 +198,12 @@ pairs.sensFun <- function (x, which=NULL, ...) {
     ij <- NULL
     if (TYP == 1)
       for (i in Select) {
-        In <- (((i-1)*nx+1)):(i*nx)
-        ij <- c(ij,rep(i,length(In)))
-        ii <- c(ii,In)
+        In <- (((i-1) * nx+1)):(i*nx)
+        ij <- c(ij, rep(i, length(In)))
+        ii <- c(ii, In)
       }
       else  for (i in Select) {
-        In <- (nx[i]+1):nx[i+1]
+        In <- (nx[i] + 1):nx[i + 1]
         ij <- c(ij,rep(i,length(In)))
         ii <- c(ii,In)
       }
@@ -213,61 +213,60 @@ pairs.sensFun <- function (x, which=NULL, ...) {
     }
 
   else {ii <- 1:nrow(x)
-        ij <- rep(1,nrow(x))
+        ij <- rep(1, nrow(x))
        }
 
-  if (colnames(x)[1]=="x" && colnames(x)[2] == "var")
-    X <- x[ii,-(1:2)] else X<-x[ii,]
+  if (colnames(x)[1] == "x" && colnames(x)[2] == "var")
+    X <- x[ii, -(1:2)] else X <- x[ii,]
 
-  dots$diag.panel <- if(is.null(dots$diag.panel)) NULL else dots$diag.panel
+  dots$diag.panel  <- if(is.null(dots$diag.panel)) NULL else dots$diag.panel
   dots$lower.panel <- if(is.null(dots$lower.panel)) panel.cor else dots$lower.panel
   dots$gap <- if(is.null(dots$gap)) 0 else dots$gap
-  do.call("pairs",c(alist(as.matrix(X)),dots))
+  do.call("pairs", c(alist(as.matrix(X)), dots))
 
 }
 
 ## -----------------------------------------------------------------------------
 
-plot.sensFun<- function(x, which=NULL, legpos="topleft",
-  ask = NULL, ...) {
-  nx  <-attr(x,"nx")
+plot.sensFun<- function(x, which = NULL, legpos = "topleft", ask = NULL, ...) {
+  nx    <-attr(x,"nx")
   xname <- attr(x,"xname")
-  var <-attr(x,"var")
-  TYP <-attr(x,"Type")
+  var   <-attr(x,"var")
+  TYP   <-attr(x,"Type")
 
-  dots <- list(...)
+  dots   <- list(...)
   nmdots <- names(dots)
 
   nc <- ncol(x) - 2
 
-  Main <- is.null(dots$main)
+  Main      <- is.null(dots$main)
   dots$ylab <- if(is.null(dots$ylab)) "sensitivity" else dots$ylab
   dots$type <- if(is.null(dots$type)) "l" else dots$type
-  dots$col <- if(is.null(dots$col)) 1:nc else dots$col
+  dots$col  <- if(is.null(dots$col)) 1:nc else dots$col
   dots$xlab <- if(is.null(dots$xlab))xname else dots$xlab
-  Allvars <- FALSE
-  Ylim <-is.null(dots$ylim)
+  Allvars   <- FALSE
+  Ylim      <- is.null(dots$ylim)
 
   ## Find selected variables
-   Select <- selectvar(which,var,Nall = TRUE)
+  Select <- selectvar(which, var, Nall = TRUE)
 
   ## Set par mfrow and ask.
   if (! is.null(which)) {
-    ask <- setplotpar (nmdots,dots,length(Select),ask)
+    ask <- setplotpar (nmdots, dots, length(Select), ask)
 
-  }  else {
+  } else {
     dots$ylim <- if(is.null(dots$ylim)) range(x[,-(1:2)])
-    Ylim <- FALSE
-    Allvars <- TRUE
+    Ylim      <- FALSE
+    Allvars   <- TRUE
     if (is.null(ask))
       ask <- prod(par("mfrow")) < length(which) && dev.interactive()
   }
 
-   ## interactively wait if there are remaining figures
+  ## interactively wait if there are remaining figures
   if (ask) {
-        oask <- devAskNewPage(TRUE)
- 	      on.exit(devAskNewPage(oask))
-    }
+    oask <- devAskNewPage(TRUE)
+    on.exit(devAskNewPage(oask))
+  }
 
   Lty <- is.null(dots$lty)
 
@@ -278,10 +277,10 @@ plot.sensFun<- function(x, which=NULL, legpos="topleft",
     is <- NULL
     for (i in Select){
       if (TYP == 1)
-        ii <- ((i-1)*nx+1):(i*nx)
+        ii <- ((i-1) * nx + 1):(i*nx)
       else
-        ii <- (nx[i]+1):nx[i+1]
-     is <- c(is,ii)
+        ii <- (nx[i] + 1):nx[i + 1]
+     is <- c(is, ii)
     }
     dots$xlim <- range(x[is, 1])
   }
@@ -289,7 +288,7 @@ plot.sensFun<- function(x, which=NULL, legpos="topleft",
     if (TYP == 1)
       ii <- ((i - 1)*nx):(i*nx)
     else
-      ii <- (nx[i] + 1):nx[i+1]
+      ii <- (nx[i] + 1):nx[i + 1]
     if (Main)
       if (! Allvars) dots$main <- var[i] else dots$main <- "All variables"
 
@@ -298,23 +297,23 @@ plot.sensFun<- function(x, which=NULL, legpos="topleft",
     if (Ylim)  dots$ylim <- range(sens[-(1:2)])
 
     if (st==1)
-      do.call("matplot",c(alist(sens$x,as.matrix( sens[,-(1:2)])),dots))
+      do.call("matplot",c(alist(sens$x, as.matrix( sens[,-(1:2)])), dots))
     else
-      do.call("matlines",c(alist(sens$x,as.matrix( sens[,-(1:2)])),dots))
+      do.call("matlines",c(alist(sens$x, as.matrix( sens[,-(1:2)])), dots))
     if (Allvars) st <- st+1
   }
   if (! is.na(legpos))
-    legend(legpos,names(x[,-(1:2)]),col=1:nc,lty=1)
+    legend(legpos, names(x[,-(1:2)]), col = 1:nc, lty = 1)
 
 }
 
 ## -----------------------------------------------------------------------------
 
 plot.summary.sensFun<- function(x, which = 1:nrow(x), ...) {
-  dots <- list(...)
+  dots   <- list(...)
   nmdots <- names(dots)
 
-  mf <- par (mfrow = c(2,3))
+  mf <- par (mfrow = c(2, 3))
   Names <- names(x)
   X <- as.matrix(x[,1:8])
   
@@ -325,8 +324,8 @@ plot.summary.sensFun<- function(x, which = 1:nrow(x), ...) {
     dots$pch <- if(is.null(dots$pch)) 16 else dots$pch
     dots$col <- if(is.null(dots$col)) "black" else dots$col
 
-    do.call("dotchart",c(alist(X[ii,i]),dots))
-    abline(v=0, lty=3)
+    do.call("dotchart", c(alist(X[ii, i]), dots))
+    abline(v=0, lty = 3)
   }
 
   par (mfrow = mf)

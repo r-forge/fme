@@ -230,24 +230,25 @@ df.residual.modFit <- function(object, ...)
 
 ## -----------------------------------------------------------------------------
 
-summary.modFit <- function (object, cov=TRUE,...) { #inspired by summary.nls.lm
+## inspired by summary.nls.lm
+summary.modFit <- function (object, cov=TRUE,...) {
 
   param  <- object$par
   pnames <- names(param)
   p      <- length(param)
-  covar  <- try(solve(0.5*object$hessian),silent=TRUE)   # unscaled covariance
+  covar  <- try(solve(0.5*object$hessian), silent=TRUE)   # unscaled covariance
   if (!is.numeric(covar)) {
     message <- "Cannot estimate covariance; system is singular"
     warning(message)
-    covar <- matrix(nr=p,nc=p,NA)
+    covar <- matrix(nr = p, nc = p, NA)
   } else message <- "ok"
 
   rownames(covar) <- colnames(covar) <-pnames
-  rdf <- object$df.residual
+  rdf    <- object$df.residual
   resvar <- object$ssr / rdf
   se     <- sqrt(diag(covar) * resvar)
   names(se) <- pnames
-  tval      <- param/se
+  tval      <- param / se
   modVariance <- object$ssr / length(object$residuals)
 
   param <- cbind(param, se, tval, 2 * pt(abs(tval), rdf, lower.tail = FALSE))
@@ -255,18 +256,18 @@ summary.modFit <- function (object, cov=TRUE,...) { #inspired by summary.nls.lm
                                     "t value", "Pr(>|t|)"))
   if(cov)
     ans <- list(residuals = object$residuals,
-                residualVariance=resvar,
+                residualVariance = resvar,
                 sigma = sqrt(resvar),
-                modVariance=modVariance,
+                modVariance = modVariance,
                 df = c(p, rdf), cov.unscaled = covar,
-                cov.scaled=covar * resvar,
+                cov.scaled = covar * resvar,
                 info = object$info, niter = object$iterations,
                 stopmess = message,
                 par = param)
   else  ans <- list(residuals = object$residuals,
-                residualVariance=resvar,
+                residualVariance = resvar,
                 sigma = sqrt(resvar),
-                modVariance=modVariance,
+                modVariance = modVariance,
                 df = c(p, rdf),
                 info = object$info, niter = object$iterations,
                 stopmess = message,
@@ -277,9 +278,8 @@ summary.modFit <- function (object, cov=TRUE,...) { #inspired by summary.nls.lm
 
 ## -----------------------------------------------------------------------------
 
-print.summary.modFit <- function (x, digits = max(3, getOption("digits") - 3),
-                        ...) {
-  df <- x$df
+print.summary.modFit <- function (x, digits = max(3, getOption("digits") - 3), ...) {
+  df  <- x$df
   rdf <- df[2]
   cat("\nParameters:\n")
   printCoefmat(x$par, digits = digits, ...)
@@ -289,7 +289,7 @@ print.summary.modFit <- function (x, digits = max(3, getOption("digits") - 3),
   printcor <- !is.null(x$cov.unscaled)
   if (printcor){
     Corr <- cov2cor(x$cov.unscaled)
-    rownames(Corr)<- colnames(Corr) <- rownames(x$par)
+    rownames(Corr) <- colnames(Corr) <- rownames(x$par)
     cat("\nParameter correlation:\n")
     print(Corr, digits = digits, ...)
   }
@@ -302,31 +302,31 @@ print.summary.modFit <- function (x, digits = max(3, getOption("digits") - 3),
 plot.modFit <- function(x, ask = NULL, ...) {
 
   vn  <- unique(names(x$residuals))
-  lvn <- max(1,length(vn))
+  lvn <- max(1, length(vn))
 
   np <- NP <- lvn
-  if(! is.null(x$rsstrace)) np <- np +1
+  if(! is.null(x$rsstrace)) np <- np + 1
 
   dots   <- list(...)
   nmdots <- names(dots)
 
-   ## Set par mfrow and ask.
-  ask <- setplotpar (nmdots,dots,np,ask)
+  ## Set par mfrow and ask.
+  ask <- setplotpar (nmdots, dots, np, ask)
 
   ## interactively wait if there are remaining figures
   if (ask) {
-        oask <- devAskNewPage(TRUE)
- 	      on.exit(devAskNewPage(oask))
-    }
+    oask <- devAskNewPage(TRUE)
+    on.exit(devAskNewPage(oask))
+   }
 
   if(! is.null(x$rsstrace))
-    plot(x$rsstrace,main="residual sum of squares",xlab="iteration",
-         ylab="-",log="y")
+    plot(x$rsstrace, main = "residual sum of squares", xlab = "iteration",
+         ylab = "-", log = "y")
   if(is.null(vn))
-    plot(x$residuals,ylab="-",main="residuals",pch=18,...)
+    plot(x$residuals, ylab = "-", main = "residuals", pch = 18, ...)
   else
     for(i in vn) {
-      ii <- which (names(x$residuals)==i)
-      plot(x$residuals[ii],main=i,ylab="residuals",pch=18,...)
+      ii <- which(names(x$residuals) == i)
+      plot(x$residuals[ii], main = i, ylab = "residuals", pch = 18, ...)
     }
 }
