@@ -6,14 +6,14 @@
 }
 
 \description{
-  Generates parameter sets arranged on a regular grid
+  Generates parameter sets arranged on a regular grid.
 }
 
 \usage{
 Grid(parRange, num)
 }
 \arguments{
-  \item{parRange}{the range (min, max) of the parameters, a matrix or a
+  \item{parRange }{the range (min, max) of the parameters, a matrix or a
     data.frame with one row for each parameter, and two columns with the minimum
     (1st) and maximum (2nd) column.
   }
@@ -33,12 +33,12 @@ Grid(parRange, num)
 
 \examples{
 
-# 4 parameters
-parRange <- data.frame(min=c(0,1,2,3),max=c(10,9,8,7))
-rownames(parRange) <- c("par1","par2","par3","par4")
+## 4 parameters
+parRange <- data.frame(min = c(0, 1, 2, 3), max = c(10, 9, 8, 7))
+rownames(parRange) <- c("par1", "par2", "par3", "par4")
 
-# grid
-pairs(Grid(parRange,500),main="Grid")
+## grid
+pairs(Grid(parRange, 500), main = "Grid")
 
 }
 \seealso{

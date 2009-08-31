@@ -9,11 +9,11 @@
 }
 
 \usage{
-Unif(parRange,num)
+Unif(parRange, num)
 }
 
 \arguments{
-  \item{parRange}{the range (min, max) of the parameters, a matrix or a
+  \item{parRange }{the range (min, max) of the parameters, a matrix or a
     data.frame with one row for each parameter, and two columns with the
     minimum (1st) and maximum (2nd) value.
   }
@@ -23,7 +23,7 @@ Unif(parRange,num)
 
 \value{
   a matrix with one row for each generated parameter set, and one column
-  per parameter
+  per parameter.
 }
 
 \details{
@@ -38,13 +38,12 @@ Unif(parRange,num)
 }
 
 \examples{
+## 4 parameters
+parRange <- data.frame(min = c(0, 1, 2, 3), max = c(10, 9, 8, 7))
+rownames(parRange) <- c("par1", "par2", "par3", "par4")
 
-# 4 parameters
-parRange <- data.frame(min=c(0,1,2,3),max=c(10,9,8,7))
-rownames(parRange) <- c("par1","par2","par3","par4")
-
-# uniform
-pairs(Unif(parRange,100),main="Uniformly random")
+## uniform
+pairs(Unif(parRange, 100), main = "Uniformly random")
 }
 
 \seealso{

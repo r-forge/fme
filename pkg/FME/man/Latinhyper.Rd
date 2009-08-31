@@ -5,7 +5,7 @@
   Latin Hypercube Sampling
 }
 \description{
-  generates random parameter sets using a latin hypercube sampling algorithm.
+  Generates random parameter sets using a latin hypercube sampling algorithm.
 }
 
 \usage{
@@ -13,7 +13,7 @@ Latinhyper(parRange, num)
 }
 
 \arguments{
-  \item{parRange}{the range (min, max) of the parameters, a matrix or a
+  \item{parRange }{the range (min, max) of the parameters, a matrix or a
     data.frame with one row for each parameter, and two columns with the
     minimum (1st) and maximum (2nd) column.
   }
@@ -27,7 +27,7 @@ Latinhyper(parRange, num)
 }
 
 \details{
-  In the latin hypercube sampling, the space for each parameter is sub divided
+  In the latin hypercube sampling, the space for each parameter is subdivided
   into \code{num} equally-sized segments and one parameter value in each of
   the segments drawn randomly.
 }
@@ -39,13 +39,12 @@ Latinhyper(parRange, num)
 }
 
 \examples{
+## 4 parameters
+parRange <- data.frame(min = c(0, 1, 2, 3), max = c(10, 9, 8, 7))
+rownames(parRange) <- c("par1", "par2", "par3", "par4")
 
-# 4 parameters
-parRange <- data.frame(min=c(0,1,2,3),max=c(10,9,8,7))
-rownames(parRange) <- c("par1","par2","par3","par4")
-
-# Latin hypercube
-pairs(Latinhyper(parRange,100),main="Latin hypercube")
+## Latin hypercube
+pairs(Latinhyper(parRange, 100), main = "Latin hypercube")
 }
 \references{
   Press, W. H.,  Teukolsky, S. A., Vetterling, W. T. and
@@ -55,7 +54,7 @@ pairs(Latinhyper(parRange,100),main="Latin hypercube")
 \seealso{
   \code{\link{Norm}} for (multi)normally distributed random parameter sets.
 
-  \code{\link{Unif}} for uniformally distributed random parameter sets.
+  \code{\link{Unif}} for uniformly distributed random parameter sets.
 
   \code{\link{Grid}} to generate random parameter sets arranged on a regular
     grid

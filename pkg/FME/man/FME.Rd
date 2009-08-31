@@ -3,15 +3,16 @@
 \alias{FME}
 \docType{package}
 \title{
-A Flexible Modelling Environment for Inverse Modelling, Sensitivity, Identifiability, Monte Carlo analysis.
+  A Flexible Modelling Environment for Inverse Modelling, Sensitivity,
+  Identifiability, Monte Carlo analysis.
 }
 \description{
   R-package FME contains functions to run complex applications of models that
   produce output as a function of input parameters.
-  Although it was created to be
-  used with models consisting of ordinary differential equations (ODE),
-  partial differential equations (PDE) or differential algebraic equations
-  (DAE), it can work with other models.
+  
+  Although it was created to be used with models consisting of ordinary
+  differential equations (ODE), partial differential equations (PDE) or
+  differential algebraic equations (DAE), it can work with other models.
 
   It contains:
   \itemize{

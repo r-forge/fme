@@ -8,14 +8,14 @@
   Generates random parameter sets that are (multi)normally distributed.
 }
 \usage{
-Norm(parMean, parCovar, parRange=NULL, num)
+Norm(parMean, parCovar, parRange = NULL, num)
 }
 \arguments{
-  \item{parMean}{a vector, with the mean value of each parameter.
+  \item{parMean }{a vector, with the mean value of each parameter.
   }
-  \item{parCovar}{the parameter variance-covariance matrix.
+  \item{parCovar }{the parameter variance-covariance matrix.
   }
-  \item{parRange}{the range (min, max) of the parameters, a matrix or a
+  \item{parRange }{the range (min, max) of the parameters, a matrix or a
     data.frame with one row for each parameter, and two columns with the
     minimum (1st) and maximum (2nd) column.
   }
@@ -42,24 +42,24 @@ Norm(parMean, parCovar, parRange=NULL, num)
   case, then the function will fail.
 }
 \examples{
-
-# multinormal parameters: variance-covariance matrix and parameter mean
-parCovar <- matrix(nr=4,
-c(0.5,-0.2,0.3,0.4,-0.2,1,0.1,0.3,0.3,0.1,1.5,-0.7,1.,0.3,-0.7,4.5))
+## multinormal parameters: variance-covariance matrix and parameter mean
+parCovar <- matrix(data = c(0.5, -0.2, 0.3, 0.4, -0.2, 1.0, 0.1, 0.3,
+                   0.3, 0.1, 1.5, -0.7, 1.0, 0.3, -0.7, 4.5), nrow = 4)
 parCovar
 
-parMean <-4:1
+parMean <- 4:1
 
-# Generated sample
-Ndist <- Norm(parCovar=parCovar,parMean=parMean,num=500)
-cov (Ndist)   # check
-pairs(Ndist,main="normal")
+## Generated sample
+Ndist <- Norm(parCovar = parCovar, parMean = parMean, num = 500)
+cov(Ndist)   # check
+pairs(Ndist, main = "normal")
 
-# truncated multinormal
-Ranges <- data.frame(min=rep(0,4),max=rep(Inf,4))
+## truncated multinormal
+Ranges <- data.frame(min = rep(0, 4), max = rep(Inf, 4))
 
-pairs(Norm(parCovar=parCovar,parMean=parMean,parRange=Ranges,num=500),
-      main="truncated normal")
+pairs(Norm(parCovar = parCovar, parMean = parMean, parRange = Ranges,
+      num = 500), main = "truncated normal")
+
 }
 \seealso{
   \code{\link{Unif}} for uniformly distributed random parameter sets.
