@@ -176,9 +176,8 @@ modCost <- function (model, obs, x = "time", y = NULL, err = NULL,
   ## SSR
   Cost  <- sum(CostVar$SSR * CostVar$scale)
 
-  ## changed by ThPe, Karline check this !!!
-  #Lprob <- -sum(log(pmax(1e-500, dnorm(Residual$mod, Residual$obs, Err)))) #avoid log(0)
-  Lprob <- -sum(log(pmax(.Machine$double.xmin, dnorm(Residual$mod, Residual$obs, Err)))) #avoid log(0)
+  Lprob <- -sum(log(pmax(0, dnorm(Residual$mod, Residual$obs, Err)))) # avoid log of negative values
+  #Lprob <- -sum(log(pmax(.Machine$double.xmin, dnorm(Residual$mod, Residual$obs, Err)))) #avoid log(0)
 
   if (! is.null(cost)) {
     Cost     <- Cost + cost$model
