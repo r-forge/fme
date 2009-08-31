@@ -29,7 +29,7 @@ sensFun <- function(func, parms, sensvar = NULL, senspar = names(parms),
   if (is.data.frame(yRef)) yRef <- as.matrix(yRef)
   if (is.vector(yRef)) {
     ynames <- names(yRef)
-    yRef <- matrix(nr = 1, yRef)
+    yRef <- matrix(data=yRef, nrow = 1)
     colnames(yRef) <- ynames
   }
   
@@ -101,7 +101,7 @@ sensFun <- function(func, parms, sensvar = NULL, senspar = names(parms),
   varscale[varscale == 0] <- 1e-20
   parscale[parscale == 0] <- 1e-20
 
-  Sens    <- matrix(nrow = length(yRef), ncol = npar,NA)
+  Sens    <- matrix(data=NA, nrow = length(yRef), ncol = npar)
 
   ## 5. Loop over all parameters
   for (i in 1:length(ipar)) {

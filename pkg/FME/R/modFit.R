@@ -240,7 +240,7 @@ summary.modFit <- function (object, cov=TRUE,...) {
   if (!is.numeric(covar)) {
     message <- "Cannot estimate covariance; system is singular"
     warning(message)
-    covar <- matrix(nr = p, nc = p, NA)
+    covar <- matrix(data = NA, nrow = p, ncol = p)
   } else message <- "ok"
 
   rownames(covar) <- colnames(covar) <-pnames

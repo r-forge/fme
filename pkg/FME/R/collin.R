@@ -101,7 +101,7 @@ collin <- function(sensfun, parset = NULL, N = NULL, which = NULL) {
         stop ("Not all parameters in parset known")
     }
 
-    parset <- matrix(nr = 1, parset)
+    parset <- matrix(data = parset, nrow = 1)
     Collin <- collFun(parset)
   }
 

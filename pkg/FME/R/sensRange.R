@@ -8,7 +8,7 @@ sensRange <- function( func, parms=NULL, sensvar=NULL, dist="unif",
 
   vec2mat <- function(vec) { # make a matrix of a vector
     NN <- names(vec)
-    mat <- matrix(nr=1,vec)
+    mat <- matrix(data=vec, nrow=1)
     colnames(mat) <- NN
     mat
   }
@@ -22,7 +22,7 @@ sensRange <- function( func, parms=NULL, sensvar=NULL, dist="unif",
     parCovar <- vec2mat(parCovar)
 
   if(is.vector(parInput))
-    parInput <- matrix(nr=1,parInput)
+    parInput <- matrix(data=parInput, nrow=1)
   if (is.null(parms) & ! is.null(parInput))
     parms <- parInput[1,]
   if (is.null(parms))
@@ -59,7 +59,7 @@ sensRange <- function( func, parms=NULL, sensvar=NULL, dist="unif",
 
   if (is.vector(yRef)) {
     ynames <- names(yRef)
-    yRef <- matrix(nr=1,yRef)
+    yRef <- matrix(data=yRef, nrow=1)
     colnames(yRef) <- ynames
   } else
   if (is.data.frame(yRef))
@@ -96,7 +96,7 @@ sensRange <- function( func, parms=NULL, sensvar=NULL, dist="unif",
   else svar <- paste(grvar[,2],grvar[,1],sep="")
 
   YREF  <- as.vector(yRef[,ivar])
-  Sens  <- matrix(ncol=length(YREF),nrow=num,NA)
+  Sens  <- matrix(data=NA, nrow=num, ncol=length(YREF))
 
   # sensitivity parameters
   senspar <- NULL

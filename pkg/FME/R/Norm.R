@@ -15,9 +15,9 @@ Norm <- function(parMean, parCovar, parRange = NULL, num) {
     stop ("cannot generate Normal distribution: parCovar and parMean not compatible")
 
   if (nc ==1)
-    return (matrix(nc = nc, rnorm(n = num, mean = parMean, sd = sqrt(parCovar))))
+    return (matrix(data=rnorm(n = num, mean = parMean, sd = sqrt(parCovar)), ncol = nc))
   R   <- chol(parCovar)   # Cholesky decomposition
-  Z   <- matrix(nc = nc, rnorm(num*nc))
+  Z   <- matrix(data = rnorm(num*nc),ncol = nc)
 
   parset <- Z %*% R
   for (i in 1:nc) parset[,i] <- parset[,i] + parMean[i]

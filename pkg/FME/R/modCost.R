@@ -8,12 +8,12 @@ modCost <- function (model, obs, x = "time", y = NULL, err = NULL,
   ## convert vector to matrix
   if (is.vector(obs)) {
     cn <- names(obs)
-    obs   <- matrix(nr = 1, obs)
+    obs   <- matrix(data = obs, nrow = 1)
     colnames(obs) <- cn
   }
   if (is.vector(model)) {
     cn <- names(model)
-    model <- matrix(nr = 1, model)
+    model <- matrix(data=model, nrow = 1)
     colnames(model) <- cn
   }
 

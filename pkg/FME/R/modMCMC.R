@@ -324,12 +324,12 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
 ## the MCMC jumps...
 
   ## matrices/vectors with results
-  pars      <- matrix(nc=outputlength,nr=npar)  # parameter values
+  pars      <- matrix(nrow=npar, ncol=outputlength)  # parameter values
   SSpars    <- vector(length=outputlength)      # SS value
   priorpars <- vector(length=outputlength)      # parameter priors
 
   if (useSigma)
-    sig     <- matrix(nr=outputlength,nc=lenvar0)  # model variances
+    sig     <- matrix(nrow=outputlength, ncol=lenvar0)  # model variances
   else sig<-NULL
 
   ## best function and parameter values will be kept
