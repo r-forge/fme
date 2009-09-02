@@ -670,15 +670,22 @@ Metropolis (AM) algorithm \citep{Haario06}.
 
 The \code{summary} method of the best fit returns several useful values:
 
-%% ThPe --> ThPe: improve formulae?
+%% ThPe --> KS: I formatted the following formula as \code, but it
+%% would be also possible (and preferred?) to use mathematical
+%% notation, however, this would require to change also the symbols
+%% (e.g. pvar0) and functions (e.g. var) to their mathematical
+%% counterparts. If you agree with the technical style here, remove
+%% this comment. BTW: I suggest to use more technical style in
+%% vignettes and mathematics in publications.
+
 
 \begin{itemize}
 
-\item the model variance \code{modVariance} is used as the initial
-  model error variance (\code{var0}).  In each MCMC step, 1/model
+\item The model variance \code{modVariance} is used as the initial
+  model error variance (\code{var0}).  In each MCMC step, \code{1/model}
   variance is drawn from a gamma function with parameters
-  shape=0.5*N*(1+pvar0), and the rate=0.5*(pvar0*N*var0+SSnew)) and
-  where SS is the current sum of squared residals, N is the number of
+  \code{shape = 0.5*N * (1 + pvar0)}, and the \code{rate = 0.5 * (pvar0*N*var0 + SSnew))} and
+  where \code{SS} is the current sum of squared residals, \code{N} is the number of
   data points and \code{pVar0} is a weighing parameter, input to
   \code{modMCMC}.
 
@@ -773,7 +780,7 @@ covIni
 Parameter values can be generated according to 4 different
 distributions:
 
-\code{Grid,Uniform,Normal,Latinhyper}:
+\code{Grid, Uniform, Normal, Latinhyper}:
 
 <<label=dist, include=FALSE>>=
 par(mfrow=c(2,2))
@@ -805,23 +812,22 @@ Several examples are present in subdirectory examples of the package.
 They include, a.o.:
 
 \begin{itemize}
-\item BODO2\_FME.R, a 1-D model of oxygen dynamics in a river. This
+\item \code{BODO2\_FME.R}, a 1-D model of oxygen dynamics in a river. This
   model consists of two coupled partial differential equations, which
   are solved to steady-state.
-\item ccl4model\_FME.R. Here the functions are applied to "ccl4model",
+\item \code{ccl4model\_FME.R}. Here the functions are applied to "ccl4model",
   one of the models included in package \ds. This is a model that has
-  been written in FORTRAN.
-\item Omexdia\_FME.R. Here the functions are applied to a model
+  been written in \proglang{FORTRAN}.
+\item \code{Omexdia\_FME.R}. Here the functions are applied to a model
   implemented in \pkg{simecol}, an object-oriented framework for
   ecological modeling \citep{simecol}, more specifically in package
   \pkg{simecolModels} \citep{simecolModels}. The omexdia model is a
   1-D diagenetic model.
-\item O2profile\_FME.R. This contains a simple model of oxygen,
+\item \code{O2profile\_FME.R}. This contains a simple model of oxygen,
   diffusing along a spatial gradient, with imposed upper and lower
   boundary concentration
 \end{itemize}
 
-% ThPe -> KS: thanks for including a simecol object
 
 
 \section{Finally}
@@ -854,21 +860,21 @@ Unif, Latinhyper & Generates parameter sets based on grid, normal, uniform or la
 Method & Function          &Description\\
 \hline \hline
 summary       & modFit  & Summary statistics, including parameter std deviations, significance, parameter correlation\\  \hline
-deviance      & modFit  & model deviance (sum of squared residuals) \\  \hline
-coef          & modFit  & values of fitted parameters               \\  \hline
-residuals     & modFit  & residuals of model and data               \\  \hline
-df.residual   & modFit  & degrees of freedom                        \\  \hline
-plot          & modFit  & plots results of the fitting              \\  \hline
-print.summary & modFit  & printout of model summary                 \\  \hline
-plot          & modCost & plots model-data residuals                \\  \hline
+deviance      & modFit  & Model deviance (sum of squared residuals) \\  \hline
+coef          & modFit  & Values of fitted parameters               \\  \hline
+residuals     & modFit  & Residuals of model and data               \\  \hline
+df.residual   & modFit  & Degrees of freedom                        \\  \hline
+plot          & modFit  & Plots results of the fitting              \\  \hline
+print.summary & modFit  & Printout of model summary                 \\  \hline
+plot          & modCost & Plots model-data residuals                \\  \hline
 summary       & modMCMC & Summary statistics of sampled parameters  \\  \hline
 plot          & modMCMC & Plots all sampled parameters              \\  \hline
 pairs         & modMCMC & Pairwise plots all sampled parameters     \\  \hline
 hist          & modMCMC & Histogram of all sampled parameters       \\  \hline
 summary       & modCRL  & Summary statistics of monte carlo variables  \\  \hline
-plot          & modCRL  & Plots monte carlo variables               \\  \hline
-pairs         & modCRL  & Pairwise plots of monte carlo variables   \\  \hline
-hist          & modCRL  & Histogram of monte carlo variables        \\  \hline
+plot          & modCRL  & Plots Monte Carlo variables               \\  \hline
+pairs         & modCRL  & Pairwise plots of Monte Carlo variables   \\  \hline
+hist          & modCRL  & Histogram of Monte Carlo variables        \\  \hline
 summary       & sensFun & Summary statistics of sensitivity functions   \\  \hline
 plot          & sensFun & Plots sensitivity functions               \\  \hline
 pairs         & sensFun & Pairwise plots of sensitivity functions   \\  \hline
@@ -884,6 +890,7 @@ plot          & collin  & Plots collinearity results                \\  \hline
 \end{tabular}
 \end{table*}
 
+\clearpage
 \bibliography{vignettes}
 
 \end{document}
