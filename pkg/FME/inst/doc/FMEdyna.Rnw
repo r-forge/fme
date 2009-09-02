@@ -23,6 +23,10 @@
 \title{\proglang{R}-package \fme: inverse modelling, sensitivity,
   Monte Carlo - applied to a dynamic simulation model}
 
+\Shorttitle{\fme: inverse modelling, sensitivity,
+  Monte Carlo with dynamic models}
+
+
 \Plaintitle{FME}
 
 \Keywords{dynamic simulation models, differential equations, fitting,
@@ -39,23 +43,18 @@ The Netherlands
 
 \Plainauthor{Karline Soetaert}
 
-\Abstract{ \R package \fme \citep{FME} contains functions for
-model calibration, sensitivity, identifiability, and Monte Carlo analysis
-of nonlinear models.
+\Abstract{ \R package \fme \citep{FME} contains functions for model
+  calibration, sensitivity, identifiability, and Monte Carlo analysis
+  of nonlinear models.
 
-This vignette (\code{vignette("FMEdyna")}), applies the functions to a
-dynamic simulation model, solved with integration routines from
-package \ds.
-
-A similar vignette, (\code{vignette("FMEsteady")}), applies \fme to a partial
-differential equation, solved with a steady-state solver from package \rs
-
-A third vignette (\code{vignette("FMEother")}), applies the functions to a
-simple nonlinear model
-
-\code{vignette("FMEmcmc")} tests the Markov chain Monte Carlo (MCMC)
-implementation
-
+  This vignette (\code{vignette("FMEdyna")}) applies the functions to
+  a dynamic simulation model, solved with integration routines from
+  package \ds.  A similar vignette, (\code{vignette("FMEsteady")}),
+  applies \fme to a partial differential equation, solved with a
+  steady-state solver from package \rs. A third vignette
+  (\code{vignette("FMEother")}), applies the functions to a simple
+  nonlinear model. \code{vignette("FMEmcmc")} tests the Markov chain
+  Monte Carlo (MCMC) implementation.
 }
 
 %% The address of (at least) one author should be given
@@ -76,13 +75,13 @@ implementation
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Begin of the document
 \begin{document}
-\SweaveOpts{engine=R,eps=FALSE}
-\SweaveOpts{keep.source=TRUE}
+\SweaveOpts{engine = R, eps = FALSE}
+\SweaveOpts{keep.source = TRUE}
 
 <<preliminaries,echo=FALSE,results=hide>>=
 library("FME")
 options(prompt = "> ")
-options(width=80)
+options(width = 80)
 @
 
 \maketitle
@@ -134,8 +133,8 @@ of \ds). First the parameters are defined, as a list (a vector would
 also do)
 
 <<>>=
-pars <- list(gmax =0.5,eff = 0.5,
-              ks =0.5, rB =0.01, dB =0.01)
+pars <- list(gmax = 0.5, eff = 0.5,
+              ks = 0.5, rB = 0.01, dB = 0.01)
 @
 
 The model function \code{solveBact} takes as input the parameters and
@@ -152,15 +151,15 @@ integration are returned, packed as a data.frame.
 
 <<>>=
 solveBact <- function(pars, times=seq(0,50,by=0.5)) {
- derivs <- function(t,state,pars) { # returns rate of change
-   with(as.list(c(state,pars)), {
+  derivs <- function(t,state,pars) { # returns rate of change
+    with(as.list(c(state,pars)), {
 
-     dBact =  gmax*eff*Sub/(Sub+ks)*Bact - dB*Bact - rB*Bact
-     dSub  = -gmax    *Sub/(Sub+ks)*Bact + dB*Bact
-     return(list(c(dBact,dSub)))
-   })
+      dBact =  gmax*eff*Sub/(Sub+ks)*Bact - dB*Bact - rB*Bact
+      dSub  = -gmax    *Sub/(Sub+ks)*Bact + dB*Bact
+      return(list(c(dBact,dSub)))
+    })
  }
- state   <- c(Bact=0.1,Sub = 100)
+ state   <- c(Bact = 0.1, Sub = 100)
  ## ode solves the model by integration...
  return(as.data.frame(ode(y=state,times=times,func=derivs,parms=pars)))
 }
@@ -673,8 +672,8 @@ The \code{summary} method of the best fit returns several useful values:
 \begin{itemize}
 
 \item The model variance \code{modVariance} is used as the initial
-  model error variance (\code{var0}) in the MCMC.  
-  In each MCMC step, \code{1/model} variance is drawn from a gamma function 
+  model error variance (\code{var0}) in the MCMC.
+  In each MCMC step, \code{1/model} variance is drawn from a gamma function
   with parameters \code{rate} and \code{shape}, calculated as:
   \code{shape = 0.5*N * (1 + pvar0)}, and \code{rate = 0.5 * (pvar0*N*var0 + SS))} and
   where \code{SS} is the current sum of squared residals, \code{N} is the number of
