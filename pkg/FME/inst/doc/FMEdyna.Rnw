@@ -49,9 +49,9 @@ The Netherlands
 
   This vignette (\code{vignette("FMEdyna")}) applies the functions to
   a dynamic simulation model, solved with integration routines from
-  package \ds.  A similar vignette, (\code{vignette("FMEsteady")}),
+  package \pkg{deSolve}.  A similar vignette, (\code{vignette("FMEsteady")}),
   applies \fme to a partial differential equation, solved with a
-  steady-state solver from package \rs. A third vignette
+  steady-state solver from package \pkg{rootSolve}. A third vignette
   (\code{vignette("FMEother")}), applies the functions to a simple
   nonlinear model. \code{vignette("FMEmcmc")} tests the Markov chain
   Monte Carlo (MCMC) implementation.

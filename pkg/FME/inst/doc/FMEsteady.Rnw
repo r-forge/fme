@@ -23,6 +23,9 @@
 \title{\proglang{R}-package \fme: inverse modelling, sensitivity,
   Monte Carlo - applied to a steady-state model}
 
+\Shorttitle{\fme: inverse modelling, sensitivity,
+  Monte Carlo - applied to a steady-state model}
+
 \Plaintitle{FME}
 
 \Keywords{steady-state models, differential equations, fitting,
