@@ -670,23 +670,15 @@ Metropolis (AM) algorithm \citep{Haario06}.
 
 The \code{summary} method of the best fit returns several useful values:
 
-%% ThPe --> KS: I formatted the following formula as \code, but it
-%% would be also possible (and preferred?) to use mathematical
-%% notation, however, this would require to change also the symbols
-%% (e.g. pvar0) and functions (e.g. var) to their mathematical
-%% counterparts. If you agree with the technical style here, remove
-%% this comment. BTW: I suggest to use more technical style in
-%% vignettes and mathematics in publications.
-
-
 \begin{itemize}
 
 \item The model variance \code{modVariance} is used as the initial
-  model error variance (\code{var0}).  In each MCMC step, \code{1/model}
-  variance is drawn from a gamma function with parameters
-  \code{shape = 0.5*N * (1 + pvar0)}, and the \code{rate = 0.5 * (pvar0*N*var0 + SSnew))} and
+  model error variance (\code{var0}) in the MCMC.  
+  In each MCMC step, \code{1/model} variance is drawn from a gamma function 
+  with parameters \code{rate} and \code{shape}, calculated as:
+  \code{shape = 0.5*N * (1 + pvar0)}, and \code{rate = 0.5 * (pvar0*N*var0 + SS))} and
   where \code{SS} is the current sum of squared residals, \code{N} is the number of
-  data points and \code{pVar0} is a weighing parameter, input to
+  data points and \code{pVar0} is a weighing parameter, argument of function
   \code{modMCMC}.
 
 \item The best-fit parameters are used as initial parameter values for
