@@ -1,5 +1,5 @@
 Package: FME
-Version: 1.0
+Version: 1.1
 Title: A Flexible Modelling Environment for inverse modelling, sensitivity, identifiability, Monte Carlo analysis.
 Author: Karline Soetaert <k.soetaert@nioo.knaw.nl>,
         Thomas Petzoldt <thomas.petzoldt@tu-dresden.de>
