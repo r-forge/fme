@@ -111,7 +111,7 @@
   }
   \item{var_ms }{the weighted and scaled variable mean squared residuals,
     one value per observed variable; only when \code{f}
-    returns an element of class \emph{modCost} ; \code{NA} otherwise.
+    returns an element of class \emph{modCost}; \code{NA} otherwise.
   }
   \item{var_ms_unscaled }{the weighted, but not scaled variable mean
     squared residuals
@@ -133,8 +133,8 @@
   (\code{method = "Newton"}) are renamed.
 
   The list returned by \code{modFit} has a method for the 
-  \code{\link{summary}},\code{\link{deviance}},\code{\link{coef}},
-  \code{\link{residuals}},\code{\link{df.residual}} and
+  \code{\link{summary}}, \code{\link{deviance}}, \code{\link{coef}},
+  \code{\link{residuals}}, \code{\link{df.residual}} and
   \code{print.summary} -- see note.
   
 }
@@ -278,9 +278,9 @@ K     <- 100
 
 ## perturbed analytical solution
 Data <- data.frame(
-          time = TT,
-          N = K / (1+(K/N0-1) * exp(-r*TT)) * (1 + rnorm(length(TT), sd = 0.01))
-        )
+  time = TT,
+     N = K / (1+(K/N0-1) * exp(-r*TT)) * (1 + rnorm(length(TT), sd = 0.01))
+)
 
 plot(TT, Data[,"N"], ylim = c(0, 120), pch = 16, col = "red",
   main = "logistic growth", xlab = "time", ylab = "N")
