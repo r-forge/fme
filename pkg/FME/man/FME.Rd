@@ -63,8 +63,8 @@
   \tabular{ll}{
     Package: \tab FME\cr
     Type: \tab Package\cr
-    Version: \tab 1.1\cr
-    Date: \tab 2009-10-01\cr
+    Version: \tab 1.2\cr
+    Date: \tab 2010-01-01\cr
     License: \tab GNU Public License 2 or above\cr
   }
 
@@ -75,7 +75,9 @@
   Thomas Petzoldt
 }
 %\references{
-%% to be filled
+%%Soetaert K and Th. Petzoldt, 201x. 
+%%Inverse modelling, sensitivity and Monte Carlo analysis in R using package FME.
+%%Journal of statistical software, subm.
 %}
 
 \examples{

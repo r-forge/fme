@@ -1,6 +1,85 @@
-## -----------------------------------------------------------------------------
-## Markov Chain Monte Carlo
-## -----------------------------------------------------------------------------
+## =============================================================================
+## MCMC auxilliary functions: logP_typeX gets as input f, parameters, 
+## the parameter prior, and 1/sigma and returns -log likelihood 
+## Depending on f(), and on settings for model variance, 
+## There are 6 different types: 1, 2, 2b, 3, 4, 5
+## =============================================================================
+
+# type 1. f() returns -2 * log likelhood, there is no model variance
+logP_type1 <- function(f, p, PPnew, divsigma, ...) {
+  SSnew  <- f(p,...)
+  list(pnew=0.5*(SSnew + PPnew), SSnew=SSnew)     #-log(p_model*p_params)
+}
+
+# type 2. f() returns residuals, model variance is specified, only one value
+logP_type2 <- function(f, p, PPnew, divsigma, ...) {
+  SSnew  <- f(p,...)
+  SSnew  <- sum(SSnew^2)
+  list(pnew=0.5*(sum(SSnew*divsigma) + PPnew), SSnew=SSnew)
+}
+
+# type 2b. f() returns residuals, model variance is specified, many values
+logP_type2b <- function(f, p, PPnew, divsigma, ...) {
+  SSnew  <- f(p,...)
+  SSnew  <- SSnew^2
+  list(pnew=0.5*(sum(SSnew*divsigma) + PPnew), SSnew=SSnew)
+}
+
+# type 3. f() returns instance of class modcost, model variance not specified
+logP_type3 <- function(f, p, PPnew, divsigma, ...) {
+  SSnew  <- f(p,...)$minlogp    # select -2*log(probability)
+  list(pnew=0.5*(SSnew + PPnew), SSnew=SSnew)     #-log(p_model*p_params)
+}
+
+# type 4. f() returns instance of class modcost, model variance specified,
+# one value per data point
+logP_type4 <- function(f, p, PPnew, divsigma, ...) {
+  SSnew  <- f(p,...)
+  SSnew  <- (SSnew$residuals$res)^2
+  list(pnew=0.5*(sum(SSnew*divsigma) + PPnew), SSnew=SSnew)
+}
+
+# type 5. f() returns instance of class modcost, model variance specified,
+# one value per observed variable
+logP_type5 <- function(f, p, PPnew, divsigma, ...) {
+   SSnew  <- f(p, ...)
+   SSnew  <- SSnew$var$SSR.unweighted 
+   list(pnew=0.5*(sum(SSnew*divsigma) + PPnew), SSnew=SSnew)
+}
+
+## =============================================================================
+## The acceptance functions ...
+## =============================================================================
+
+Test <- function(fnew,fold,SSnew,SSold,useSigma,divsigma,PPnew,PPold) {
+
+    if (is.na(fnew) | is.infinite(fnew))
+       return(0)
+    if (!useSigma)
+       test <- exp(fold-fnew)
+    else                  # uses SSR, scaled by sigma
+       test <- exp(-0.5*sum((SSnew-SSold)*divsigma) - 0.5*(PPnew-PPold))
+    return(test)
+}
+
+Accept <- function(tst) {
+    if (is.nan(tst)|is.na(tst))
+      accept <- FALSE
+    else if (tst<0)
+      accept<-FALSE
+    else if (tst>1)
+      accept <- TRUE
+    else accept <- (runif(1) < tst)
+
+    return(accept)
+}
+
+## =============================================================================
+## Markov Chain Monte Carlo - main function
+## Part of this R-code (the DR-part) is based on the matlab code (Marco Laine)
+## as available from http://www.helsinki.fi/~mjlaine/mcmc/
+## =============================================================================
+
 
 modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
                      prior=NULL, var0=NULL, wvar0=NULL,  n0 =NULL,
@@ -8,11 +87,9 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
                      updatecov = niter, covscale = 2.4^2/length(p),
                      ntrydr=1, drscale =NULL, verbose=TRUE) {
 
-## Part of this R-code (the DR-part) is based on the matlab code (Marco Laine)
-## as available from http://www.helsinki.fi/~mjlaine/mcmc/
-
 ##------------------------------------------------------------------------------
 ## 1. check input
+##------------------------------------------------------------------------------
   npar   <- length(p)
   pnames <- names(p)
 
@@ -56,8 +133,9 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
 
 ##------------------------------------------------------------------------------
 ## 2. Function to generate new parameter values
-  ## NewParsMn used if parameters are generated with multiD normal distribution
-  ## (this may not be the case at first, but will be if updatecov < niter
+##------------------------------------------------------------------------------
+  # NewParsMn used if parameters are generated with multiD normal distribution
+  # (this may not be the case at first, but will be if updatecov < niter
 
   NewParsMN <- function(p,R) {
     pp <- as.vector(p + rnorm(npar)%*%R) # R is cholesky decomposition
@@ -87,7 +165,8 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
   }
 
 ##------------------------------------------------------------------------------
-## Prior, absent or a function that returns -2 * log(prior parameter probability)
+## 3. parameter prior, absent or function that returns -2 * log(prior par prob)
+##------------------------------------------------------------------------------
 
   if (is.null(prior))
     Prior <- function(p) return(0)
@@ -97,39 +176,37 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
   PPnew  <- Prior(p)
 
 ##------------------------------------------------------------------------------
-## model variance: initial value and accurracy...
-
-  ## if 'var0' has a value, it is used to scale the SSR; divsigma = 1/var
+## 4. initialise model variance
+##------------------------------------------------------------------------------
+  # if 'var0' has a value, it is used to scale the SSR; divsigma = 1/var
   useSigma <- !is.null(var0)
 
   if (useSigma)
     divsigma <- 1/var0
-  else divsigma <- 1
+  else 
+    divsigma <- 1
 
-  ## if 'wvar0' or n0 has a value, then sigma will be updated
+  # if 'wvar0' or n0 has a value, then sigma will be updated
   updateSigma <- (useSigma & !is.null(wvar0) | (useSigma & !is.null(n0)))
 
+  # Number of elements in var0
   lenvar0 <- length(var0)
 
 ##------------------------------------------------------------------------------
-## check function call 'f': function returns either
-## -2*log Probability, the model residuals, or a list of class modFit.
-## (note:SSnew, PPnew, divsigma are globals...)
+## 5. initialise the log likelihood function (logP) and the initial SSR (SSold)
+## There are 6 types, depending on model variance and function 'f' returning 
+## either -2*log Probability, the model residuals, or a list of class modFit.
+##------------------------------------------------------------------------------
 
-## First function call ...
+  # Call function for first time ...
   SSnew <- f(p,...)
 
-  ## type I: numeric value , no model variance
+  # type I: numeric value, no model variance
   if (is.numeric(SSnew)& !useSigma) {
-    N <- 1
-    if (length(SSnew)>1)
+    N <- length(SSnew)
+    if (N>1)
       stop("if 'var0' is NULL, 'f' should either return -2*log of the model probability, OR an instance of class 'modCost'")
-
-    Fun <- function(p,...) {
-      PPnew  <<- Prior(p)
-      SSnew  <<- f(p,...)
-      return(0.5*(SSnew + PPnew))     #-log(p_model*p_params)
-    }
+    logP  <- function (...) logP_type1(...)
     SSold <- SSnew
   }
 
@@ -138,25 +215,14 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
     N <- length(SSnew)
     if (N == 1)
       stop("if 'var0' has a value, 'f' should return the model residuals OR an instance of class 'modCost'")
-    if (length(var0) != 1 && length(var0) != N)
+    if (lenvar0 != 1 && lenvar0 != N)
       stop("length of 'var0' should either 1 or = length of model residuals as returned by 'f'")
 
-    if (length(var0) == 1) {
-
-      Fun <- function(p,...) {
-        PPnew  <<- Prior(p)
-        SSnew  <<- f(p,...)
-        SSnew  <<- sum(SSnew^2)
-        return(0.5*(sum(SSnew*divsigma) + PPnew))
-      }
+    if (lenvar0 == 1) {
+      logP <- function(...)  logP_type2(...)
       SSold <- sum(SSnew^2)
-    } else  {
-      Fun <- function(p,...)  {
-        PPnew  <<- Prior(p)
-        SSnew  <<- f(p,...)
-        SSnew  <<- SSnew^2
-        return(0.5*(sum(SSnew*divsigma) + PPnew))
-      }
+    } else  { # = N
+      logP <- function(...)  logP_type2b(...)
       SSold <- SSnew^2
     }
   } else if (class(SSnew) != "modCost")
@@ -165,38 +231,21 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
   ## type III: class modCost & ! usesigma
   else if (!useSigma)  {
     N <- nrow(SSnew$residuals)    # total number of data points
-
-    Fun <- function(p,...)  {
-      PPnew  <<- Prior(p)
-      SSnew  <<- f(p,...)$minlogp    # select -2*log(probability)
-      return(0.5*(SSnew + PPnew))     #-log(p_model*p_params)
-    }
+    logP <- function(...)  logP_type3(...)
     SSold <- SSnew$minlogp
   } else {
 
   ## type IV and V: class modCost & sigma. Either uses residuals or variable SSR.
-    if (length(var0) == nrow(SSnew$residuals)) { # use data residuals
+    if (lenvar0 == nrow(SSnew$residuals)) { # use data residuals
       N <- nrow(SSnew$residuals)    # total number of data points
-
-      Fun <- function(p,...)  {
-        PPnew  <<- Prior(p)
-        SSnew  <<- f(p,...)
-        SSnew  <<- (SSnew$residuals$res)^2
-        return(0.5*(sum(SSnew*divsigma) + PPnew))
-      }
+      logP <- function(...)  logP_type4(...)
       SSold <- (SSnew$residuals$res)^2
     } else
-    if (length(var0) != 1 & length(var0) != nrow(SSnew$var))
+    if (lenvar0 != 1 && lenvar0 != nrow(SSnew$var))
       stop("function 'f' is not compatible with length of var0")
     else {
       N <- SSnew$var$N            # number of data points per variable
-
-      Fun <- function(p, ...) {
-        PPnew  <<- Prior(p)
-        SSnew  <<- f(p, ...)
-        SSnew  <<- SSnew$var$SSR.unweighted ### KARLINE:CHECK THIS!
-        return(0.5*(sum(SSnew*divsigma) + PPnew))
-      }
+      logP <- function(...)  logP_type5(...)
       SSold <- SSnew$var$SSR.unweighted
     }
   }
@@ -208,63 +257,30 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
       divsigma <- rgamma(lenvar0, shape = 0.5*(n0 + N),
          rate = 0.5*(n0*var0 + SSold))
 
-
 ##------------------------------------------------------------------------------
-## initial values for f, SS, PP, sigma...
-
-  parold  <- p
-  PPold   <- PPnew     # prior
-  sigold  <- divsigma
-  funpold <- 0.5* (sum(SSold*divsigma) + PPold)
-  SSnew   <- Inf
-
+## initialise some quantities
 ##------------------------------------------------------------------------------
-## The acceptance function ...
 
-  Test <- function(fnew,fold) {
-
-    if (is.na(fnew) | is.infinite(fnew))
-       return(0)
-    if (fnew < bestfunp)  # new best value - save it!
-       {bestfunp<<-fnew ; bestPar<<-parnew}
-    if (!useSigma)
-       test <- exp(fold-fnew)
-    else                  # uses SSR, scaled by sigma
-       test <- exp(-0.5*sum((SSnew-SSold)*divsigma) - 0.5*(PPnew-PPold))
-    return(test)
-  }
-
-  Accept <- function(tst) {
-    if (is.nan(tst)|is.na(tst))
-      accept <- FALSE
-    else if (tst<0)
-      accept<-FALSE
-    else if (tst>1)
-      accept <- TRUE
-    else accept <- (runif(1) < tst)
-
-    if (accept) {
-      SSold  <<- SSnew
-      PPold  <<- PPnew
-      if (useSigma)
-        sigold <<- divsigma
-    }
-    return(accept)
-  }
+  parold  <- p         # parameter values
+  PPold   <- PPnew     # prior parameter prob
+  sigold  <- divsigma  # 1/model variance
+  funpold <- 0.5* (sum(SSold*divsigma) + PPold) 
+  SSnew   <- Inf       # sum of squared residuals
 
 ##------------------------------------------------------------------------------
 ## The delayed rejection procedure ...  (based on matlab code)
+##------------------------------------------------------------------------------
 
   A_count  <- 0       # counter to number of alpha entrances
   dr_steps <- 0       # counter to number of dr steps...
 
 
   AlphaFun <- function(arg) {
-  ##----------------------------------------------------------------------------
-  ## recursive acceptance function for delayed rejection
-  ## arg$pri: the prior for the parameters
-  ## arg$ss : the sum of squares
-  ##----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # recursive acceptance function for delayed rejection
+  # arg$pri: the prior for the parameters
+  # arg$ss : the sum of squares
+  #----------------------------------------------------------------------------
 
     stage <- length(arg)-1      # the stage we are in
     A_count <<- A_count+1
@@ -300,8 +316,8 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
     return(y)
   }
 
-  ## gaussian n-th stage log proposal ratio
-  ## log of q_i(yn,... yn-j)/q_i(x, y1, ...yj)
+  # gaussian n-th stage log proposal ratio
+  # log of q_i(yn,... yn-j)/q_i(x, y1, ...yj)
 
   qfun <- function(iq,arg) {
     LL <- function(x) sum(x*x)
@@ -322,8 +338,9 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
 
 ##------------------------------------------------------------------------------
 ## the MCMC jumps...
+##------------------------------------------------------------------------------
 
-  ## matrices/vectors with results
+  # matrices/vectors with results
   pars      <- matrix(nrow=npar, ncol=outputlength)  # parameter values
   SSpars    <- vector(length=outputlength)      # SS value
   priorpars <- vector(length=outputlength)      # parameter priors
@@ -332,11 +349,11 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
     sig     <- matrix(nrow=outputlength, ncol=lenvar0)  # model variances
   else sig<-NULL
 
-  ## best function and parameter values will be kept
+  # best function and parameter values will be kept
   bestPar   <- parold
   bestfunp  <- funpold
 
-  ## keep track of ...
+  # keep track of ...
   naccepted <- 0               # number of saved parameters
   ii        <- 0               # counter to saved parameters
   naccsave  <- 0               # number of saved accepted parameters
@@ -345,14 +362,14 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
   Rold      <- 0               # these two to know when to update the covariances...
   Rnew      <- 1
 
-  ## keep initial runs during burnin, if adaptive metropolis algorithm (isR)
+  # keep initial runs during burnin, if adaptive metropolis algorithm (isR)
   if (isR & burninlength>0) {
     SaveIni     <- TRUE
     naccsave2   <- 0
     burnupdate  <- updatecov
   } else SaveIni <- FALSE
 
-  ## if delayed rejection
+  # if delayed rejection
   if (ntrydr > 1) {
     Rw   <- list()      # The cholesky decompositions used
     invR <- list()      # The inverses of the choleski decompositions
@@ -362,7 +379,7 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
     z <- list()         # newly tried
   }
 
-  ## looping....
+  # loop over iterations ....
   for ( i in 1:niter) {
 
     accept <- FALSE
@@ -373,19 +390,30 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
       funpnew <- Inf
 
     } else {
-
-      funpnew <- Fun(parnew,...)        # probability of new parameter set
+      PPnew   <- Prior(parnew)
+      logfun  <- logP(f, parnew, PPnew, divsigma, ...)
+      funpnew <- logfun$pnew        # probability of new parameter set
+      SSnew   <- logfun$SSnew
         if (is.infinite(funpnew)){
           alpha  <- 0
           accept <- FALSE
         } else  {
-          alpha  <- Test(funpnew, funpold)
+          if (! is.na(funpnew))
+            if (funpnew < bestfunp)  {# new best value - save it!
+               bestfunp <- funpnew 
+               bestPar  <- parnew
+            }
+          alpha  <- Test(funpnew,funpold,SSnew,SSold,useSigma,divsigma,PPnew,PPold) 
           accept <- Accept(alpha)
+          if (accept) {
+            SSold  <- SSnew
+            PPold  <- PPnew
+            if (useSigma) sigold <- divsigma
+          }
         }
       }
 
-##------------------------------------------------------------------------------
-##  delayed rejection
+    # start delayed rejection
     itry   <- 1
 
     if (ntrydr > 1 & !accept) {
@@ -422,9 +450,12 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
           z$pri<- 0
           z$ss <- Inf
         } else {
-          funpnew <- Fun(parnew, ...)  # probability of new parameter set
-          z$pri <- PPnew
-          z$ss  <- SSnew
+         PPnew  <- Prior(parnew)
+         logfun <- logP(f, parnew, PPnew, divsigma, ...)
+         funpnew <- logfun$pnew        # probability of new parameter set
+         SSnew   <- logfun$SSnew
+         z$pri <- PPnew
+         z$ss  <- SSnew
         }
         trypath[[itry+1]] <- z
 
@@ -436,12 +467,16 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
           alpha <- AlphaFun(trypath[1:(itry + 1)])
           dr_steps <- dr_steps +1
           accept <- Accept(alpha)
+          if (accept) {
+            SSold  <- SSnew
+            PPold  <- PPnew
+            if (useSigma) sigold <- divsigma
+          }
         }
       }
     } # end delayed rejection
 
-##------------------------------------------------------------------------------
-## saving if accepted or during burnin in case of adaptive metropolis...
+  # saving if accepted or during burnin in case of adaptive metropolis...
 
     if (accept) {
       naccepted <- naccepted +1
@@ -452,7 +487,7 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
     if(updateSigma)
       divsigma <- rgamma(lenvar0, shape = 0.5*(n0 + N), rate = 0.5*(n0*var0 + SSold))
 
-## -----  during burnin: SaveIni will be true
+  # during burnin: SaveIni will be true
     if (SaveIni) {  # use burnin to update covariance...
       ipos <- ipos + 1
       if (ipos > outputlength) {
@@ -479,8 +514,8 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
       }
     }
 
-## -----  past burnin  ------
-  ## current parameter set saved every nupdate steps ...
+  # past burnin: current parameter set saved every nupdate steps ...
+
     if (i == ou1) {
       if (SaveIni)
         isR <- FALSE
@@ -496,7 +531,7 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
       if (useSigma)
         sig[ii,] <- 1/sigold
 
-   ## update jump parameters by estimating param covariance.. only if > 5 accepted ones!
+    # update jump parameters by estimating param covariance.. only if > 5 accepted ones!
       if (isR & ii > nupdate & naccsave > 5) {
         ie <- max(ipos, icov, ii)
         if (npar > 1)
@@ -516,6 +551,7 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
 
 ##------------------------------------------------------------------------------
 ## 3. finalisation
+##------------------------------------------------------------------------------
 
   if (is.null(pnames))
     pnames <- paste("p", 1:npar,sep="")
@@ -554,9 +590,9 @@ modMCMC <- function (f, p, ..., jump=NULL, lower=-Inf, upper= +Inf,
   return(res)
 }
 
-## -----------------------------------------------------------------------------
+## =============================================================================
 ## S3 methods of modMCMC
-## -----------------------------------------------------------------------------
+## =============================================================================
 
 pairs.modMCMC <- function (x, Full=FALSE, which=1:ncol(x$pars),
                            remove = NULL, nsample = NULL, ...) {
@@ -791,4 +827,3 @@ summary.modMCMC <- function (object, remove = NULL, ...) {
     ))
   return(Res)
 }
-

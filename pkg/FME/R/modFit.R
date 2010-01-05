@@ -30,7 +30,9 @@ modFit <- function(f, p, ..., lower=-Inf, upper=Inf,
   useCost <- method != "Marq" # marquardt uses residuals, others model cost
 
   Func <- function(p,...) {
-    ## ThPe: this is awful and must be fixed, but I currently don't understand your logic here
+    ## The global assignment ensures that, upon returning from the fitting
+    ## the function need NOT be called once more, to obtain the residuals,
+    ## sum of squares etc...
     FF<<- f(p,...)
     cM      <- class(FF) == "modCost"
 
