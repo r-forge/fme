@@ -3,6 +3,11 @@ New issues from 2010-01-05:
 Karline please check formulations in modFit.Rd, line 128ff about the
 renamed list elements!
 
+modFit, L 204:
+
+- is the following correct: "\eqn{2*J^T*J}" ?
+ --> the code says: res$hessian <- 2 * t(Jac)%*%Jac 
+
 ----------------------------------------------------------------------
 
  ToDo
