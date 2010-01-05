@@ -102,10 +102,10 @@ collin(sensfun, parset = NULL, N = NULL, which = NULL)
 ## =======================================================================
 
 ## linearly related set...  => Infinity
-collin (cbind(1:5,2*(1:5)))
+collin(cbind(1:5,2*(1:5)))
 
 ## unrelated set            => 1
-MM<- matrix(nr=4,nc=2,byrow=TRUE,data=c( -0.400, -0.374, 0.255,
+MM <- matrix(nr=4, nc=2, byrow=TRUE, data=c( -0.400, -0.374, 0.255,
    0.797, 0.690, -0.472, -0.546,  0.049))
 
 collin(MM)
@@ -114,29 +114,28 @@ collin(MM)
 ## Bacterial model as in Soetaert and Herman, 2009
 ## =======================================================================
 
-pars <- list(gmax =0.5,eff = 0.5,
-              ks =0.5, rB =0.01, dB =0.01)
+pars <- list(gmax = 0.5,eff = 0.5,
+              ks = 0.5, rB = 0.01, dB = 0.01)
 
 solveBact <- function(pars) {
   derivs <- function(t, state, pars) {   # returns rate of change
-    with (as.list(c(state,pars)), {
-      dBact = gmax*eff*Sub/(Sub+ks)*Bact - dB*Bact - rB*Bact
-      dSub  =-gmax    *Sub/(Sub+ks)*Bact + dB*Bact
-      return(list(c(dBact,dSub)))
+    with (as.list(c(state, pars)), {
+      dBact <-  gmax*eff*Sub/(Sub+ks)*Bact - dB*Bact - rB*Bact
+      dSub  <- -gmax    *Sub/(Sub+ks)*Bact + dB*Bact
+      return(list(c(dBact, dSub)))
     })
   }
-
- state   <- c(Bact=0.1,Sub = 100)
- tout    <- seq(0,50,by=0.5)
- ## ode solves the model by integration...
- return(as.data.frame(ode(y=state,times=tout,func=derivs,parms=pars)))
+  state   <- c(Bact = 0.1, Sub = 100)
+  tout    <- seq(0, 50, by = 0.5)
+  ## ode solves the model by integration...
+  return(as.data.frame(ode(y=state,times=tout,func=derivs,parms=pars)))
 }
 
 out <- solveBact(pars)
 
 ## We wish to estimate parameters gmax and eff by fitting the model to
 ## these data:
-Data <- matrix (nc=2,byrow=TRUE,data=
+Data <- matrix (nc = 2,byrow = TRUE,data=
 c(  2,  0.14,    4,  0.2,     6,  0.38,    8,  0.42,
    10,  0.6,    12,  0.107,  14,  1.3,    16,  2.0,
    18,  3.0,    20,  4.5,    22,  6.15,   24,  11,

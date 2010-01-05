@@ -197,14 +197,14 @@ modCost(model, obs, x="time", y=NULL, err=NULL,
 ## =======================================================================
 
 ## Create new data: two observed variables, "a", "b"
-Data  <-data.frame(name=c(rep("a",4),rep("b",4)),
+Data <- data.frame(name=c(rep("a",4),rep("b",4)),
                    time=c(1:4,2:5),val=c(runif(4),1:4))
 
 ## "a nonsense model"
-Mod <- function (t,y,par) {
- da <- 0
- db <- 1
- return(list(c(da,db)))
+Mod <- function (t, y, par) {
+  da <- 0
+  db <- 1
+  return(list(c(da, db)))
 }
 
 out <- ode(y=c(a=0.5,b=0.5),times=0:6,func=Mod,parms=NULL)
@@ -262,8 +262,8 @@ cAna   <- modCost(Ana2 , Ana)$model
 compare <- data.frame(method=c("euler", "rk4", "lsoda", "Ana"),
                       cost=c(cEuler, cRk4, cLsoda, cAna))
 
-points(Euler,col="red")
-points(Rk4,col="blue")
+points(Euler, col="red")
+points(Rk4, col="blue")
 
 legend("bottomright", c("exact","euler","rk4"), pch=c(NA,1,1),
       col=c("red","red","blue"),lty=c(1,NA,NA))
@@ -286,17 +286,17 @@ init <-  ode(x, time, logist, parms)
 plot(TT, Ana[,"N"], ylim=c(0, 120),  type="p", col="red", pch=16,cex=2,
      main = "logistic growth", xlab="time", ylab="N")
 
-lines (init  ,lwd=2,col="green")
+lines(init, lwd=2, col="green")
 
 ## FITTING algorithm uses modFit
 ## First define the objective function (model cost) to be minimised
 
 ## more general: using modFit
 Cost <- function(P) {
- parms["K"]<-P[1]
- parms["r"]<-P[2]
- out <- ode(x, time, logist, parms)
- return(modCost(out, Ana))
+  parms["K"]<-P[1]
+  parms["r"]<-P[2]
+  out <- ode(x, time, logist, parms)
+  return(modCost(out, Ana))
 }
 (Fit<-modFit(p=c(K=10,r=2),f=Cost))
 
@@ -308,7 +308,7 @@ fitted <-  ode(x, time, logist, parms)
 
 lines (fitted,lwd=2,col="blue")
 
-legend("right",c("initial", "fitted"), col=c("green", "blue"), lwd=2)
+legend("right", c("initial", "fitted"), col=c("green", "blue"), lwd=2)
 
 Cost(Fit$par)
 
