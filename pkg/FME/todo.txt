@@ -1,4 +1,11 @@
-  ToDo
+New issues from 2010-01-05:
+
+Karline please check formulations in modFit.Rd, line 128ff about the
+renamed list elements!
+
+----------------------------------------------------------------------
+
+ ToDo
 Ks -> ThPe
  - made S3 plot methods the same as in deSolve.
  - (ask and mfrow/mfcol settings)
