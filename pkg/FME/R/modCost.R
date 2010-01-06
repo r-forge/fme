@@ -50,7 +50,7 @@ modCost <- function (model, obs, x = "time", y = NULL, err = NULL,
 
   if (!is.null(y)) {   # it is in table format; first column are names of observed data...
 
-    Names    <- as.character(unique(obs[,1]))   # Names of data sets, all data should be model variables...
+    Names    <- as.character(unique(obs[, 1]))  # Names of data sets, all data should be model variables...
     Ndat     <- length(Names)                   # Number of data sets
     ilist    <- 1:Ndat
     if (! is.character(y))
@@ -87,9 +87,9 @@ modCost <- function (model, obs, x = "time", y = NULL, err = NULL,
     }
 
   xMod     <- model[,ixMod]    # Independent variable, model
-  } else if (length(ix)==1) {
-   ixMod    <- which(colnames(model)==x)
-   if (length(ixMod)==0)
+  } else if (length(ix) == 1) {
+   ixMod    <- which(colnames(model) == x)
+   if (length(ixMod) == 0)
      stop(paste("Cannot calculate cost: independent variable not found in model output", x))
    xMod     <- model[,ixMod]    # Independent variable, model
   }
@@ -111,7 +111,7 @@ modCost <- function (model, obs, x = "time", y = NULL, err = NULL,
       if (length(ix) > 0) xDat <- obs[iDat, ix]
       obsdat <- obs[iDat, iy]
     } else {
-      if (length(ix) > 0) xDat <- obs[,1]
+      if (length(ix) > 0) xDat <- obs[, 1]
       obsdat <- obs[,i]
     }
     ii <- which(is.na(obsdat))

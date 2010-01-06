@@ -5,13 +5,13 @@
 ## -----------------------------------------------------------------------------
 ## combinations of n elements from a vector p (length (p) > = n)
 ## -----------------------------------------------------------------------------
-combin <- function(n, v) { 
-   if (n == 1)
-       matrix(data = v, ncol = 1)
-   else if (n >= length(v))
-       matrix(data = v, nrow = 1)
-   else
-       rbind(cbind(v[1], combin(n-1, v[-1])), combin(n, v[-1]))
+combin <- function(n, v) {
+  if (n == 1)
+    matrix(data = v, ncol = 1)
+  else if (n >= length(v))
+    matrix(data = v, nrow = 1)
+  else
+    rbind(cbind(v[1], combin(n-1, v[-1])), combin(n, v[-1]))
 }
 
 ## -----------------------------------------------------------------------------
@@ -33,12 +33,12 @@ collFun <- function(cc, normSens, npar, iNa) {
     } else {
         id  <- 1 / sqrt(min(eigen(t(S) %*% S)$value)) # collinearity
     }
-      
-    # output: psub= whether par is in (1) set or not (0), n= number of 
+
+    # output: psub= whether par is in (1) set or not (0), n= number of
     # parameters, id = the collinearity value
-    psub     <- rep(0, npar)    
-    psub[ii] <- 1            
-    n        <- ncol(cc)     
+    psub     <- rep(0, npar)
+    psub[ii] <- 1
+    n        <- ncol(cc)
     Collset  <- rbind(Collset, c(psub, n, id))
   }
   return(Collset)
@@ -54,10 +54,10 @@ collin <- function(sensfun, parset = NULL, N = NULL, which = NULL) {
   # 1. check input
   if (is.null(colnames(sensfun)))
     colnames(sensfun) <- 1:ncol(sensfun)
-  
+
   #-----------------
   # 2. If observed *variables* are specified ..
-  if (!is.null(which)) {  
+  if (!is.null(which)) {
     nx  <- attr(sensfun, "nx")
     var <- attr(sensfun, "var")
     TYP <- attr(sensfun, "Type")
@@ -82,10 +82,10 @@ collin <- function(sensfun, parset = NULL, N = NULL, which = NULL) {
     sensfun <- sensfun[ii,]
   }
 
-  # cleanup 
+  # cleanup
   if (colnames(sensfun)[1]=="x" && colnames(sensfun)[2] == "var")
     Sens <- sensfun[,-(1:2)]
-  else 
+  else
     Sens <- sensfun
 
   npar <- ncol(Sens)
@@ -105,17 +105,17 @@ collin <- function(sensfun, parset = NULL, N = NULL, which = NULL) {
   # normalise sensitivity functions
   normSens <- t(t(Sens) / L2)
 
-  
+
   Collin <- NULL      # Will contain the collinearity coefficients
 
   if (is.null(parset)) {   # parameter combination not given, but the number of params
     pset   <- 1:npar
 
-    if (is.null(N))        # All parameter combination (from 2 to total number) 
-      nset <- 2:npar 
+    if (is.null(N))        # All parameter combination (from 2 to total number)
+      nset <- 2:npar
     else                   # only given number of parameters
       nset <- N
-    
+
     for (n in nset) {
       numcomb <- choose(npar, n) # number of combinations requested
       if (numcomb < 5000) {

@@ -1,6 +1,6 @@
 New issues from 2010-01-05:
 
-Karline please check the following:
+Karline please check the following (line numbers in .R may have changed):
 
 modFit, L 204:
 -------------
@@ -20,7 +20,7 @@ all .Rd files
 
 all .R files
 ------------
-- proofread
+- proofread: done
 
 vignettes
 ---------
