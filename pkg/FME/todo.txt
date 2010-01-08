@@ -4,14 +4,14 @@ Karline please check the following (line numbers in .R may have changed):
 
 modFit, L 204:
 -------------
-- line 128ff, paragraph about the renamed list elements!
-- is the following correct: "\eqn{2*J^T*J}" ?
+- line 128ff, paragraph about the renamed list elements!  KS: DONE
+- is the following correct: "\eqn{2*J^T*J}" ? KS: DON't understand... J^T*J is 0.5*hessian
  --> the code says: res$hessian <- 2 * t(Jac)%*%Jac 
 
 modMCMC
 -------
 L193: missing parenthesis?
-
+DONT UNDERSTAND. SEE NO PROBLEM THERE..
 ThPe, check:
 
 all .Rd files
@@ -30,19 +30,6 @@ vignettes
 
 Old Issues: check if already done!
 ==================================
-
- ToDo
-Ks -> ThPe
- - made S3 plot methods the same as in deSolve.
- - (ask and mfrow/mfcol settings)
-    -> wrote a generic function, in utilities.R
-
- - Need to keep plotmod and histmod?? (the former is now better
-   in plot.deSolve..., but histmod does not (yet) exist)
- 
- - Need to put this one on CRAN fast; many of our other packages start depending
- on it (e.g. BCE); the modMCMC is very efficient.
- 
  
 
 modFit.R
@@ -71,9 +58,11 @@ modCost.R
 plot.modcost
 
 - Why "c(16:24)" -- simply "16:24" (etc.) should be enough.
+KS: it needs () => (16:24)[...] is ok
 
 
 sensFun.R
 =========
 
 - line 100ff: why 1e-20 as "very small" number?
+KS->ThPE.  No reason. Suggestion?

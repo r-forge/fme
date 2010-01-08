@@ -201,10 +201,10 @@ plot.modCost<- function(x, legpos="topleft", ...) {
 
   dots$xlab <- if(is.null(dots$xlab)) "x" else dots$xlab
   dots$ylab <- if(is.null(dots$ylab)) "weighted residuals" else dots$ylab
-  DotsPch   <- if(is.null(dots$pch)) c(16:24) else dots$pch
-  dots$pch  <- if(is.null(dots$pch)) c(16:24)[x$residuals$name] else dots$pch[x$residuals$name]
-  DotsCol   <- if(is.null(dots$col)) c(1:nvar) else dots$col
-  dots$col  <- if(is.null(dots$col)) c(1:nvar)[x$residuals$name] else dots$col[x$residuals$name]
+  DotsPch   <- if(is.null(dots$pch)) (16:24) else dots$pch
+  dots$pch  <- if(is.null(dots$pch)) (16:24)[x$residuals$name] else dots$pch[x$residuals$name]
+  DotsCol   <- if(is.null(dots$col)) (1:nvar) else dots$col
+  dots$col  <- if(is.null(dots$col)) (1:nvar)[x$residuals$name] else dots$col[x$residuals$name]
 
   do.call("plot", c(alist(x$residuals$x, x$residuals$res), dots))
 

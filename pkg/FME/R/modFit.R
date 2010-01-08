@@ -122,7 +122,7 @@ modFit <- function(f, p, ..., lower = -Inf, upper = Inf,
       warning("unknown names in control: ", paste(noNms, collapse = ", "))
 
     res <- as.list(nls.lm(par = Pars, fn = Fun, control = Contr, ...)[])
-
+    # renaming results for compatibility with other methods
     names(res)[7] <- "iterations"  # called "niter" here
     names(res)[9] <- "ssr"         # called "deviance" here
     names(res)[3] <- "residuals"
@@ -151,6 +151,7 @@ modFit <- function(f, p, ..., lower = -Inf, upper = Inf,
                steptol = overrule(1e-6, control$steptol),
                iterlim = overrule(100, control$iterlim),
                check.analyticals = overrule(TRUE, control$check.analyticals))
+    # renaming results for compatibility with other methods
     names(res)[1] <- "ssr"  # called "minimum" here
     names(res)[2] <- "par"  # called "estimate" here
   }
