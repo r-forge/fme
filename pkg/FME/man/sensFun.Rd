@@ -15,7 +15,7 @@
   by calculating a matrix of so-called sensitivity functions.  In this
   matrix the (i,j)-th element contains
 
-  \deqn{ \frac{\partial y_i}{\partial \Theta _j}\cdot \frac{\Delta \Theta _j}
+  \deqn{\frac{\partial y_i}{\partial \Theta _j}\cdot \frac{\Delta \Theta _j}
   {\Delta y_i}}{dy_i/dpar_j*parscale_j/varscale_i}
 
   and where \eqn{y_i}{y_i} is an output variable (at a certain time instance),
@@ -142,7 +142,7 @@ sensFun(func, parms, sensvar = NULL, senspar = names(parms),
 
   The sensitivity functions are estimated numerically. This means that
   each parameter value \eqn{\Theta_j}{par_j} is perturbed as
-  \eqn{\max{(tiny,\Theta_j *(1+tiny))}}{max(tiny,par_j)*(1+tiny)}
+  \eqn{\max{(tiny,\Theta_j \cdot (1+tiny))}}{max(tiny,par_j)*(1+tiny)}
 }
 
 \note{
@@ -156,7 +156,7 @@ sensFun(func, parms, sensvar = NULL, senspar = names(parms),
       \itemize{
         \item L1: the L1-norm \eqn{\frac{1}{n} \cdot \sum{|S_{ij}|}}{sum(abs(Sij))/n},
 
-        \item L2: the L2-norm \eqn{ \cdot \sqrt{\frac{1}{n}\sum{S_{ij}
+        \item L2: the L2-norm \eqn{\cdot \sqrt{\frac{1}{n}\sum{S_{ij}
           \cdot S_{ij}}}}{sqrt(sum(Sij^2)/n)},
 
         \item Mean: the mean of the sensitivity functions,

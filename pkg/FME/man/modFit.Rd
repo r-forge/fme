@@ -201,8 +201,8 @@
 
   In case parameters are transformed (all methods) or in case the
   \code{method} \code{Port}, \code{Pseudo} or \code{Marq} is selected,
-  the \emph{Hessian} is approximated as \eqn{2*J^T*J}, where J is the Jacobian,
-  estimated by finite differences.
+  the \emph{Hessian} is approximated as \eqn{2 \cdot J^T \cdot J}{2 * J^T * J}, 
+  where J is the Jacobian, estimated by finite differences.
 
   This ignores the second derivative terms, but this is reasonable if the method
   has truly converged to the minimum.
@@ -223,7 +223,7 @@
   treated as if it were a linear least squares problem, linearizing around
   the parameter values that minimize \eqn{Chi^2}.
 
-  The covariance matrix is estimated as \eqn{1/(0.5*Hessian)}.
+  The covariance matrix is estimated as \eqn{1/(0.5 \cdot Hessian)}{1/(0.5*Hessian)}.
 
   This computation relies on several things, i.e.:
 

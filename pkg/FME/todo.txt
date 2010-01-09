@@ -1,64 +1,25 @@
 New issues from 2010-01-05:
 
-Karline please check the following (line numbers in .R may have changed):
 
-modFit, L 204:
--------------
-- line 128ff, paragraph about the renamed list elements!  KS: DONE
-- is the following correct: "\eqn{2*J^T*J}" ? KS: DON't understand... J^T*J is 0.5*hessian
- --> the code says: res$hessian <- 2 * t(Jac)%*%Jac 
-
-modMCMC
--------
-L193: missing parenthesis?
-DONT UNDERSTAND. SEE NO PROBLEM THERE..
-ThPe, check:
+ThPe, check(ed):
 
 all .Rd files
 -------------
-- check \eqn and \deqn (in ASCII->HTML and Latex->PDF)
+- check \eqn and \deqn (in ASCII->HTML and Latex->PDF): done
 
 all .R files
 ------------
 - proofread: done
 
-vignettes
----------
-- ???
+examples
+- check comments, indentation, cosmetics: 
+thpe: should be good enough now (~done)
+
 
 ----------------------------------------------------------------------
 
 Old Issues: check if already done!
 ==================================
- 
-
-modFit.R
-========
-
-ThPe:
-
- - make overrule a general usable (but not exported) function in FME
- - can I do this?
- 
-Ks->ThPe; it is but a small function; yes you can.
-
-=============================================
-== New issues found on 2009-08-30          ==
-=============================================
-
-
-modCost.R
-=========
-
-1e-500 does not prevent log(0) because 
-
-> .Machine$double.xmin
-[1] 2.225074e-308
-
-plot.modcost
-
-- Why "c(16:24)" -- simply "16:24" (etc.) should be enough.
-KS: it needs () => (16:24)[...] is ok
 
 
 sensFun.R
@@ -66,3 +27,11 @@ sensFun.R
 
 - line 100ff: why 1e-20 as "very small" number?
 KS->ThPE.  No reason. Suggestion?
+
+ThPe, Suggestion;
+
+What about setting: verysmall <- tiny * 1e-12
+
+
+all others done, compare versions if you want to see them 
+

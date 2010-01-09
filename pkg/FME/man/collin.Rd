@@ -11,7 +11,7 @@
   of parameters, calculates the "identifiability" of sets of parameter.
 
   The sensitivity functions are a matrix whose (i,j)-th element contains
-  \deqn{ \frac{\partial y_i}{\partial \Theta _j}\cdot \frac{\Delta
+  \deqn{\frac{\partial y_i}{\partial \Theta _j}\cdot \frac{\Delta
   \Theta _j} {\Delta y_i}}{dy_i/dpar_j*parscale_j/varscale_i} and where
   \eqn{y_i}{y_i} is an output variable, at a certain (time) instance, i,
   \eqn{\Delta y_i}{varscale_i} is the scaling of variable

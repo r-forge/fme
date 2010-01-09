@@ -145,7 +145,7 @@ modMCMC(f, p, ..., jump = NULL,  lower = -Inf, upper = +Inf, prior = NULL,
     in \code{pars}.}
   \item{naccepted }{the number of accepted runs.
   }
-  \item{sig }{the sampled error variance \eqn{\sigma^2}, a matrix with
+  \item{sig }{the sampled error variance \eqn{\sigma^2}{sigma^2}, a matrix with
     one row for each row in \code{pars}.
   }
   \item{bestpar }{the parameter set that gave the highest probability.
@@ -179,25 +179,25 @@ modMCMC(f, p, ..., jump = NULL,  lower = -Inf, upper = +Inf, prior = NULL,
   created by function \code{\link{modFit}}.
 
   In the latter two cases, it is assumed that the prior distribution for
-  \eqn{\theta} is either non-informative or gaussian. If gaussian, it
+  \eqn{\theta}{theta} is either non-informative or gaussian. If gaussian, it
   can be treated as a sum of squares (SS). If the measurement function
   is defined as:
   
 \deqn{y=f(\theta) + \xi\\
-\xi ~ N(0,\sigma^2)}{y=f(p)+xi; xi~N(0,\sigma^2}
+\xi ~ N(0,\sigma^2)}{y = f(p) + xi; xi ~ N(0, sigma^2}
 
-  where \eqn{\xi} is the measurement error, assumed normally
+  where \eqn{\xi}{xi} is the measurement error, assumed normally
   distribution, then the posterior for the parameters will be estimated
   as:
   
-  \deqn{p(\theta | y,\sigma^2)\propto exp(-0.5*(\frac{SS(\theta)}{\sigma^2}
-  +SS_{pri}(\theta))}{prob(p|y,\sigma^2)~exp(-0.5 SS(p)/\sigma^2)+SSpri(p)}
+  \deqn{p(\theta | y,\sigma^2)\propto exp(-0.5 \cdot (\frac{SS(\theta)}{\sigma^2}
+  +SS_{pri}(\theta))}{prob(p|y,sigma^2)~exp(-0.5 SS(p)/sigma^2)+SSpri(p)}
 
-  and where \eqn{\sigma^2} is the error variance, SS is the sum of squares
+  and where \eqn{\sigma^2}{sigma^2} is the error variance, SS is the sum of squares
   function \eqn{SS(\theta)=\sum(y_i-f(\theta))^2}{SS(p)=sum(yi-f(p))^2}.
   If non-informative priors are used, then \eqn{SS_{pri}(\theta)=0}{SSpri(p)=0}.
 
-  The error variance \eqn{\sigma^2} is considered a nuisance parameter.
+  The error variance \eqn{\sigma^2}{sigma^2} is considered a nuisance parameter.
   A prior distribution of it should be specified and a posterior distribution
   is estimated.
 
@@ -206,19 +206,19 @@ modMCMC(f, p, ..., jump = NULL,  lower = -Inf, upper = +Inf, prior = NULL,
   \code{var0} and \code{n0=wvar0*n}.  Larger values of \code{wvar0} keep
   these samples closer to \code{var0}.
 
-  Thus, at each step, 1/ the error variance (\eqn{\sigma^{-2}} ) is sampled
+  Thus, at each step, 1/ the error variance (\eqn{\sigma^{-2}}{sigma^{-2}}) is sampled
   from a gamma distribution:
   
   \deqn{p(\sigma^{-2}|y,\theta) \sim \Gamma(\frac{(n_0+n)}{2},
-  \frac{(n_0 \cdot var0+SS(\theta))}{2})}{prob(\sigma^2|y,p)~Gam(0.5*(n0+n),
+  \frac{(n_0 \cdot var0+SS(\theta))}{2})}{prob(sigma^2|y,p)~Gam(0.5*(n0+n),
   0.5*(n0+var0+SS(p)}
 
   where \code{n} is the number of data points and where
-  \eqn{n0=n*wvar0}, and where the second argument to the gamma function
+  \eqn{n0=n \cdot wvar0}{n0=n * wvar0}, and where the second argument to the gamma function
   is the shape parameter.
 
   The prior parameters (\code{var0} and \code{wvar0}) are the prior mean
-  for \eqn{\sigma^2} and the prior accuracy.
+  for \eqn{\sigma^2}{sigma^2} and the prior accuracy.
 
   By setting \code{wvar0} equal to 1 (default), equal weight is given to the
   prior and the current value.

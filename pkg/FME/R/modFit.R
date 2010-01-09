@@ -2,6 +2,9 @@
 ## Fitting the Model to Data
 ## -----------------------------------------------------------------------------
 
+## a small utility function
+overrule <- function(ini, new) if(is.null(new)) ini else new
+
 modFit <- function(f, p, ..., lower = -Inf, upper = Inf,
                    method = c("Marq", "Port", "Newton", "Nelder-Mead", "BFGS", "CG",
                    "L-BFGS-B", "SANN", "Pseudo"), jac = NULL,
@@ -138,7 +141,7 @@ modFit <- function(f, p, ..., lower = -Inf, upper = Inf,
     namc <- names(control)
     if (length(noNms <- namc[!namc %in% nmsC]) > 0)
        warning("unknown names in control: ", paste(noNms, collapse = ", "))
-    overrule <- function(ini, new) if(is.null(new)) ini else new
+
     typsize <- overrule( rep(1, length(p)), control$typsize)
     res <- nlm(p = Pars, f = Fun, ..., hessian = hessian,
                typsize = typsize,
