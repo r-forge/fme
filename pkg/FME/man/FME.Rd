@@ -91,6 +91,9 @@ example(modCRL)
 ## open the directory with documents
 browseURL(paste(system.file(package = "FME"), "/doc", sep = ""))
 
+## open the directory with examples
+browseURL(paste(system.file(package = "FME"), "/doc/examples", sep = ""))
+
 ## the vignette
 vignette("FMEdyna")
 vignette("FMEsteady")

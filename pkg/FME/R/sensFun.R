@@ -98,8 +98,8 @@ sensFun <- function(func, parms, sensvar = NULL, senspar = names(parms),
   else varscale <- rep (varscale, length(yRef))
 
   ## 0 is set equal to a very small number
-  varscale[varscale == 0] <- 1e-20
-  parscale[parscale == 0] <- 1e-20
+  varscale[varscale == 0] <- tiny*1e-12
+  parscale[parscale == 0] <- tiny*1e-12
 
   Sens    <- matrix(data=NA, nrow = length(yRef), ncol = npar)
 
