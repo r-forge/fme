@@ -62,7 +62,7 @@
   \tabular{ll}{
     Package: \tab FME\cr
     Type: \tab Package\cr
-    Version: \tab 1.2\cr
+    Version: \tab 1.1\cr
     Date: \tab 2010-01-01\cr
     License: \tab GNU Public License 2 or above\cr
   }
