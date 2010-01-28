@@ -259,19 +259,17 @@ cor(SnsBact[,-(1:2)])
   Karline Soetaert <k.soetaert@nioo.knaw.nl>
 }
 \references{
-  Soetaert, K and P.M.J. Herman, 2009. A practical guide to ecological modelling -
-  using R as a simulation platform. Springer, 390 pp.
+  Soetaert, K. and Herman, P. M. J., 2009. A Practical Guide to Ecological
+  Modelling -- Using R as a Simulation Platform. Springer, 390 pp.
 
-  Brun, R., Reichert, P., Kunsch, H.R., 2001.
-  Practical identificability analysis of large environmental simulation models.
-  Water Resour. Res. 37(4): 1015-1030
+  Brun, R., Reichert, P. and Kunsch, H.R., 2001.  Practical
+  Identificability Analysis of Large Environmental Simulation Models.
+  Water Resour. Res. 37(4): 1015--1030.
 
-Soetaert, K and Th. Petzoldt, 2010. 
-Inverse Modelling, Sensitivity and Monte Carlo Analysis in R Using Package FME.
-Journal of statistical software 33(3) 1-28.
-
-\url{http://www.jstatsoft.org/v33/i03}
-
+  Soetaert, K. and Petzoldt, T., 2010.  Inverse Modelling, Sensitivity
+  and Monte Carlo Analysis in R Using Package FME.  Journal of
+  Statistical Software 33(3) 1--28.
+  \url{http://www.jstatsoft.org/v33/i03}
 }
 
 \keyword{utilities}

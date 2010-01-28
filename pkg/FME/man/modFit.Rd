@@ -382,16 +382,18 @@ max(abs(mf$par - X))
 }
 \references{
   Press, W. H.,  Teukolsky, S. A., Vetterling, W. T. and
-  Flannery, B. P. (2007) Numerical Recipes in C. Cambridge
+  Flannery, B. P., 2007. Numerical Recipes in C. Cambridge
   University Press.
 
+  Gay, D. M., 1990. Usage Summary for Selected Optimization Routines.
+  Computing Science Technical Report No. 153. AT&T Bell Laboratories,
+  Murray Hill, NJ 07974.
   \url{http://netlib.bell-labs.com/cm/cs/cstr/153.pdf}
   
-Soetaert K and Th. Petzoldt, 2010. 
-Inverse Modelling, Sensitivity and Monte Carlo Analysis in R Using Package FME.
-Journal of statistical software 33(3) 1-28.
-
-\url{http://www.jstatsoft.org/v33/i03}
+  Soetaert, K. and Petzoldt, T., 2010.  Inverse Modelling, Sensitivity
+  and Monte Carlo Analysis in R Using Package FME.  Journal of
+  Statistical Software 33(3) 1--28.
+  \url{http://www.jstatsoft.org/v33/i03}
 
 }
 \keyword{utilities}

@@ -17,7 +17,7 @@
   combinations, and calculating the values of the selected output
   variables at each output interval.
 
-  This function is useful for "what-if" scenarios.
+  This function is useful for ``what-if'' scenarios.
 
   If the output variables consist of a time-series or spatially
   dependent, use sensRange instead.
@@ -202,15 +202,16 @@ plot(CRL)  # plots both variables
 plot(CRL, which = c("eff", "Bact"), trace = FALSE) #selects one
 
 }
-\author{
-Karline Soetaert <k.soetaert@nioo.knaw.nl>.
-}
-\references{
-Soetaert K and Th. Petzoldt, 2010. 
-Inverse Modelling, Sensitivity and Monte Carlo Analysis in R Using Package FME.
-Journal of statistical software 33(3) 1-28.
 
-\url{http://www.jstatsoft.org/v33/i03}
+\author{
+  Karline Soetaert <k.soetaert@nioo.knaw.nl>.
+}
+
+\references{
+  Soetaert, K. and Petzoldt, T., 2010.  Inverse Modelling, Sensitivity
+  and Monte Carlo Analysis in R Using Package FME.  Journal of
+  Statistical Software 33(3) 1--28.
+  \url{http://www.jstatsoft.org/v33/i03}
 }
 
 \keyword{utilities}

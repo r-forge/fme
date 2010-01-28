@@ -194,19 +194,16 @@ collin(sensFun(Objective, P, varscale = 1))
   Karline Soetaert <k.soetaert@nioo.knaw.nl>
 }
 \references{
-  Brun, R., Reichert, P., Kunsch, H.R., 2001.
-  Practical identifiability analysis of large environmental simulation models.
-  Water Resour. Res. 37(4): 1015--1030
+  Brun, R., Reichert, P. and Kunsch, H. R., 2001.
+  Practical Identifiability Analysis of Large Environmental Simulation Models.
+  Water Resour. Res. 37(4): 1015--1030.
 
   Omlin, M., Brun, R. and Reichert, P., 2001.
-  Biogeochemical model of Lake Zurich: sensitivity, identifiability and
-  uncertainty analysis. Ecol. Modell. 141: 105--123
+  Biogeochemical Model of Lake Zurich: Sensitivity, Identifiability and
+  Uncertainty Analysis. Ecol. Modell. 141: 105--123.
 
-Soetaert, K. and Th. Petzoldt, 2010. 
-Inverse Modelling, Sensitivity and Monte Carlo Analysis in R Using Package FME.
-Journal of statistical software 33(3) 1-28.
-
-\url{http://www.jstatsoft.org/v33/i03}
-}
-\keyword{utilities}
+  Soetaert, K. and Petzoldt, T., 2010.  Inverse Modelling, Sensitivity
+  and Monte Carlo Analysis in R Using Package FME.  Journal of
+  Statistical Software 33(3) 1--28.
+  \url{http://www.jstatsoft.org/v33/i03} } \keyword{utilities}
 

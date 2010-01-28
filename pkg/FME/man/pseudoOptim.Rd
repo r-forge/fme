@@ -78,12 +78,11 @@ see the book of Soetaert and Herman (2009) for a description of the algorithm
 AND for a line to line explanation of the function code.
 }
 \references{
-Soetaert, K. and P.M.J. Herman, 2009.
-A Practical Guide to Ecological Modelling. Using R as a Simulation Platform.
- Springer, 372 pp.
+  Soetaert, K. and Herman, P. M. J., 2009.  A Practical Guide to Ecological
+  Modelling. Using R as a Simulation Platform.  Springer, 372 pp.
  
-Price, W.L., 1977.  A controlled random search procedure for global optimisation.
-The Computer Journal, 20: 367-370.
+  Price, W.L., 1977.  A Controlled Random Search Procedure for Global
+  Optimisation.  The Computer Journal, 20: 367-370.
 }
 \keyword{optimize}
 

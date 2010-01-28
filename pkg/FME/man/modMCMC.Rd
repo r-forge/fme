@@ -511,29 +511,29 @@ points(Obs, pch = 16, cex = 1.5)
   Marko Laine <Marko.Laine@fmi.fi>
 }
 \references{
-  Laine, M, 2008. Adaptive MCMC methods with applications in environmental and
-    geophysical models,
-    Finnish meteorological institute contributions n0 69 -ISBN 978-951-697-662-7,
-    Finnish meteorological institute, Helsinki.
+  Laine, M., 2008. Adaptive MCMC Methods With Applications in
+  Environmental and Geophysical Models. Finnish Meteorological Institute
+  contributions 69, ISBN 978-951-697-662-7, Finnish Meteorological
+  Institute, Helsinki.
 
-  H. Haario, E. Saksman and J. Tamminen, 2001. An adaptive Metropolis algorithm
-    Bernoulli 7, pp. 223-242.
+  Haario, H., Saksman, E. and Tamminen, J., 2001. An Adaptive Metropolis
+  Algorithm. Bernoulli 7, pp. 223--242.
 
-  H. Haario, M. Laine, A. Mira, and E. Saksman, 2006. DRAM: Efficient adaptive
-     MCMC, Statistics and Computing, 16(4), pages 339 354.
+  Haario, H., Laine, M., Mira, A. and Saksman, E., 2006. DRAM: Efficient
+  Adaptive MCMC. Statistics and Computing, 16(4), 339--354.
      
-  H. Haario, E. Saksman and J. Tamminen, 2005. Componentwise adaptation for high
-    dimensional MCMC. Computational Statistics 20(2), 265-274.
+  Haario, H., Saksman, E. and Tamminen, J., 2005. Componentwise
+  Adaptation for High Dimensional MCMC. Computational Statistics 20(2),
+  265--274.
 
-  A. Gelman, JB Varlin, HS Stern and DB Rubin, 2004. Bayesian Data Analysis,
-    second edition. Chapman and Hall,Boca Raton.
+  Gelman, A. Varlin, J. B., Stern, H. S. and Rubin, D. B.,
+  2004. Bayesian Data Analysis.  Second edition. Chapman and Hall, Boca
+  Raton.
 
-K Soetaert and Th. Petzoldt, 2010. 
-Inverse Modelling, Sensitivity and Monte Carlo Analysis in R Using Package FME.
-Journal of statistical software 33(3) 1-28.
-
-\url{http://www.jstatsoft.org/v33/i03}
-
+  Soetaert, K. and Petzoldt, T., 2010.  Inverse Modelling, Sensitivity
+  and Monte Carlo Analysis in R Using Package FME.  Journal of
+  Statistical Software 33(3)
+  1--28. \url{http://www.jstatsoft.org/v33/i03}
 
 }
 \keyword{utilities}

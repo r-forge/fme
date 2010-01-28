@@ -74,11 +74,10 @@
   Thomas Petzoldt
 }
 \references{
-Soetaert K and Th. Petzoldt, 2010. 
-Inverse Modelling, Sensitivity and Monte Carlo Analysis in R Using Package FME.
-Journal of statistical software 33(3) 1-28.
-
-\url{http://www.jstatsoft.org/v33/i03}
+  Soetaert, K. and Petzoldt, T. 2010.  Inverse Modelling, Sensitivity and
+  Monte Carlo Analysis in R Using Package FME.  Journal of Statistical
+  Software 33(3) 1--28.
+  \url{http://www.jstatsoft.org/v33/i03}
 }
 
 \examples{
