@@ -256,5 +256,13 @@ plot(Sens2, xlab = "time, hour", ylab = "molC/m3", which = "Bact", quant = TRUE)
 \author{
   Karline Soetaert <k.soetaert@nioo.knaw.nl>
 }
+\references{
+Soetaert K and Th. Petzoldt, 2010. 
+Inverse Modelling, Sensitivity and Monte Carlo Analysis in R Using Package FME.
+Journal of statistical software 33(3) 1-28.
+
+\url{http://www.jstatsoft.org/v33/i03}
+}
+
 \keyword{utilities}
 

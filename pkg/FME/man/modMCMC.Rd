@@ -527,6 +527,14 @@ points(Obs, pch = 16, cex = 1.5)
 
   A. Gelman, JB Varlin, HS Stern and DB Rubin, 2004. Bayesian Data Analysis,
     second edition. Chapman and Hall,Boca Raton.
+
+K Soetaert and Th. Petzoldt, 2010. 
+Inverse Modelling, Sensitivity and Monte Carlo Analysis in R Using Package FME.
+Journal of statistical software 33(3) 1-28.
+
+\url{http://www.jstatsoft.org/v33/i03}
+
+
 }
 \keyword{utilities}
 

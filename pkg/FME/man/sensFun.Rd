@@ -265,6 +265,13 @@ cor(SnsBact[,-(1:2)])
   Brun, R., Reichert, P., Kunsch, H.R., 2001.
   Practical identificability analysis of large environmental simulation models.
   Water Resour. Res. 37(4): 1015-1030
+
+Soetaert, K and Th. Petzoldt, 2010. 
+Inverse Modelling, Sensitivity and Monte Carlo Analysis in R Using Package FME.
+Journal of statistical software 33(3) 1-28.
+
+\url{http://www.jstatsoft.org/v33/i03}
+
 }
 
 \keyword{utilities}

@@ -56,14 +56,14 @@
     \item FME also contains functions to generate multiple parameter
       values arranged according to a grid (\code{Grid}) multinormal
       (\code{Norm}) or uniform (\code{Unif}) design, and a latin
-      hypercube sampling (\code{Latinhyper}) function } }
-
+      hypercube sampling (\code{Latinhyper}) function } 
+}
 \details{
   \tabular{ll}{
     Package: \tab FME\cr
     Type: \tab Package\cr
     Version: \tab 1.1\cr
-    Date: \tab 2010-01-01\cr
+    Date: \tab 2010-02-01\cr
     License: \tab GNU Public License 2 or above\cr
   }
 
@@ -73,11 +73,13 @@
   
   Thomas Petzoldt
 }
-%\references{
-%%Soetaert K and Th. Petzoldt, 201x. 
-%%Inverse modelling, sensitivity and Monte Carlo analysis in R using package FME.
-%%Journal of statistical software, subm.
-%}
+\references{
+Soetaert K and Th. Petzoldt, 2010. 
+Inverse Modelling, Sensitivity and Monte Carlo Analysis in R Using Package FME.
+Journal of statistical software 33(3) 1-28.
+
+\url{http://www.jstatsoft.org/v33/i03}
+}
 
 \examples{
 \dontrun{

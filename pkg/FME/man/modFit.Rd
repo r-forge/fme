@@ -386,6 +386,13 @@ max(abs(mf$par - X))
   University Press.
 
   \url{http://netlib.bell-labs.com/cm/cs/cstr/153.pdf}
+  
+Soetaert K and Th. Petzoldt, 2010. 
+Inverse Modelling, Sensitivity and Monte Carlo Analysis in R Using Package FME.
+Journal of statistical software 33(3) 1-28.
+
+\url{http://www.jstatsoft.org/v33/i03}
+
 }
 \keyword{utilities}
 
