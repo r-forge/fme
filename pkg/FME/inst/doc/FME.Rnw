@@ -90,6 +90,7 @@ Please refer to the original publication when citing this work.
 library("FME")
 options("prompt" = "R> ", "continue" = "+  ")
 options(width=80)
+set.seed(1257)
 @
 
 \maketitle
@@ -401,7 +402,7 @@ version. As this will be significant when running the model multiple times,
 in what follows, the fast version (\code{HIV}) will be used.
 
 <<>>=
-pars = c(bet = 0.00002, rho = 0.15, delt = 0.55, c = 5.5, lam = 80, n = 900)
+pars <- c(bet = 0.00002, rho = 0.15, delt = 0.55, c = 5.5, lam = 80, n = 900)
 out <- HIV(pars = pars)
 @
 
@@ -416,7 +417,7 @@ par(mfrow = c(1, 1))
 \setkeys{Gin}{width=\textwidth}
 \begin{figure}
 \begin{center}
-<<label=odefig,fig=TRUE,echo=FALSE, width=13, height=6>>=
+<<label=odefig,fig=TRUE,echo=FALSE,height=4,width=8.667>>=
 <<ode>>
 @
 \end{center}
@@ -523,13 +524,13 @@ HIVcost(pars)$model
 @
 
 <<label=cost,include=FALSE>>=
-plot(HIVcost(pars))
+plot(HIVcost(pars), xlab="time")
 @
 
 \setkeys{Gin}{width=0.6\textwidth}
 \begin{figure}
 \begin{center}
-<<label=costfig,fig=TRUE,echo=FALSE>>=
+<<label=costfig,fig=TRUE,echo=FALSE,width=5.5,height=5.5>>=
 <<cost>>
 @
 \end{center}
@@ -577,7 +578,7 @@ par(fig=c(0,1,0,1))
 \setkeys{Gin}{width=0.6\textwidth}
 \begin{figure}
 \begin{center}
-<<label=sf,fig=TRUE,echo=FALSE>>=
+<<label=sf,fig=TRUE,echo=FALSE,width=5.5,height=5.5>>=
 <<sf>>
 @
 \end{center}
@@ -632,12 +633,12 @@ The plots are clearest if produced one per output variable
 (Figure~\ref{fig:sfun}):
 
 <<label=sfun,include=FALSE>>=
-plot(Sfun, which = c("logV", "T"), lwd = 2)
+plot(Sfun, which = c("logV", "T"), xlab="time", lwd = 2)
 @
 \setkeys{Gin}{width=0.8\textwidth}
 \begin{figure}
 \begin{center}
-<<label=sfunfig,fig=TRUE,echo=FALSE,height=6,width=13>>=
+<<label=sfunfig,fig=TRUE,echo=FALSE,height=4,width=8.667>>=
 <<sfun>>
 @
 \end{center}
@@ -766,7 +767,7 @@ plot(ident, log = "y")
 \setkeys{Gin}{width=0.6\textwidth}
 \begin{figure}
 \begin{center}
-<<label=collfig,fig=TRUE,echo=FALSE>>=
+<<label=collfig,fig=TRUE,echo=FALSE,width=5.5,height=5.5>>=
 <<coll>>
 @
 \end{center}
@@ -871,7 +872,7 @@ par(mfrow = c(1, 1))
 \setkeys{Gin}{width=\textwidth}
 \begin{figure}
 \begin{center}
-<<label=fitfig,fig=TRUE,echo=FALSE,height=6,width=13>>=
+<<label=fitfig,fig=TRUE,echo=FALSE,height=4,width=8>>=
 <<fit>>
 @
 \end{center}
@@ -995,6 +996,7 @@ cov0 <- summary(Fit)$cov.scaled * 2.4^2/5
 <<eval=FALSE>>=
 MCMC <- modMCMC(f = HIVcost2, p = Fit$par, niter = 5000, jump = cov0,
                 var0 = var0, wvar0 = 0.1, updatecov = 50)
+#save(MCMC, file="mcmc.Rdata")
 @
 
 %%but instead load the pre-calculated data
@@ -1154,7 +1156,7 @@ plot(CRL, ylab = "number of virions", trace = TRUE)
 \setkeys{Gin}{width=0.8\textwidth}
 \begin{figure}
 \begin{center}
-<<label=crlfig,fig=TRUE,echo=FALSE>>=
+<<label=crlfig,fig=TRUE,echo=FALSE,width=5.5,height=5.5>>=
 <<crl>>
 @
 \end{center}
