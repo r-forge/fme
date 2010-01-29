@@ -4,7 +4,7 @@
 \docType{package}
 \title{
   A Flexible Modelling Environment for Inverse Modelling, Sensitivity,
-  Identifiability, Monte Carlo analysis.
+  Identifiability, Monte Carlo Analysis.
 }
 \description{
   R-package FME contains functions to run complex applications of models
@@ -95,12 +95,14 @@ browseURL(paste(system.file(package = "FME"), "/doc", sep = ""))
 ## open the directory with examples
 browseURL(paste(system.file(package = "FME"), "/doc/examples", sep = ""))
 
-## the vignette
+## the vignettes
+vignette("FME")
 vignette("FMEdyna")
 vignette("FMEsteady")
 vignette("FMEother")
 vignette("FMEmcmc")
 
+edit(vignette("FME"))
 edit(vignette("FMEdyna"))
 edit(vignette("FMEsteady"))
 edit(vignette("FMEother"))
@@ -109,4 +111,4 @@ edit(vignette("FMEmcmc"))
 }
 }
 
-\keyword{ package }
+\keyword{package}
