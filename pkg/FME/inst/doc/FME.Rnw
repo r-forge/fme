@@ -531,7 +531,7 @@ plot(HIVcost(pars), xlab="time")
 \begin{figure}
 \begin{center}
 <<label=costfig,fig=TRUE,echo=FALSE,width=5.5,height=5.5>>=
-<<cost>>
+plot(HIVcost(pars), xlab="time", legpos="topright")
 @
 \end{center}
 \caption{Residuals of model and pseudodata.}
@@ -680,7 +680,7 @@ pairs(Sfun, which = c("logV", "T"), col = c("blue", "green"))
 \setkeys{Gin}{width=0.8\textwidth}
 \begin{figure}
 \begin{center}
-<<label=sfunpfig,fig=TRUE,echo=FALSE>>=
+<<label=sfunpfig,fig=TRUE,echo=FALSE,width=6,height=6>>=
 <<sfunp>>
 @
 \end{center}
@@ -872,7 +872,7 @@ par(mfrow = c(1, 1))
 \setkeys{Gin}{width=\textwidth}
 \begin{figure}
 \begin{center}
-<<label=fitfig,fig=TRUE,echo=FALSE,height=4,width=8>>=
+<<label=fitfig,fig=TRUE,echo=FALSE,height=4,width=8.667>>=
 <<fit>>
 @
 \end{center}
@@ -1037,7 +1037,8 @@ plot(MCMC, Full = TRUE)
 \setkeys{Gin}{width=0.8\textwidth}
 \begin{figure}
 \begin{center}
-<<label=mcmcfig,fig=TRUE,echo=FALSE>>=
+<<label=mcmcfig,fig=TRUE,echo=FALSE,width=5.5,height=5.5>>=
+par(mar=c(4, 4, 3, 1) + .1)
 <<mcmc>>
 @
 \end{center}
@@ -1069,8 +1070,8 @@ pairs(MCMC, nsample = 1000)
 \setkeys{Gin}{width=0.8\textwidth}
 \begin{figure}
 \begin{center}
-<<label=mcmcfig2,fig=TRUE,echo=FALSE>>=
-<<mcmc2>>
+<<label=mcmcfig2,fig=TRUE,echo=FALSE,width=5.5,height=5.5>>=
+pairs(MCMC, nsample = 1000,cex.labels=1.4,cex=0.7)
 @
 \end{center}
 \caption{Pairs plot of the MCMC application.}
@@ -1157,7 +1158,7 @@ plot(CRL, ylab = "number of virions", trace = TRUE)
 \begin{figure}
 \begin{center}
 <<label=crlfig,fig=TRUE,echo=FALSE,width=5.5,height=5.5>>=
-<<crl>>
+plot(CRL, ylab = "number of virions", cex=0.5, trace = TRUE)
 @
 \end{center}
 \caption{Global sensitivity; mean virus number (averaged over the simulation
