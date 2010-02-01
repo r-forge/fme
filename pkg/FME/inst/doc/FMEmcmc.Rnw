@@ -19,8 +19,9 @@
 \newcommand{\ds}{\textbf{\textsf{deSolve }}}
 \newcommand{\rs}{\textbf{\textsf{rootSolve }}}
 \newcommand{\R}{\proglang{R}}
-\title{\proglang{R}-package \fme: MCMC tests}
-\Plaintitle{Tests of the Markov Chain Monte Carlo Implementation}
+\title{\proglang{R} Package \fme: Tests of the Markov Chain Monte Carlo Implementation}
+\Plaintitle{R Package FME: Tests of the Markov Chain Monte Carlo Implementation}
+\Shorttitle{Tests of the MCMC Implementation}
 
 \Keywords{Markov chain Monte Carlo, delayed rejection, adapative Metropolis,
 MCMC, DRAM,  \proglang{R}}

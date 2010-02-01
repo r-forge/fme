@@ -20,10 +20,10 @@
 \newcommand{\rs}{\textbf{\textsf{rootSolve }}}
 \newcommand{\R}{\proglang{R}}
 
-\title{\proglang{R}~Package \fme: Inverse Modelling, Sensitivity,
+\title{\proglang{R} Package \fme: Inverse Modelling, Sensitivity,
   Monte Carlo -- Applied to a Steady-State Model}
 
-\Plaintitle{R~package FME: Inverse Modelling, Sensitivity,
+\Plaintitle{R Package FME: Inverse Modelling, Sensitivity,
   Monte Carlo -- Applied to a Steady-State Model}
 
 \Shorttitle{\fme -- Inverse Modelling, Sensitivity,
