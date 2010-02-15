@@ -522,7 +522,7 @@ Then the modCost will give:
 Dat<- data.frame(name=c("Obs1","Obs1","Obs2","Obs2"),
                  time=c(1,2,1,2),val=c(50,150,1,2),
                  err=c(5,15,0.1,0.2))
-Mod <- Mod <- data.frame(time=0:3,Obs1=rep(4,4),Obs2=1:4)
+Mod <- data.frame(time=0:3,Obs1=rep(4,4),Obs2=1:4)
 modCost(mod=Mod,obs=Dat,y="val")
 @
 
