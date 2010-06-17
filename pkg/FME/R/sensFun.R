@@ -11,7 +11,7 @@ sensFun <- function(func, parms, sensvar = NULL, senspar = names(parms),
 
   yRef  <- Solve(parms)
   Type <- 1
-  if (class(yRef) == "modCost") {
+  if("modCost" %in% class(yRef))  {
     Res    <- yRef$residuals
     ynames <- Res$name
     yRef <- cbind(Res$x, Res$mod)
