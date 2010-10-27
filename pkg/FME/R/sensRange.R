@@ -246,23 +246,31 @@ plot.sensRange<-function(x, xyswap = FALSE, which = NULL,
 
 plot.summary.sensRange<-function(x, xyswap = FALSE, which = NULL,
    legpos = "topleft", col = c(grey(0.8),grey(0.7)), quant = FALSE,
-   ask = NULL, ...) {
+   ask = NULL, obs = NULL, ...) {
 
   nx    <- attr(x, "nx")
   var   <- attr(x, "var")
 
   dots   <- list(...)
   nmdots <- names(dots)
-  Select <- selectvar(which, var, Nall = TRUE)
+  Which <- which
+  if (is.null (Which) & ! is.null(obs))
+    Which <- which (var %in% colnames(obs))
+    
+  Select <- selectvar(Which, var, Nall = TRUE)
   Main   <- is.null(dots$main)
   Ylim   <- is.null(dots$ylim)
   Xlim   <- is.null(dots$xlim)
+  ylim  <- dots$ylim
+  xlim  <- dots$xlim
 
   dots$ylab <- if(is.null(dots$ylab)) "y" else dots$ylab
   dots$xlab <- if(is.null(dots$xlab)) "x" else dots$xlab
 
   Dots <- dots
   Dots$ylab <- Dots$ylim <- Dots$xlab <- Dots$xlim <- NULL
+  if (! is.null(obs)) 
+      pdots <- dots[c("pch","col","bg","cex","lwd")]    
 
   if (nx > 1)  {    # summary of a times series or a profile...
     ## Set par mfrow and ask.
@@ -273,6 +281,7 @@ plot.summary.sensRange<-function(x, xyswap = FALSE, which = NULL,
       oask <- devAskNewPage(TRUE)
       on.exit(devAskNewPage(oask))
     }
+    if (! is.null(obs)) obsname <- colnames(obs)
 
     for (i in Select){
       ii <- ((i-1)*nx+1):(i*nx)
@@ -292,23 +301,37 @@ plot.summary.sensRange<-function(x, xyswap = FALSE, which = NULL,
         xup  <- X$Mean+X$Sd
         leg <- c("Min-Max", "Mean+-sd")
       }
-
+      iobs <- NULL
+      Obs <- NULL
+      
+      if (! is.null(obs)) {  # find corresponding observed data
+        iobs <- which (obsname == var[i])
+        if (length(iobs) == 0) iobs <- NULL
+        Obs <- obs[,iobs]
+      }
       if (Main) dots$main <- var[i]
-
+      dots$ylim <- ylim
+      dots$xlim <- xlim
       if (!xyswap) {
-        if (Ylim) dots$ylim <- range(cbind(xmin, xmax))
+        if (Ylim) dots$ylim <- range(c(xmin, xmax, Obs), na.rm = TRUE)
         if (Xlim) dots$xlim <- range(X$x)
+        
         do.call("plot", c(alist(X$x, xmean, type = "n"), dots))
         polygon(c(X$x, rev(X$x)), c(xmin, rev(xmax)), col = col[1], border = NA)
         polygon(c(X$x, rev(X$x)), c(xlow, rev(xup)), col = col[2], border = NA)
         do.call("lines", c(alist(X$x, xmean), Dots) )
+        if (! is.null(iobs))
+          do.call("points", c(alist(obs[,1], obs[,iobs]), pdots) )
+        
       } else {
-       if (Xlim) dots$xlim <- range(cbind(xmin, xmax))
+       if (Xlim) dots$xlim <- range(c(xmin, xmax,Obs), na.rm = TRUE)
        if (Ylim) dots$ylim <- rev(range(X$x))
         do.call("plot", c(alist(xmean, X$x, type = "n"), dots))
         polygon(c(xmin, rev(xmax)), c(X$x, rev(X$x)), col = col[1], border = NA)
         polygon(c(xlow, rev(xup)), c(X$x, rev(X$x)), col = col[2], border = NA)
         do.call("lines", c(alist(xmean, X$x), Dots) )
+        if (! is.null(iobs))
+          do.call("points", c(alist(obs[,iobs], obs[,1]), pdots) )
       }
     } # end i loop
     if (! is.null(legpos))

@@ -30,7 +30,7 @@ sensRange(func, parms = NULL, sensvar = NULL, dist = "unif",
 \method{plot}{summary.sensRange}(x, xyswap = FALSE,
               which = NULL, legpos = "topleft",
               col = c(grey(0.8), grey(0.7)),
-              quant = FALSE, ask = NULL, \dots)
+              quant = FALSE, ask = NULL, obs = NULL, \dots)
 
 \method{plot}{sensRange}(x, xyswap = FALSE,
               which = NULL, ask = NULL, \dots)
@@ -120,6 +120,12 @@ sensRange(func, parms = NULL, sensvar = NULL, dist = "unif",
     page of plots is necessary and the current graphics device is set
     interactive, see \code{\link{par}(ask=...)} and
     \code{\link{dev.interactive}}.
+  }
+  \item{obs }{a \code{data.frame} or \code{matrix} with "observed data" that 
+    will be added as \code{points} to the plots. 
+    The first column of \code{obs} should contain the \code{time} or space-variable. 
+    If \code{obs} is not \code{NULL} and \code{which} is \code{NULL}, 
+    then the variables, common to both \code{obs} and \code{x} will be plotted.
   }
   \item{... }{additional arguments passed to \code{func} or to the
     methods.
