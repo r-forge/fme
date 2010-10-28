@@ -240,9 +240,6 @@ K     <- 100
 ## analytical solution
 Ana <- cbind(time = TT, N = K/(1 + (K/N0 - 1) * exp(-r*TT)))
 
-plot(TT, Ana[,"N"], ylim = c(0, 120),  type = "l", col = "red", lwd = 2,
-     main = "logistic growth", xlab = "time", ylab = "N")
-
 ## numeric solution
 logist <- function(t, x, parms) {
   with(as.list(parms), {
@@ -268,12 +265,12 @@ cLsoda <- modCost(Lsoda, Ana)$model
 cAna   <- modCost(Ana2 , Ana)$model
 compare <- data.frame(method = c("euler", "rk4", "lsoda", "Ana"),
                       cost   = c(cEuler, cRk4, cLsoda, cAna))
+## Plot Euler, RK and analytic solution
+plot(Euler, Rk4, col = c("red", "blue"), obs = Ana,  
+     main = "logistic growth", xlab = "time", ylab = "N")
 
-points(Euler, col = "red")
-points(Rk4, col = "blue")
-
-legend("bottomright", c("exact", "euler", "rk4"), pch = c(NA, 1, 1),
-  col=c("red", "red", "blue"), lty = c(1, NA, NA))
+legend("bottomright", c("exact", "euler", "rk4"), pch = c(1, NA, NA),
+  col=c("black", "red", "blue"), lty = c(NA, 1, 2))
 legend("right", ncol = 2, title = "SSR",
   legend = c(as.character(compare[,1]), format(compare[,2], digits = 2)))
 
@@ -287,13 +284,8 @@ compare
 ## Run the model with initial guess: K = 10, r = 2
 parms["K"] <- 10
 parms["r"] <-  2
+
 init <-  ode(x, time, logist, parms)
-
-## show results, compared with "observations"
-plot(TT, Ana[,"N"], ylim = c(0, 120),  type = "p", col = "red",
-  pch = 16, cex = 2, main = "logistic growth", xlab = "time", ylab = "N")
-
-lines(init, lwd = 2, col = "green")
 
 ## FITTING algorithm uses modFit
 ## First define the objective function (model cost) to be minimised
@@ -313,7 +305,10 @@ summary(Fit)
 parms[c("K", "r")] <- Fit$par
 fitted <-  ode(x, time, logist, parms)
 
-lines (fitted, lwd = 2, col = "blue")
+## show results, compared with "observations"
+plot(init, fitted, col = c("green", "blue"), lwd = 2, lty = 1, 
+     obs = Ana, obspar = list(col = "red", pch = 16, cex = 2), 
+     main = "logistic growth", xlab = "time", ylab = "N")
 
 legend("right", c("initial", "fitted"), col=c("green", "blue"), lwd = 2)
 

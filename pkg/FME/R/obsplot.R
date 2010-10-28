@@ -96,7 +96,7 @@ mergeObs <- function(obs, Newobs) {
 ### S3 methods
 ### ============================================================================
 
-plot.obs <- function (x, ..., which = NULL, xyswap = FALSE, ask = NULL) {
+obsplot <- function (x, ..., which = NULL, xyswap = FALSE, ask = NULL) {
 
 ## check observed data
     checkobs <- function (obs) {

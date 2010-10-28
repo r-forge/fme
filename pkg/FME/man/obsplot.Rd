@@ -1,5 +1,5 @@
-\name{plot.obs}
-\alias{plot.obs}
+\name{obsplot}
+\alias{obsplot}
 \title{
  Plot Method for observed data
 }
@@ -7,7 +7,7 @@
 Plot all observed variables in matrix formalt
 }
 \usage{
-plot.obs(x, ..., which = NULL, xyswap = FALSE, ask = NULL)
+obsplot(x, ..., which = NULL, xyswap = FALSE, ask = NULL)
 }
 
 \arguments{
@@ -70,21 +70,21 @@ plot.obs(x, ..., which = NULL, xyswap = FALSE, ask = NULL)
 ## 'observed' data
 AIRquality <- cbind(DAY = 1:153, airquality[, 1:4])
 head(AIRquality)
-plot.obs(AIRquality, type="l", xlab="Day since May")
+obsplot(AIRquality, type="l", xlab="Day since May")
 
 AIR2 <- cbind( 1:100, Solar.R = 250 * runif(100), Temp = 90-30*cos(2*pi*1:100/365) )
 
-plot.obs(AIRquality, AIR2, type = "l", xlab = "Day since May" , lwd = 1:2)
+obsplot(AIRquality, AIR2, type = "l", xlab = "Day since May" , lwd = 1:2)
 
-plot.obs(AIRquality, AIR2, type = "l", xlab = "Day since May" , 
+obsplot(AIRquality, AIR2, type = "l", xlab = "Day since May" , 
          lwd = 1 : 2, which =c("Solar.R", "Temp"), 
          xlim = list(c(0, 150), c(0, 100)))
 
 # 
-plot.obs(AIRquality, AIR2, type = "l", xlab = "Day since May" , 
+obsplot(AIRquality, AIR2, type = "l", xlab = "Day since May" , 
          lwd = 1 : 2, which =c("Solar.R", "Temp"), log = c("y", ""))
 
-plot.obs(AIRquality, AIR2, which = 1:3, xyswap = c(TRUE,FALSE,TRUE))
+obsplot(AIRquality, AIR2, which = 1:3, xyswap = c(TRUE,FALSE,TRUE))
 
 }
 
