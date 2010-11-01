@@ -62,15 +62,17 @@ findvar <- function(var1, var2, str = "var") {
 ## Selecting numbers from "which"...
 ## =============================================================================
 
-selectvar <- function (which, var, nm = "x", Nall = FALSE) { # var = list from which to select...
+selectvar <- function (which, var, nm = "x", Nall = FALSE, NAallowed = FALSE) { # var = list from which to select...
   if (!is.null(which)) {
     if (! is.numeric(which)) {
       ln <- length(which)
       Select <- NULL
       for (i in which) {  # use loop rather than which(...%in%) to keep ordering of "which"
         ii <- which (var == i)
-        if (length(ii) == 0)
-          stop(paste(" variable in 'which' is not in", nm, ":", i))
+        if (length(ii) ==0 & ! NAallowed) 
+          stop("variable ", i, " not in variable names")
+        else if (length(ii) == 0)
+          Select <- c(Select, NA)
         Select <- c(Select, ii)
       }
     } else {     # index
@@ -87,4 +89,88 @@ selectvar <- function (which, var, nm = "x", Nall = FALSE) { # var = list from w
       Select <- NULL
 
   return(Select)
+}
+### ============================================================================
+### first some common functions
+### ============================================================================
+# Update range, taking into account neg values for log transformed values
+Range <- function(Range, x, log) {
+   if (log) 
+      x[x <= 0] <- min(x[x>0])  # remove zeros
+   return( range(Range, x, na.rm = TRUE) )
+}
+
+## =============================================================================
+## function for checking and expanding arguments in dots (...) with default
+## =============================================================================
+
+expanddots <- function (dots, default, n) {
+  dots <- if (is.null(dots)) default else dots
+  rep(dots, length.out = n)
+}
+
+# ks->Th: for xlim and ylim....
+expanddotslist <- function (dots, n) {
+  if (is.null(dots)) return(dots)
+  dd <- if (!is.list(dots )) list(dots) else dots
+  rep(dd, length.out = n)
+}
+
+## =============================================================================
+## functions for expanding arguments in dots  (...)
+## =============================================================================
+
+repdots <- function(dots, n) 
+  if (is.function(dots)) dots else rep(dots, length.out = n)
+
+setdots <- function(dots, n) lapply(dots, repdots, n)
+
+## =============================================================================
+## function for extracting element 'index' from dots  (...)
+## =============================================================================
+
+extractdots <- function(dots, index) {
+  ret <- lapply(dots, "[", index)
+  ret <- lapply(ret, unlist) ## thpe: flatten list (experimental)
+  return(ret)
+}
+
+### ============================================================================
+### Merge two observed data files; assumed that first column = 'x' and ignored
+### ============================================================================
+
+mergeObs <- function(obs, Newobs) {
+      
+  if (! class(Newobs) %in% c("data.frame","matrix"))
+    stop ("the elements in 'obs' should be either a 'data.frame' or a 'matrix'")
+      
+  obsname <- colnames(obs)
+
+## check if some observed variables in NewObs are already in obs
+  newname <- colnames(Newobs)[-1]    # 1st column = x-var and ignored
+  ii <- which (newname %in% obsname)
+  if (length(ii) > 0)
+    obsname <- c(obsname, newname[-ii] ) 
+  else
+    obsname <- c(obsname, newname) 
+
+## padding with NA of the two datasets
+  O1 <- matrix(nrow = nrow(Newobs), ncol = ncol(obs), data = NA)
+  O1[ ,1] <- Newobs[,1]
+  for (j in ii) {   # obseerved data in common are put in correct position
+    jj <- which (obsname == newname[j])
+    O1[,jj] <- Newobs[,j+1]
+  }
+  O1 <- cbind(O1, Newobs[,-c(1,ii+1)] )
+  colnames(O1) <- obsname
+
+  nnewcol <- ncol(Newobs)-1 - length (ii)  # number of new columns
+  if (nnewcol > 0) {     
+     O2 <- matrix(nrow = nrow(obs), ncol = nnewcol, data = NA)
+     O2 <- cbind(obs, O2)
+     colnames(O2) <- obsname
+  } else O2 <- obs
+      
+  obs <- rbind(O2, O1) 
+  return(obs) 
 }

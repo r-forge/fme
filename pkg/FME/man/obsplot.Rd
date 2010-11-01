@@ -17,6 +17,10 @@ obsplot(x, ..., which = NULL, xyswap = FALSE, ask = NULL)
     
     Several other matrices or data.frames can be passed in the \code{...},
     after \code{x} (unnamed) - see second example.
+    
+    If the first column of \code{x} consists of factors, or characters (strings),
+    then it is assumed that the data are presented in long (database) format,
+    where the first three columns contain (name, x, y). See last example.
     }
 
   \item{which }{the name(s) or the index to the variables that should be
@@ -72,6 +76,7 @@ AIRquality <- cbind(DAY = 1:153, airquality[, 1:4])
 head(AIRquality)
 obsplot(AIRquality, type="l", xlab="Day since May")
 
+## second set of observed data
 AIR2 <- cbind( 1:100, Solar.R = 250 * runif(100), Temp = 90-30*cos(2*pi*1:100/365) )
 
 obsplot(AIRquality, AIR2, type = "l", xlab = "Day since May" , lwd = 1:2)
@@ -80,11 +85,19 @@ obsplot(AIRquality, AIR2, type = "l", xlab = "Day since May" ,
          lwd = 1 : 2, which =c("Solar.R", "Temp"), 
          xlim = list(c(0, 150), c(0, 100)))
 
-# 
 obsplot(AIRquality, AIR2, type = "l", xlab = "Day since May" , 
          lwd = 1 : 2, which =c("Solar.R", "Temp"), log = c("y", ""))
 
 obsplot(AIRquality, AIR2, which = 1:3, xyswap = c(TRUE,FALSE,TRUE))
+
+## ' a data.frame, with 'treatments', presented in long database format
+Data <- ToothGrowth[,c(2,3,1)]
+head   (Data)
+obsplot(Data, ylab = "len", xlab = "dose")
+
+# same, plotted as two observed data sets
+obsplot(subset(ToothGrowth, supp == "VC", select = c(dose, len)),
+        subset(ToothGrowth, supp == "OJ", select = c(dose, len)))
 
 }
 

@@ -55,11 +55,35 @@ extractdots <- function(dots, index) {
 ### Merge two observed data files; assumed that first column = 'x' and ignored
 ### ============================================================================
 
+# from 3-columned format (what, where, value) to wide format...
+convert2wide <- function(Data) {
+    cnames   <- as.character(unique(Data[,1]))
+    
+    MAT      <- Data[Data[,1] == cnames[1], 2:3]
+    colnames.MAT <- c("x", cnames[1])
+
+    for ( ivar in cnames[-1]) {
+      sel <- Data[Data[,1] == ivar, 2:3]
+      nt  <- cbind(sel[,1],matrix(nrow = nrow(sel), ncol = ncol(MAT)-1, data = NA),sel[,2])
+      MAT <- cbind(MAT, NA)
+      colnames(nt) <- colnames(MAT)
+      MAT <- rbind(MAT, nt)
+      colnames.MAT <- c(colnames.MAT, ivar)
+    }  
+  colnames(MAT) <- colnames.MAT
+  return(MAT)
+}
+
+### ============================================================================
+
 mergeObs <- function(obs, Newobs) {
       
   if (! class(Newobs) %in% c("data.frame","matrix"))
     stop ("the elements in 'obs' should be either a 'data.frame' or a 'matrix'")
       
+  if (is.character(Newobs[,1]) | is.factor(Newobs[,1])) 
+    Newobs <- convert2wide(Newobs)
+  
   obsname <- colnames(obs)
 
 ## check if some observed variables in NewObs are already in obs
@@ -71,6 +95,7 @@ mergeObs <- function(obs, Newobs) {
     obsname <- c(obsname, newname) 
 
 ## padding with NA of the two datasets
+
   O1 <- matrix(nrow = nrow(Newobs), ncol = ncol(obs), data = NA)
   O1[ ,1] <- Newobs[,1]
   for (j in ii) {   # obseerved data in common are put in correct position
@@ -106,6 +131,8 @@ obsplot <- function (x, ..., which = NULL, xyswap = FALSE, ask = NULL) {
       DD <- duplicated(obsname)
       if (sum(DD) > 0)  
         obs <- mergeObs(obs[,!DD], cbind(obs[,1],obs[,DD]))
+      else  if (is.character(obs[,1]) | is.factor(obs[,1])) 
+        obs <- convert2wide(obs)
       return(obs)
     } 
 
