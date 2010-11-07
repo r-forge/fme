@@ -26,7 +26,7 @@
 }
 \usage{
 sensFun(func, parms, sensvar = NULL, senspar = names(parms),
-  varscale = NULL, parscale = NULL, tiny = 1e-8, map = 1, ...)
+        varscale = NULL, parscale = NULL, tiny = 1e-8, map = 1, ...)
 
 \method{summary}{sensFun}(object, vars = FALSE, \dots)
 
@@ -225,7 +225,7 @@ out <- solveBact(pars)
 
 plot(out$time, out$Bact, ylim = range(c(out$Bact, out$Sub)),
      xlab = "time, hour", ylab = "molC/m3", type = "l", lwd = 2)
-lines(out$time, out$Sub,lty = 2,lwd = 2)
+lines(out$time, out$Sub, lty = 2, lwd = 2)
 lines(out$time, out$Sub + out$Bact)
 
 legend("topright", c("Bacteria", "Glucose", "TOC"),

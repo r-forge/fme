@@ -22,8 +22,8 @@
 }
 \usage{
 sensRange(func, parms = NULL, sensvar = NULL, dist = "unif",
-  parInput = NULL, parRange = NULL, parMean = NULL, parCovar = NULL,
-  map = 1, num = 100,  ...)
+          parInput = NULL, parRange = NULL, parMean = NULL, 
+          parCovar = NULL, map = 1, num = 100,  ...)
   
 \method{summary}{sensRange}(object, \dots)
 

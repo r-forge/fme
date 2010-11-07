@@ -10,8 +10,8 @@
   residuals, and the variable and model costs (sum of squared residuals).
 }
 \usage{
-modCost(model, obs, x="time", y=NULL, err=NULL,
-  weight="none", scaleVar=FALSE, cost=NULL,  ...)
+modCost(model, obs, x = "time", y = NULL, err = NULL,
+        weight = "none", scaleVar = FALSE, cost = NULL,  ...)
 }
 
 \arguments{
@@ -214,7 +214,7 @@ Mod <- function (t, y, par) {
   return(list(c(da, db)))
 }
 
-out <- ode(y = c(a=0.5, b=0.5), times = 0:6, func = Mod, parms = NULL)
+out <- ode(y = c(a = 0.5, b = 0.5), times = 0:6, func = Mod, parms = NULL)
 
 Data   # Show
 out
@@ -270,9 +270,10 @@ plot(Euler, Rk4, col = c("red", "blue"), obs = Ana,
      main = "logistic growth", xlab = "time", ylab = "N")
 
 legend("bottomright", c("exact", "euler", "rk4"), pch = c(1, NA, NA),
-  col=c("black", "red", "blue"), lty = c(NA, 1, 2))
+       col = c("black", "red", "blue"), lty = c(NA, 1, 2))
 legend("right", ncol = 2, title = "SSR",
-  legend = c(as.character(compare[,1]), format(compare[,2], digits = 2)))
+       legend = c(as.character(compare[,1]), 
+                  format(compare[,2], digits = 2)))
 
 compare
 
@@ -297,7 +298,7 @@ Cost <- function(P) {
   out <- ode(x, time, logist, parms)
   return(modCost(out, Ana))
 }
-(Fit<-modFit(p = c(K = 10, r = 2),f = Cost))
+(Fit<-modFit(p = c(K = 10, r = 2), f = Cost))
 
 summary(Fit)
 
@@ -310,7 +311,7 @@ plot(init, fitted, col = c("green", "blue"), lwd = 2, lty = 1,
      obs = Ana, obspar = list(col = "red", pch = 16, cex = 2), 
      main = "logistic growth", xlab = "time", ylab = "N")
 
-legend("right", c("initial", "fitted"), col=c("green", "blue"), lwd = 2)
+legend("right", c("initial", "fitted"), col = c("green", "blue"), lwd = 2)
 
 Cost(Fit$par)
 
