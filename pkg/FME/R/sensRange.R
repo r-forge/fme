@@ -368,15 +368,15 @@ plot.summary.sensRange<-function(x, xyswap = FALSE, which = NULL,
         Xlog  <- length(grep("x",Dotmain$log))
       }       
       if (!xyswap) {
-        if (is.null(yylim[[ii]])) 
+        if (is.null(yylim[[ij]]))
           Dotmain$ylim <- Range(NULL,c(xmin, xmax, obs[,io]), Ylog)
         else
-          Dotmain$ylim <- yylim[[ii]]   
+          Dotmain$ylim <- yylim[[ij]]
         
-        if (is.null(xxlim[[ii]])) 
+        if (is.null(xxlim[[ij]]))
           Dotmain$xlim <- Range(NULL,X$x,Xlog)
         else
-          Dotmain$xlim <- xxlim[[ii]]
+          Dotmain$xlim <- xxlim[[ij]]
         do.call("plot", c(alist(X$x, xmean, type = "n"), Dotmain))
         polygon(c(X$x, rev(X$x)), c(xmin, rev(xmax)), col = col[1], border = NA)
         polygon(c(X$x, rev(X$x)), c(xlow, rev(xup)), col = col[2], border = NA)
@@ -388,15 +388,15 @@ plot.summary.sensRange<-function(x, xyswap = FALSE, which = NULL,
                          extractdots(Obspar, j) ))        
         
       } else {
-        if (is.null(xxlim[[ii]])) 
+        if (is.null(xxlim[[ij]]))
           Dotmain$xlim <- range(c(xmin, xmax, obs[,io]), na.rm = TRUE)
         else
-          Dotmain$xlim <- xxlim[[ii]]
+          Dotmain$xlim <- xxlim[[ij]]
   
-        if (is.null(yylim[[ii]])) 
+        if (is.null(yylim[[ij]]))
           Dotmain$ylim <- rev(range(X$x))
         else
-          Dotmain$ylim <- yylim[[ii]]
+          Dotmain$ylim <- yylim[[ij]]
   
         do.call("plot", c(alist(xmean, X$x, type = "n"), Dotmain))
         polygon(c(xmin, rev(xmax)), c(X$x, rev(X$x)), col = col[1], border = NA)

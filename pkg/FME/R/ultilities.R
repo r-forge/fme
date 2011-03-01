@@ -47,7 +47,8 @@ panel.hist <- function(x,...) {
 
 findvar <- function(var1, var2, str = "var") {
   if (is.character(var2[[1]])){
-    ivar  <- which (names(var1) %in% var2)
+    ivar <- sapply(var2, FUN= function(x) which (names(var1) %in% x))
+#    ivar  <- which (names(var1) %in% var2)  #returns sorted list
     if (length(ivar)!= length(var2))
       stop(paste("cannot proceed: not all sensitivity", str, "are known"))
     return(ivar)
