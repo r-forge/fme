@@ -2,7 +2,7 @@
 \alias{pseudoOptim}
 \title{Pseudo-random Search Optimisation Algorithm of Price (1977)}
 \description{Fits a model to data, using the pseudo-random search
-  algorithm of Price (1997), a random-based fitting technique.
+  algorithm of Price (1977), a random-based fitting technique.
 }
 
 \usage{pseudoOptim(f, p,..., lower, upper, control = list())}
