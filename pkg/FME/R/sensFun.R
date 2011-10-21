@@ -91,11 +91,11 @@ sensFun <- function(func, parms, sensvar = NULL, senspar = names(parms),
 
   if (is.null(parscale))
     parscale <- pp
-  else parscale<-rep(parscale, npar)
+  else parscale<-rep(parscale, length.out=npar)              #changed 21/10/2011 (Karline, Tom)
 
   if (is.null(varscale))
     varscale <- yRef
-  else varscale <- rep (varscale, length(yRef))
+  else varscale <- rep (varscale, length.out=length(yRef))   #changed 21/10/2011 (Karline, Tom)
 
   ## 0 is set equal to a very small number
   varscale[varscale == 0] <- tiny*1e-12
@@ -294,7 +294,7 @@ plot.sensFun<- function(x, which = NULL, legpos = "topleft", ask = NULL, ...) {
   }
   for (i in Select){
     if (TYP == 1)
-      ii <- ((i - 1)*nx):(i*nx)
+      ii <- ((i - 1)*nx+1):(i*nx)       # changed (addition of +1; by Karline & Tom 21/10/2011)
     else
       ii <- (nx[i] + 1):nx[i + 1]
     if (Main)
