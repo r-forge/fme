@@ -2,7 +2,7 @@
 \alias{cross2long}
 
 \title{
-  Convert a dataset in wide (crosstab) format to long (database format)
+  Convert a dataset in wide (crosstab) format to long (database) format
 }
 
 \description{
@@ -12,24 +12,21 @@
 }
 
 \usage{
-cross2long(data, x, include = NULL, exclude = NULL, replicate = NULL, error = F )
+cross2long( data, x, select = NULL, replicate = NULL, error = F )
 }
 
 \arguments{
 
-  \item{data }{a data frame with crosstab layout
+  \item{data }{a data frame (or matrix) with crosstab layout
   }
   \item{x }{name of the independent variable to be replicated
   }
-  \item{include }{a character vector containing the names of the columns
-     that should be included (see details)
+  \item{select }{a vector of column names to be included (see details).
+     All columns are included if not specified.
   }
-  \item{exclude }{a character vector containing the names of the columns
-     that should be excluded (see details)
-  }
-  \item{replicate }{a character vector containing the names of columns
-     that have to be replicated for every included column (e.g. experimental
-     treatment specification)
+  \item{replicate }{a vector of names of variables (apart from the
+     independent variable that have to be replicated for every included
+     column (e.g. experimental treatment specification).
   }
   \item{error }{boolean indicating whether the final dataset in long format
      should contain an extra column for error values (cf. \link{modCost};
@@ -77,7 +74,7 @@ cross2long(data, x, include = NULL, exclude = NULL, replicate = NULL, error = F 
   }
   for the crosstab format.
 
-  The parameters \code{include}, \code{exclude}, and  \code{replicate} should
+  The parameters \code{x}, \code{select}, and  \code{replicate} should
   be disjoint. Although the independent variable always has to be replicated
   it should not be given by the \code{replicate} parameter.
 
@@ -101,11 +98,16 @@ oxygen <- data.frame(depth = depth,
                      sand  = O2sand
           )
 
-cross2long(data=oxygen, x = "depth", include=c("silt","mud"),replicate="zone")
+cross2long(data=oxygen, x = depth, select=c(silt,mud), replicate = zone)
+cross2long(data=oxygen, x = depth, include=c(mud,-silt, replicate = zone)
 
-#cross2long(data=oxygen, x = "depth", include=c("silt","mud"), exclude="sand",replicate="zone")
+# two times the same column name: replicates
+colnames(oxygen)[4] <- "mud"    
 
-#cross2long(data=oxygen, x = "depth", include="silt", exclude="sand",replicate="zone")
+cross2long(data=oxygen, x = depth, select = mud)
+
+
+
 
 }
 \author{

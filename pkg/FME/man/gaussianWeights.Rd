@@ -8,66 +8,73 @@
 
 \description{
   A calibration dataset in database format (cf. modCost for the database
-  format) is extended in order to fit model output surrounding a specific
-  observation in the calibration dataset to this observation by weighing
-  the residuals according to a Gaussian density function that has the
-  relevant observation as mean and a specified standard deviation.
-  
+  format) is extended in order to fit model output using a weighted least
+  squares approach. To this end, the observations are replicated for a
+  certain number of times, and weights are assigned to the replicates
+  according to a Gaussian density function. This density has the relevant
+  observation as mean value. The standard deviation, provided as a parameter,
+  determines the number of inserted replicate observations (see Detail).
+
   This weighted regression approach may be interesting when discontinuities
   exist in the observational data. Under these circumstances small changes 
   in the timing (or more general the position along the axis of the independent
   variable) of the model output may have a disproportional impact on the
-  overall goodness-of-fit (e.g. timing of nutrient depletion). Another
-  application is when the exact value of the independent variable in the
-  observational dataset is uncertain (e.g. slices of sediment profiles,
-  or the timing of a sampling).
+  overall goodness-of-fit (e.g. timing of nutrient depletion). Additionally,
+  this approach may be used to model uncertainty in the independent variable
+  (e.g. slices of sediment profiles, or the timing of a sampling).
 
 }
 \usage{
-gaussianWeights (obs, x = "x", y = "y", xmodel = NULL, spread = 1/24,
-                weight = "none",aggregation = "name",ordering = c(aggregation,x))
+gaussianWeights (obs, x=x, y=y, xmodel, spread, weight = "none",
+                 aggregation = name ,ordering)
 }
 
 \arguments{
 
-  \item{obs }{dataset in long (database) format as is typically used in
+  \item{obs }{dataset in long (database) format as is typically used by
      modCost
   }
   \item{x }{name of the independent variable (typically x, cf. modCost) in
-     \code{obs}
+     \code{obs}. Defaults to x (not given as character string; cf. subset)
   }
-  \item{y }{name of the dependent variable in \code{obs}
+  \item{y }{name of the dependent variable in \code{obs}. Defaults to y.
   }
   \item{xmodel }{an ordered vector of unique times at which model output
-     is produced
+     is produced. If not given, the independent variable of the observational
+     dataset is used.
   }
   \item{spread }{standard deviation used to calculate the weights from a
      normal density function. This value also determines the number of
-     point from the model output that are compared to a specific observa-
+     points from the model output that are compared to a specific observa-
      tion in \code{obs} (2 * 3 * spread + 1; containing 99.7\% of the
      Gaussian distribution, centered around the observation of interest).
   }
   \item{weight }{scaling factor of the modCost function ("sd", "mean", or
-    "none"). The Gaussian weights are multiplied by this factor.
+     "none"). The Gaussian weights are multiplied by this factor to account
+     for differences in units.
   }
   \item{aggregation }{vector of column names from the dataset that are used
-    to aggregate the scaling factor
+    to aggregate observations while calculating the scaling factor. Defaults
+    to the variable name, "name".
   }
-  \item{ordering }{list of variables in obs used for grouping during scale
-    factor calculation (cf. tapply)
+  \item{ordering }{Optional extra grouping and ordering of observations. Given
+    as a vector of variable names. If none given, ordering will be done by
+    variable name and independent variable. If both aggregation and ordering
+    variables are given, ordering will be done as follows:
+    x within ordering (in reverse order) within aggregation (in reverse order).
+    Aggregation and ordering should be disjoint sets of variable names.
   }
 }
 \value{
   
   A modified version of \code{obs} is returned with the following extensions:
 
-  1. Each observation is replicated n times were n represents the number
-  of \code{modelx} values that are within 3 * the standard deviation of 
-  the Gaussian density function with the \code{x} value of the relevant
-  observation as mean and \code{spread} as standard deviation.
+  1. Each observation obs[i] is replicated n times were n represents the number
+     of \code{modelx} values within the interval [obs_i - (3 * spread), obs_i +
+     3 * spread)].
 
   2. These replicate observations get the same \code{x} values as their
-  modeled counterparts.
+     modeled counterparts (\code{xmodel}).
 
   3. Weights are given in column, called "err"
 
@@ -84,14 +91,26 @@ gaussianWeights (obs, x = "x", y = "y", xmodel = NULL, spread = 1/24,
     \item{"err" containing the calculated weights
     }
     \item{The rest of the columns of the data frame given by \code{obs} in
-    that order
+    that order.
     }
   }
 }
 
 \details{
 
-  !formules hier geven!
+  Suppose: spread = 1/24 (days; = 1 hour)
+           x      = time in days, 1 per hour
+
+  Then:
+   obs_i is replicated 7 times (spread = observational periodicity = 1 hour):
+
+   =>  obs_i-3 = ... = obs_i-1 = obs_i = obs_i+1 = ... = obs_i+3
+
+  The weights (W_i+j, for j = -3 ...3) are calculated as follows:
+       W'_i+j = 1/(spread * sqrt(2pi)) * exp(-1/2 * ((obs_i+j - obs_i)/spread)^2
+
+       W_i+j  = W'_i+j/sum(W_i-3,...,W_i+3)
+         (such that their sum equals 1)
 
 }
 
@@ -115,10 +134,19 @@ observations <- data.frame(
 ## The model generates profiles with a depth resolution of 1 millimeter
 modeldepths <- seq(0,9,by=0.05)
 
-gaussianWeights(obs=observations,x="depth",y="O2",xmodel = modeldepths,
-                spread=0.1,weight="none",aggregation="profile")
+gaussianWeights(obs=observations,x=depth,y=O2,xmodel = modeldepths,
+                spread=0.1,weight="none",aggregation=profile)
 
 }
+
+# Weights of one observation in silt at depth 2:
+Sub <- subset(observations, subset = (profile == "silt" & depth == 2))
+plot(Sub[,-1])
+SubWW <- gaussianWeights(obs=Sub,x=depth,y=O2,xmodel = modeldepths,
+                spread=0.5, weight="none",aggregation=profile)
+SubWW[,-1]
+
+
 \author{
   Tom Van Engeland <t.vanengeland@nioo.knaw.nl>
 }
