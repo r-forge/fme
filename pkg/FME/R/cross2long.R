@@ -30,14 +30,7 @@ cross2long <- function(data,
   }
   else stop("no independent variable defined")
 
-  if(!is.null(substitute(select))) {
-        vars <- varlist[names(varlist) %in% as.character(substitute(select))]
-        vars <- vars[vars != indep]
-    }
-  else vars <- TRUE
-  selectedData <- as.data.frame(data[, vars])
-  names(selectedData) <- names(varlist)[vars]
-
+  reps <- NULL
   if(!is.null(substitute(replicate))) { 
     reps <- varlist[names(varlist) %in% as.character(substitute(replicate))]
     reps <- reps[reps != indep]
@@ -45,6 +38,13 @@ cross2long <- function(data,
     names(replicatedData) <- names(varlist)[reps]
   }
 
+  if(!is.null(substitute(select))) vars <- varlist[names(varlist) %in% as.character(substitute(select))]
+  else vars <- varlist
+
+  vars <- vars[!(vars %in% c(indep,reps))]
+  
+  selectedData <- as.data.frame(data[, vars])
+  names(selectedData) <- names(vars)
 
   # gathering of data
   nVars <- ncol(selectedData)
