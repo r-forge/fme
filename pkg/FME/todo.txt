@@ -1,7 +1,4 @@
 Added plot.obs from version 1.1.1 to plot obsreved data at once.
+Added and revised cross2long and gaussianWeights functions (TomVE; Nov 10, 2011)
 
 thpe: it would be nice to have a  "predict.modFit" method
-
-
-
-
