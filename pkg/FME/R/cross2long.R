@@ -13,7 +13,6 @@ cross2long <- function(data,
                        x,
                        select=NULL,
                        replicate=NULL,
-                       drop=FALSE,
                        error = FALSE,
                        na.rm = FALSE
                       )

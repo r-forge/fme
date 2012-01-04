@@ -7,12 +7,13 @@
 
 \description{
   Rearranges a data frame in cross tab format by putting all relevant columns below
-  eachother and replicating the independent variable and, if necessary, other specified
+  each other, replicating the independent variable and, if necessary, other specified
   columns. Optionally, an err column is added.
 }
 
 \usage{
-cross2long( data, x, select = NULL, replicate = NULL, error = F )
+cross2long( data, x, select = NULL, replicate = NULL, 
+            error = FALSE,  na.rm = FALSE)
 }
 
 \arguments{
@@ -29,8 +30,10 @@ cross2long( data, x, select = NULL, replicate = NULL, error = F )
      column (e.g. experimental treatment specification).
   }
   \item{error }{boolean indicating whether the final dataset in long format
-     should contain an extra column for error values (cf. \link{modCost};
-     here filled with 1's)
+     should contain an extra column for error values (cf. \link{modCost});
+     here filled with 1's.
+  }
+  \item{na.rm }{whether or not to remove the \code{NA}s.
   }
 }
 
@@ -86,11 +89,11 @@ cross2long( data, x, select = NULL, replicate = NULL, error = F )
 ## Suppose we have measured sediment oxygen concentration profiles
 ## =======================================================================
 
-depth <- 0:7
-O2mud <- c(6,1,0.5,0.1,0.05,0,0,0)
-O2silt <- c(6,5,3,2,1.5,1,0.5,0)
-O2sand <- c(6,6,5,4,3,2,1,0)
-zones  <- c("a","b","b","c","c","d","d","e")
+depth  <- 0:7
+O2mud  <- c( 6,   1,   0.5, 0.1, 0.05,0,   0,   0)
+O2silt <- c( 6,   5,   3,   2,   1.5, 1,   0.5, 0)
+O2sand <- c( 6,   6,   5,   4,   3,   2,   1,   0)
+zones  <- c("a", "b", "b", "c", "c", "d", "d", "e")
 oxygen <- data.frame(depth = depth,
                      zone  = zones,
                      mud   = O2mud,
@@ -98,17 +101,16 @@ oxygen <- data.frame(depth = depth,
                      sand  = O2sand
           )
 
-cross2long(data=oxygen, x = depth, select=c(silt,mud), replicate = zone)
-cross2long(data=oxygen, x = depth, include=c(mud,-silt, replicate = zone)
+ cross2long(data = oxygen, x = depth, 
+            select = c(silt, mud), replicate = zone)
 
-# two times the same column name: replicates
-colnames(oxygen)[4] <- "mud"    
+ cross2long(data = oxygen, x = depth, 
+            select = c(mud, -silt), replicate = zone)
 
-cross2long(data=oxygen, x = depth, select = mud)
+# twice the same column name: replicates
+ colnames(oxygen)[4] <- "mud"    
 
-
-
-
+ cross2long(data=oxygen, x = depth, select = mud)
 }
 \author{
   Tom Van Engeland <t.vanengeland@nioo.knaw.nl>
