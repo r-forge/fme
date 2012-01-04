@@ -137,7 +137,7 @@ modeldepths <- seq(0,9,by=0.05)
 gaussianWeights(obs=observations,x=depth,y=O2,xmodel = modeldepths,
                 spread=0.1,weight="none",aggregation=profile)
 
-}
+
 
 # Weights of one observation in silt at depth 2:
 Sub <- subset(observations, subset = (profile == "silt" & depth == 2))
@@ -145,7 +145,7 @@ plot(Sub[,-1])
 SubWW <- gaussianWeights(obs=Sub,x=depth,y=O2,xmodel = modeldepths,
                 spread=0.5, weight="none",aggregation=profile)
 SubWW[,-1]
-
+}
 
 \author{
   Tom Van Engeland <t.vanengeland@nioo.knaw.nl>
