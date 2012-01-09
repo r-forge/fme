@@ -32,7 +32,7 @@
   \item{rsstrace}{a 2-columned matrix with the iteration number and the model
     cost at each succesful iteration.}
 }
-\author{Karline Soetaert <k.soetaert@nioo.knaw.nl>}
+\author{Karline Soetaert <karline.soetaert@nioz.nl>}
 \examples{
 amp    <- 6
 period <- 5

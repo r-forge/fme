@@ -515,7 +515,7 @@ points(Obs, pch = 16, cex = 1.5)
 
 }
 \author{
-  Karline Soetaert <k.soetaert@nioo.knaw.nl>
+  Karline Soetaert <karline.soetaert@nioz.nl>
   
   Marko Laine <Marko.Laine@fmi.fi>
 }

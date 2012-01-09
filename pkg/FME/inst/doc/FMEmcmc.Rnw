@@ -31,7 +31,7 @@ MCMC, DRAM,  R}
 
 
 \author{Karline Soetaert\\
-NIOO-CEME\\
+NIOZ Yerseke\\
 The Netherlands
 \And
 Marko Laine \\
@@ -50,11 +50,10 @@ It includes the delayed rejection and adaptive Metropolis algorithm \citep{Haari
 %% in the following format:
 \Address{
   Karline Soetaert\\
-  Centre for Estuarine and Marine Ecology (CEME)\\
-  Netherlands Institute of Ecology (NIOO)\\
+  Royal Netherlands Institute of Sea Research (NIOZ)\\
   4401 NT Yerseke, Netherlands\\
-  E-mail: \email{k.soetaert@nioo.knaw.nl}\\
-  URL: \url{http://www.nioo.knaw.nl/users/ksoetaert}\\
+  E-mail: \email{karline.soetaert@nioz.nl}\\
+  URL: \url{http://www.nioz.nl}\\
   \\
   Marko Laine\\
   Finnish Meteorological Institute\\

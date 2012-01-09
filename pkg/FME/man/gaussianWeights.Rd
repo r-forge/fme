@@ -148,7 +148,7 @@ SubWW[,-1]
 }
 
 \author{
-  Tom Van Engeland <t.vanengeland@nioo.knaw.nl>
+  Tom Van Engeland <tom.vanengeland@nioz.nl>
 }
 
 \keyword{utilities}

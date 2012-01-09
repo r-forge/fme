@@ -113,7 +113,7 @@ oxygen <- data.frame(depth = depth,
  cross2long(data=oxygen, x = depth, select = mud)
 }
 \author{
-  Tom Van Engeland <t.vanengeland@nioo.knaw.nl>
+  Tom Van Engeland <tom.vanengeland@nioz.nl>
 }
 
 \references{
