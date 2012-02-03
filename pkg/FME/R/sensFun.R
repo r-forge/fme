@@ -161,9 +161,9 @@ summary.sensFun <- function(object, vars=FALSE, ...) {
       N    = unlist(aggregate(Sens, by = list(Vars), FUN = length)[, -1])
     )
     out$L2 <- sqrt(out$L2/out$N)
-    out$var <- unique(Vars)
+    out$var <- levels(Vars)                                                     # changed 31-01-2012 (Tom): used to be unique(vars) => problem: aggregate orders according to levels, not first appearance (unique does)
     np <- length(pp)
-    nv <- length(unique(Vars))
+    nv <- nlevels(Vars)                                                         # follows from levels(Vars)
     out <- data.frame(cbind(value = rep(pp, times=rep(nv,np)),
                       scale=rep(parscale, times=rep(nv,np)),out))
   } else {  # global summaries
