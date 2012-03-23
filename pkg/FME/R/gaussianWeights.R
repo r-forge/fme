@@ -15,7 +15,7 @@ gaussianWeights <- function(obs,                            # data set in long f
                             xmodel,                         # unique times at which model output is produced
                             spread,                         # standard deviation used to calculate the weights from a normal distribution (stdev = standard deviation of that normal distribution)
                             weight      = "none",           # scaling factor of modCost function (sd, mean, or none)
-                            aggregation = name,
+                            aggregation = x,
                             ordering                        # list of variables in obs used for grouping during scale factor calculation (cf. tapply)
                            )
 {

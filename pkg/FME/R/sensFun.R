@@ -15,7 +15,7 @@ sensFun <- function(func, parms, sensvar = NULL, senspar = names(parms),
     Res    <- yRef$residuals
     ynames <- Res$name
     YNAMES <- as.matrix(unique(ynames))                                                 # changed on 01-12-2011 (Tom): rearrangement of residual matrix to put costs of same var together
-    iRes <- unlist(apply(YNAMES,MAR=1,function(x) which(Res[,"name"]==x)))              # (cf. modcost(... cost=cost) where residuals for different cost calculations are appended but not 
+    iRes <- unlist(apply(YNAMES,MARGIN=1,function(x) which(Res[,"name"]==x)))              # (cf. modcost(... cost=cost) where residuals for different cost calculations are appended but not 
     yRef <- cbind(Res$x[iRes], Res$mod[iRes])                                           # sorted by variable)
     ynames <- ynames[iRes]
     names(yRef) <- ynames
@@ -25,7 +25,7 @@ sensFun <- function(func, parms, sensvar = NULL, senspar = names(parms),
     Solve <- function(parms) {
       Res<- func(parms, ...)$residuals
       YNAMES <- as.matrix(unique(Res[,"name"]))                                           # changed on 01-12-2011 (Tom): for same reason as above
-      iRes <- unlist(apply(YNAMES,MAR=1,function(x) which(Res[,"name"]==x)))              # 
+      iRes <- unlist(apply(YNAMES,MARGIN=1,function(x) which(Res[,"name"]==x)))              # 
       cbind(Res$x[iRes], Res$mod[iRes])
     }
 

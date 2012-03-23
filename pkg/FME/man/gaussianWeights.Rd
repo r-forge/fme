@@ -4,6 +4,8 @@
 \title{
   A kernel average smoother function to weigh residuals according to a Gaussian
   density function
+  
+  This function is still experimental...  use with care
 }
 
 \description{
@@ -25,8 +27,8 @@
 
 }
 \usage{
-gaussianWeights (obs, x=x, y=y, xmodel, spread, weight = "none",
-                 aggregation = name ,ordering)
+gaussianWeights (obs, x = x, y = y, xmodel, spread, weight = "none",
+                 aggregation = x ,ordering)
 }
 
 \arguments{
@@ -119,7 +121,7 @@ gaussianWeights (obs, x=x, y=y, xmodel, spread, weight = "none",
 ## A Sediment example
 ## =======================================================================
 
-## Suppose we have sediment oxygen profiles with measurements every
+## Sediment oxygen concentration is measured every
 ## centimeter in 3 sediment types
 depth <- 0:7
 observations <- data.frame(
@@ -131,19 +133,23 @@ observations <- data.frame(
                               )
                 )
 
-## The model generates profiles with a depth resolution of 1 millimeter
-modeldepths <- seq(0,9,by=0.05)
+## A model generates profiles with a depth resolution of 1 millimeter
+modeldepths <- seq(0, 9, by = 0.05)
 
-gaussianWeights(obs=observations,x=depth,y=O2,xmodel = modeldepths,
-                spread=0.1,weight="none",aggregation=profile)
+## All these model outputs are compared with  weighed observations.
+gaussianWeights(obs = observations, x = depth, y = O2,
+                xmodel = modeldepths,
+                spread = 0.1, weight = "none", 
+                aggregation = profile)
 
 
 
 # Weights of one observation in silt at depth 2:
 Sub <- subset(observations, subset = (profile == "silt" & depth == 2))
 plot(Sub[,-1])
-SubWW <- gaussianWeights(obs=Sub,x=depth,y=O2,xmodel = modeldepths,
-                spread=0.5, weight="none",aggregation=profile)
+SubWW <- gaussianWeights(obs = Sub, x = depth, y = O2, 
+                xmodel = modeldepths, spread = 0.5, 
+                weight="none", aggregation = profile)
 SubWW[,-1]
 }
 
