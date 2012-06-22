@@ -193,7 +193,7 @@ modMCMC(f, p, ..., jump = NULL,  lower = -Inf, upper = +Inf,
   is defined as:
   
 \deqn{y=f(\theta) + \xi\\
-\xi ~ N(0,\sigma^2)}{y = f(p) + xi; xi ~ N(0, sigma^2}
+\xi ~ N(0,\sigma^2)}{y = f(p) + xi; xi ~ N(0, sigma^2)}
 
   where \eqn{\xi}{xi} is the measurement error, assumed normally
   distribution, then the posterior for the parameters will be estimated
@@ -220,7 +220,7 @@ modMCMC(f, p, ..., jump = NULL,  lower = -Inf, upper = +Inf,
   
   \deqn{p(\sigma^{-2}|y,\theta) \sim \Gamma(\frac{(n_0+n)}{2},
   \frac{(n_0 \cdot var0+SS(\theta))}{2})}{prob(sigma^2|y,p)~Gam(0.5*(n0+n),
-  0.5*(n0+var0+SS(p)}
+  0.5*(n0+var0+SS(p))}
 
   where \code{n} is the number of data points and where
   \eqn{n0=n \cdot wvar0}{n0=n * wvar0}, and where the second argument to the gamma function
@@ -229,10 +229,12 @@ modMCMC(f, p, ..., jump = NULL,  lower = -Inf, upper = +Inf,
   The prior parameters (\code{var0} and \code{wvar0}) are the prior mean
   for \eqn{\sigma^2}{sigma^2} and the prior accuracy.
 
-  By setting \code{wvar0} equal to 1 (default), equal weight is given to the
+  By setting \code{wvar0} equal to 1, equal weight is given to the
   prior and the current value.
 
-  If \code{wvar0} is 0 (the default) then the error variances are
+  If \code{wvar0} is 0 then the prior is ignored.
+
+  If \code{wvar0} is \code{NULL} (the default) then the error variances are
   assumed to be fixed.
 
   \code{var0} estimates the variance of the measured components. In case
