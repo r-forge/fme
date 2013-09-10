@@ -53,14 +53,14 @@ modMCMC(f, p, ..., jump = NULL,  lower = -Inf, upper = +Inf,
     of the parameters and produces as output the perturbed
     parameters. See details.
   }
-  \item{prior }{prior probability of the parameters, either a function
+  \item{prior }{-2*log(parameter prior probability), either a function
     that is called as \code{prior(p)} or \code{NULL}; in the latter case
     a non-informative prior is used (i.e. all parameters are equally
     likely, depending on \code{lower} and \code{upper} within min and max bounds).
   }
   \item{var0 }{initial model variance; if \code{NULL}, it is assumed
     that the model variance is \code{1}, and the return element from \code{f}
-    is -2*log (probability). If it has a value, it is assumed that the return element
+    is -2*log (likelihood). If it has a value, it is assumed that the return element
     from \code{f} contain the model residuals or a list of class
     \code{modFit}.  See details. Good options for \code{var0} are to use 
     the modelvariance (\code{modVariance}) as returned by the 
