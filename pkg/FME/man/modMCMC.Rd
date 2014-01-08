@@ -393,11 +393,11 @@ NN <- function(p) {
 }
 
 # simple Metropolis-Hastings
-MCMC <- modMCMC(f = NN, p = 0:2, niter = 10000,
+MCMC <- modMCMC(f = NN, p = 0:2, niter = 5000,
                 outputlength = 1000, jump = 0.5)
 
 # More accepted values by updating the jump covariance matrix...
-MCMC <- modMCMC(f = NN, p = 0:2, niter = 10000, updatecov = 100,
+MCMC <- modMCMC(f = NN, p = 0:2, niter = 5000, updatecov = 100,
                  outputlength = 1000, jump = 0.5)
 summary(MCMC)
 
@@ -414,7 +414,7 @@ NN <- function(p) {
   -2*sum(log(dnorm(p, mean = mu, sd = 0.5)))   #-2*log(probability)
 }
 
-MCMC2 <- modMCMC(f = NN, p = 1:3, niter = 3000, burninlength = 500,
+MCMC2 <- modMCMC(f = NN, p = 1:3, niter = 2000, burninlength = 500,
   updatecov = 10, jump = 0.5, lower = c(0, 2, 1), upper = c(1, 3, 3))
 plot(MCMC2)
 hist(MCMC2, breaks = 20)
@@ -438,19 +438,19 @@ NL <- function(p) {
   mu <- 1:4
   -2*sum(log(dlnorm(p, mean = mu, sd = 1)))      #-2*log(probability)
 }
-MCMCl <- modMCMC(f = NL, p = log(1:4), niter = 10000,
+MCMCl <- modMCMC(f = NL, p = log(1:4), niter = 3000,
                  outputlength = 1000, jump = 5)
 plot(MCMCl)   # bad convergence
 cumuplot(as.mcmc(MCMCl$pars))
 
-MCMCl <- modMCMC (f = NL, p = log(1:4), niter = 10000,
+MCMCl <- modMCMC (f = NL, p = log(1:4), niter = 3000,
                   outputlength = 1000, jump = 2^(2:5))
 plot(MCMCl)   # better convergence but CHECK it!
 pairs(MCMCl)
 colMeans(log(MCMCl$pars))
 apply(log(MCMCl$pars), 2, sd)
 
-MCMCl <- modMCMC (f = NL, p = rep(1, 4), niter = 5000, 
+MCMCl <- modMCMC (f = NL, p = rep(1, 4), niter = 3000, 
                   outputlength = 1000, jump = 5, updatecov = 100)
 plot(MCMCl)
 colMeans(log(MCMCl$pars))
@@ -498,7 +498,7 @@ Covar   <- sP$cov.scaled * 2.4^2/2
 s2prior <- sP$modVariance
 
 # set nprior = 0 to avoid updating model variance
-MCMC <- modMCMC(f = Residuals, p = P$par,jump = Covar, niter = 10000,
+MCMC <- modMCMC(f = Residuals, p = P$par,jump = Covar, niter = 1000,
                 var0 = s2prior, wvar0 = NULL, updatecov = 100)
 
 plot(MCMC, Full = TRUE)
