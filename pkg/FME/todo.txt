@@ -1,4 +1,18 @@
-Added plot.obs from version 1.1.1 to plot obsreved data at once.
+Added plot.obs from version 1.1.1 to plot observed data at once.
 Added and revised cross2long and gaussianWeights functions (TomVE; Nov 10, 2011)
 
 thpe: it would be nice to have a  "predict.modFit" method
+
+16/04/2014.
+Made collin function faster, as suggested by Jeremy David Silver.
+This changes the output slightly, when collin is very very large (near infinity).
+This is due to a different method for estimating eigenvalues, when this is near to zero.
+At not too large collinearities, both methods are the same.
+As the time gain is substantial, the new method is retained.
+
+The difference is:
+## original:
+      id  <- 1 / sqrt(min(eigen(t(S) %*% S)$value)) # collinearity
+
+## NOW: only calculate eigenvalues, use symmetry, make the cross product more efficient
+      id <- 1/sqrt(max(0,tail(eigen(crossprod(S),only.values=TRUE,symmetric=TRUE)$value,1)))
