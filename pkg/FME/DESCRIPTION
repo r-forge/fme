@@ -4,7 +4,8 @@ Title: A Flexible Modelling Environment for Inverse Modelling, Sensitivity, Iden
 Author: Karline Soetaert <karline.soetaert@nioz.nl>,
         Thomas Petzoldt <thomas.petzoldt@tu-dresden.de>
 Maintainer: Karline Soetaert <karline.soetaert@nioz.nl>
-Depends: R (>= 2.6), deSolve, rootSolve, minpack.lm, MASS, coda
+Depends: R (>= 2.6), deSolve, rootSolve, coda
+Imports: minpack.lm, MASS
 Description: Provides functions to help in fitting models to data, to
   perform Monte Carlo, sensitivity and identifiability analysis. It is
   intended to work with models be written as a set of differential
