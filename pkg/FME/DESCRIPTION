@@ -5,7 +5,7 @@ Author: Karline Soetaert <karline.soetaert@nioz.nl>,
         Thomas Petzoldt <thomas.petzoldt@tu-dresden.de>
 Maintainer: Karline Soetaert <karline.soetaert@nioz.nl>
 Depends: R (>= 2.6), deSolve, rootSolve, coda
-Imports: minpack.lm, MASS, graphics, grDevices, stats, utils
+Imports: minpack.lm, MASS, graphics, grDevices, stats, utils, minqa
 Suggests: diagram
 Description: Provides functions to help in fitting models to data, to
   perform Monte Carlo, sensitivity and identifiability analysis. It is

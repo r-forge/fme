@@ -18,7 +18,7 @@
 \usage{modFit(f, p, ..., lower = -Inf, upper = Inf,
   method = c("Marq", "Port", "Newton",
            "Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN",
-           "Pseudo"), jac = NULL,
+           "Pseudo", "bobyqa), jac = NULL,
   control = list(), hessian = TRUE)
 
 \method{summary}{modFit}(object, cov=TRUE,\dots)
@@ -57,7 +57,7 @@
     \code{Inf}.
   }
   \item{method }{The method to be used, one of "Marq", "Port", "Newton",
-    "Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN", "Pseudo" - see details.
+    "Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN", "Pseudo", "bobyqa" - see details.
   }
   \item{jac }{A function that calculates the Jacobian; it should be
     called as \code{jac(x, ...)} and return the matrix with derivatives

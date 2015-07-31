@@ -1,3 +1,5 @@
 todo.txt
 inst/doc/Rplots.pdf
 inst/doc/FME-002.pdf
+^.*\.Rproj$
+^\.Rproj\.user$

@@ -16,3 +16,10 @@ The difference is:
 
 ## NOW: only calculate eigenvalues, use symmetry, make the cross product more efficient
       id <- 1/sqrt(max(0,tail(eigen(crossprod(S),only.values=TRUE,symmetric=TRUE)$value,1)))
+
+
+---------------
+
+Added bobyqa optimizer from minqa package
+
+Todo: complete documentation and cite paper.

@@ -12,6 +12,7 @@ import("utils")
 importFrom("minpack.lm", "nls.lm")
 importFrom("minpack.lm", "nls.lm.control")
 importFrom("MASS", "ginv")
+importFrom("minqa", "bobyqa")
 
 export(modCost,sensFun,collin,sensRange,Unif,Norm,Latinhyper,Grid,
        modFit,modMCMC,pseudoOptim,modCRL,obsplot,gaussianWeights,
