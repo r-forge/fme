@@ -3,10 +3,15 @@ import ("deSolve")
 import("rootSolve")
 import("coda")
 
-import("graphics")
 import("grDevices")
 import("stats")
 import("utils")
+
+## import "graphics" only partly, because redefined "matplot" is
+## already imported from deSolve,
+importFrom("graphics", "abline", "boxplot", "dotchart", "hist",
+           "legend", "lines", "par", "plot", "points", "polygon",
+           "rect", "segments", "text")
 
 
 importFrom("minpack.lm", "nls.lm")

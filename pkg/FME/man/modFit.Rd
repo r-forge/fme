@@ -163,7 +163,7 @@
     \item "Pseudo", a pseudorandom-search algorithm
       (see \code{\link{pseudoOptim}}),
     \item "bobyqa", derivative-free optimization by quadratic 
-      approximation from package \code{\link{minqa}}.
+      approximation from package \code{minqa}.
   }
 
   For difficult problems it may be efficient to perform some iterations
@@ -402,8 +402,7 @@ max(abs(mf$par - X))
   Gay, D. M., 1990. Usage Summary for Selected Optimization Routines.
   Computing Science Technical Report No. 153. AT&T Bell Laboratories,
   Murray Hill, NJ 07974.
-  \url{http://netlib.bell-labs.com/cm/cs/cstr/153.pdf}
-
+  
   Powell, M. J. D. (2009). The BOBYQA algorithm for bound constrained
   optimization without derivatives. Report No. DAMTP 2009/NA06, Centre
   for Mathematical Sciences, University of Cambridge, UK.
