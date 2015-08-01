@@ -18,7 +18,7 @@
 \usage{modFit(f, p, ..., lower = -Inf, upper = Inf,
   method = c("Marq", "Port", "Newton",
            "Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN",
-           "Pseudo", "bobyqa), jac = NULL,
+           "Pseudo", "bobyqa"), jac = NULL,
   control = list(), hessian = TRUE)
 
 \method{summary}{modFit}(object, cov=TRUE,\dots)
