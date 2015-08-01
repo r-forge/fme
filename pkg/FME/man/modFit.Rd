@@ -161,7 +161,9 @@
     \item "Newton", a Newton-type algorithm (see \code{\link{nlm}}),
     \item "Port", the Port algorithm (see \code{\link{nlminb}}),
     \item "Pseudo", a pseudorandom-search algorithm
-      (see \code{\link{pseudoOptim}}).
+      (see \code{\link{pseudoOptim}}),
+    \item "bobyqa", derivative-free optimization by quadratic 
+      approximation from package \code{\link{minqa}}.
   }
 
   For difficult problems it may be efficient to perform some iterations
@@ -173,9 +175,10 @@
   from \code{\link{constrOptim}} which implements an adaptive barrier
   algorithm and which allows a more flexible implementation of linear
   constraints.
-
-  In \code{modFit}, bounds on parameters are imposed by a transformation
-  of the parameters to be fitted.
+  
+  For all methods except \code{L-BFGS-B}, \code{Port}, \code{Pseudo}, and 
+  \code{bobyqa} that handle box constraints internally, bounds on parameters are 
+  imposed by a transformation of the parameters to be fitted.
 
   In case \emph{both lower and upper bounds} are specified, this is
   achieved by a tangens and arc tangens transformation.
@@ -200,7 +203,7 @@
   by a log transformation and a corresponding exponential back transformation.
 
   In case parameters are transformed (all methods) or in case the
-  \code{method} \code{Port}, \code{Pseudo} or \code{Marq} is selected,
+  \code{method} \code{Port}, \code{Pseudo}, \code{Marq} or \code{bobyqa} is selected,
   the \emph{Hessian} is approximated as \eqn{2 \cdot J^T \cdot J}{2 * J^T * J}, 
   where J is the Jacobian, estimated by finite differences.
 
@@ -391,20 +394,35 @@ max(abs(mf$par - X))
   Thomas Petzoldt <thomas.petzoldt@tu-dresden.de>
 }
 \references{
-  Press, W. H.,  Teukolsky, S. A., Vetterling, W. T. and
-  Flannery, B. P., 2007. Numerical Recipes in C. Cambridge
-  University Press.
+  Bates, D., Mullen, K. D. Nash, J. C. and Varadhan, R. 2014.
+  minqa: Derivative-free optimization algorithms by quadratic approximation.
+  R package.
+  \url{http://CRAN.R-project.org/package=minqa}
 
   Gay, D. M., 1990. Usage Summary for Selected Optimization Routines.
   Computing Science Technical Report No. 153. AT&T Bell Laboratories,
   Murray Hill, NJ 07974.
   \url{http://netlib.bell-labs.com/cm/cs/cstr/153.pdf}
+
+  Powell, M. J. D. (2009). The BOBYQA algorithm for bound constrained
+  optimization without derivatives. Report No. DAMTP 2009/NA06, Centre
+  for Mathematical Sciences, University of Cambridge, UK.
+  \url{http://www.damtp.cam.ac.uk/user/na/NA_papers/NA2009_06.pdf}
+
+  Press, W. H.,  Teukolsky, S. A., Vetterling, W. T. and
+  Flannery, B. P., 2007. Numerical Recipes in C. Cambridge
+  University Press.
+  
+  Price, W.L., 1977. A Controlled Random Search Procedure for Global
+  Optimisation. The Computer Journal, 20: 367-370.
   
   Soetaert, K. and Petzoldt, T., 2010.  Inverse Modelling, Sensitivity
-  and Monte Carlo Analysis in R Using Package FME.  Journal of
-  Statistical Software 33(3) 1--28.
+  and Monte Carlo Analysis in R Using Package FME.  
+  Journal of Statistical Software 33(3) 1--28.
   \url{http://www.jstatsoft.org/v33/i03}
 
+  Please see also additional publications on the help pages of the individual
+  algorithms.
 }
 \keyword{utilities}
 
