@@ -118,9 +118,9 @@ modCost(model, obs, x = "time", y = NULL, err = NULL,
   \code{weight} which is either:
   \itemize{
     \item \code{"none"}, which sets the weight equal to 1 (the default)
-    \item \code{"std"}, which sets the weights equal to the standard deviation
+    \item \code{"std"}, which sets the weights equal to the reciprocal of the standard deviation
       of the observed data (can only be used if there is more than 1 data point)
-    \item \code{"mean"}, which uses the mean of the absolute value of the
+    \item \code{"mean"}, which uses 1/mean of the absolute value of the
       observed data (can only be used if not 0).
   }
   \emph{2.} Then for each observed variable, j, a \emph{variable cost} is
