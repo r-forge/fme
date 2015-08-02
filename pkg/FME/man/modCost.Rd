@@ -103,10 +103,11 @@ modCost(model, obs, x = "time", y = NULL, err = NULL,
   There are three steps:
 
   \emph{1.} For any observed data point, i, the \emph{weighted
-  residuals} are estimated as: \deqn{res_i=\frac{Mod_i-Obs_i}{error_i}=
-  (Mod_i-Obs_i) \cdot Weight_i}{res_i=(mod_i-obs_i)/err_i=(mod_i-obs_i)
-  * weight_i} and where \eqn{Mod_i}{Mod_i} and \eqn{Obs_i}{Obs_i} are
-  the modeled, respectively observed value of data point i.
+  residuals} are estimated as:
+  \deqn{res_i=\frac{Mod_i-Obs_i}{error_i}}{res_i=(mod_i-obs_i)/err_i}
+  with \eqn{weight_i = 1/err_i} and where \eqn{Mod_i}{Mod_i} and
+  \eqn{Obs_i}{Obs_i} are the modeled, respectively observed value of
+  data point i.
 
   The weights are equal to 1/error, where the latter can be inputted,
   one for each data point by specifying \code{err} as an extra column in
