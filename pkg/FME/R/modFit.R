@@ -2,8 +2,14 @@
 ## Fitting the Model to Data
 ## -----------------------------------------------------------------------------
 
-## a small utility function
+## small utility functions
 overrule <- function(ini, new) if(is.null(new)) ini else new
+
+renameListElement <- function(L, old, new) {
+  names(L)[match(old, names(L))] <- new
+  L
+}
+
 
 modFit <- function(f, p, ..., lower = -Inf, upper = Inf,
                    method = c("Marq", "Port", "Newton", "Nelder-Mead", "BFGS", "CG",
@@ -171,9 +177,10 @@ modFit <- function(f, p, ..., lower = -Inf, upper = Inf,
     ##       As an alternative, one may also try package optimx,
     ##       that has more options and estimates the Hessian internally.
     res <- bobyqa(par = Pars, fn = Fun, lower = lower, upper = upper,
-                       control = control, ...)
-    #names(res)["fval"] <- "ssr"  # is called "fval" here
-    names(res)[2] <- "ssr"  # is called "fval" here
+                  control = control, ...)
+    #names(res)[2] <- "ssr"  # is called "fval" here
+    renameListElement(res, "fval", "ssr") # avoids hard-coded number
+    
     if(hessian) estHess <- TRUE
   }
 
