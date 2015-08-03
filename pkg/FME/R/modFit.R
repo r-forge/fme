@@ -179,7 +179,7 @@ modFit <- function(f, p, ..., lower = -Inf, upper = Inf,
     res <- bobyqa(par = Pars, fn = Fun, lower = lower, upper = upper,
                   control = control, ...)
     #names(res)[2] <- "ssr"  # is called "fval" here
-    renameListElement(res, "fval", "ssr") # avoids hard-coded number
+    res <- renameListElement(res, "fval", "ssr") # avoids hard-coded number
     
     if(hessian) estHess <- TRUE
   }
