@@ -120,9 +120,13 @@ modCost <- function (model, obs, x = "time", y = NULL, err = NULL,
       obsdat <- obsdat[-ii]
     }
 
-    if (length(ix) > 0)
-      ModVar   <- approx(xMod, yMod, xout = xDat)$y
-    else {
+    if (length(ix) > 0) {
+      if ((length(xMod) == length(xDat))&&(all(xMod == xDat))) {
+        ModVar   <- yMod
+      } else {
+        ModVar   <- approx(xMod, yMod, xout = xDat)$y
+      }
+    } else {
       ModVar <- mean(yMod)
       obsdat <- mean(obsdat)
     }
@@ -153,32 +157,45 @@ modCost <- function (model, obs, x = "time", y = NULL, err = NULL,
     Res <- (ModVar- obsdat)
     res <- Res/Err
     resScaled <- res*Scale
-    Residual <- rbind(Residual,
-                      data.frame(
-                        name   = Names[i],
-                        x      = xDat,
-                        obs    = obsdat,
-                        mod    = ModVar,
-                        weight = 1/Err,
-                        res.unweighted = Res,
-                        res    = res))
 
-    CostVar <- rbind(CostVar,
-                     data.frame(
-                       name           = Names[i],
-                       scale          = Scale,
-                       N              = length(Res),
-                       SSR.unweighted = sum(Res^2),
-                       SSR.unscaled   = sum(res^2),
-                       SSR            = sum(resScaled^2)))
+    len <- length(xDat)
+    nList    <- rep(Names[i], len)
+    if (length(Err) == 1) {
+      Err <- rep(Err, len)
+    }
+    resFrame <- matrix(
+      nrow     = len,
+      ncol     = 6,
+      dimnames = list(nList,
+                      c('x', 'obs', 'mod', 'weight', 'res.unweighted', 'res')
+      )
+    )
+    resFrame[,'x']              <- xDat
+    resFrame[,'obs']            <- obsdat
+    resFrame[,'mod']            <- ModVar
+    resFrame[,'weight']         <- 1/Err
+    resFrame[,'res.unweighted'] <- Res
+    resFrame[,'res']            <- res
+
+    Residual <- rbind(Residual, resFrame)
+
+
+    CostVarFrame <- matrix(
+      data     = c(Scale, len, sum(Res^2), sum(res^2), sum(resScaled^2)),
+      nrow     = 1,
+      ncol     = 5,
+      dimnames = list(Names[i], c('scale', 'N', 'SSR.unweighted', 'SSR.unscaled', 'SSR'))
+    )
+
+
+    CostVar <- rbind(CostVar, CostVarFrame)
   }  # end loop over all observed variables
 
   ## SSR
-  Cost  <- sum(CostVar$SSR * CostVar$scale)
+  Cost  <- sum(CostVar[, 'SSR'] * CostVar[, 'scale'])
 
   ## Corrected a bug in version 1.2
-  # Lprob <- -sum(log(pmax(0, dnorm(Residual$mod, Residual$obs, Err))))
-  Lprob <- -sum(log(pmax(0, dnorm(Residual$mod, Residual$obs, 1/Residual$weight)))) # avoid log of negative values
+  Lprob <- -sum(log(pmax(0, dnorm(Residual[,'mod'], Residual[,'obs'], 1/Residual[,'weight'])))) # avoid log of negative values
 
   if (! is.null(cost)) {
     Cost     <- Cost + cost$model
@@ -200,18 +217,20 @@ plot.modCost<- function(x, legpos="topleft", ...) {
 
   dots <- list(...)
 
+  Names <- factor(rownames(x$residuals))
+
   dots$xlab <- if(is.null(dots$xlab)) "x" else dots$xlab
   dots$ylab <- if(is.null(dots$ylab)) "weighted residuals" else dots$ylab
   DotsPch   <- if(is.null(dots$pch)) (16:24) else dots$pch
-  dots$pch  <- if(is.null(dots$pch)) rep(16:24,length.out=nvar)[x$residuals$name] else rep(dots$pch,length.out=nvar)[x$residuals$name]   # Tom 02/01/2012: changed (16:24)  to rep(16:24,length.out=nvar); same for dots$pch in else part
+  dots$pch  <- if(is.null(dots$pch)) rep(16:24,length.out=nvar)[Names] else rep(dots$pch,length.out=nvar)[Names]   # Tom 02/01/2012: changed (16:24)  to rep(16:24,length.out=nvar); same for dots$pch in else part
   DotsCol   <- if(is.null(dots$col)) (1:nvar) else dots$col
-  dots$col  <- if(is.null(dots$col)) (1:nvar)[x$residuals$name] else dots$col[x$residuals$name]
+  dots$col  <- if(is.null(dots$col)) (1:nvar)[Names] else dots$col[Names]
 
-  do.call("plot", c(alist(x$residuals$x, x$residuals$res), dots))
+  do.call("plot", c(alist(x$residuals[, 'x'], x$residuals[, 'res']), dots))
 
 #  plot(x$residuals$x, x$residuals$res, xlab="x", ylab="weighted residuals",
 #     pch=c(16:24)[x$residuals$name],col=c(1:nvar)[x$residuals$name],...)
 
   if (! is.na(legpos))
-    legend(legpos, legend = x$var$name, col = DotsCol, pch = DotsPch)
+    legend(legpos, legend = rownames(x$var), col = DotsCol, pch = DotsPch)
 }

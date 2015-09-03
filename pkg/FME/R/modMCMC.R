@@ -35,7 +35,7 @@ logP_type3 <- function(f, p, PPnew, divsigma, ...) {
 # one value per data point
 logP_type4 <- function(f, p, PPnew, divsigma, ...) {
   SSnew  <- f(p, ...)
-  SSnew  <- (SSnew$residuals$res)^2
+  SSnew  <- (SSnew$residuals[, 'res'])^2
   list(pnew=0.5*(sum(SSnew*divsigma) + PPnew), SSnew = SSnew)
 }
 
@@ -43,7 +43,7 @@ logP_type4 <- function(f, p, PPnew, divsigma, ...) {
 # one value per observed variable
 logP_type5 <- function(f, p, PPnew, divsigma, ...) {
    SSnew  <- f(p, ...)
-   SSnew  <- SSnew$var$SSR.unweighted
+   SSnew  <- SSnew$var[, 'SSR.unweighted']
    list(pnew=0.5*(sum(SSnew*divsigma) + PPnew), SSnew = SSnew)
 }
 
@@ -228,14 +228,14 @@ modMCMC <- function (f, p, ..., jump = NULL, lower = -Inf, upper = +Inf,
     if (lenvar0 == nrow(SSnew$residuals)) { # use data residuals
       N <- nrow(SSnew$residuals)   # total number of data points
       logP <- function(...)  logP_type4(...)
-      SSold <- (SSnew$residuals$res)^2
+      SSold <- (SSnew$residuals[, 'res'])^2
     } else
     if (lenvar0 != 1 && lenvar0 != nrow(SSnew$var))
       stop("function 'f' is not compatible with length of var0")
     else {
-      N <- SSnew$var$N             # number of data points per variable
+      N <- SSnew$var[, 'N']             # number of data points per variable
       logP <- function(...)  logP_type5(...)
-      SSold <- SSnew$var$SSR.unweighted
+      SSold <- SSnew$var[, 'SSR.unweighted']
     }
   }
 

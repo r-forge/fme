@@ -46,7 +46,7 @@ modFit <- function(f, p, ..., lower = -Inf, upper = Inf,
     cM <- class(FF) == "modCost"
 
     if (cM && useCost ) return(FF$model)
-    if (cM)             return(FF$residuals$res)
+    if (cM)             return(FF$residuals[, 'res'])
     if (useCost) return (sum(FF^2)) else return(FF)
   }
 
@@ -209,21 +209,21 @@ modFit <- function(f, p, ..., lower = -Inf, upper = Inf,
 
   if (!method == "Marq")
     if (class(FF) == "modCost")
-      res$residuals <- FF$residuals$res
-    else res$residuals  <- FF
-  
+      res$residuals <- FF$residuals[, 'res']
+  else res$residuals  <- FF
+
   # mean square
   res$ms <- res$ssr/length(res$residuals)
 
   # mean square per varaible
   if (class(FF) == "modCost") {
-    names(res$residuals)  <- FF$residuals$name
-    res$var_ms            <- FF$var$SSR/FF$var$N
-    res$var_ms_unscaled   <- FF$var$SSR.unscaled/FF$var$N
-    res$var_ms_unweighted <- FF$var$SSR.unweighted/FF$var$N
+    names(res$residuals)  <- rownames('name')
+    res$var_ms            <- FF$var[, 'SSR']/FF$var[, 'N']
+    res$var_ms_unscaled   <- FF$var[, 'SSR.unscaled']/FF$var[, 'N']
+    res$var_ms_unweighted <- FF$var[, 'SSR.unweighted']/FF$var[, 'N']
 
     names(res$var_ms_unweighted) <- names(res$var_ms_unscaled) <-
-      names(res$var_ms) <- FF$var$name
+      names(res$var_ms) <- rownames(FF$var)
   } else res$var_ms <- res$var_ms_unweighted <- res$var_ms_unscaled <- NA
 
   res$rank <- np
