@@ -49,7 +49,7 @@
   \item{...}{additional arguments passed to function \code{f} (modFit)
     or passed to the methods.
   }
-  
+
   \item{lower }{lower bounds on the parameters; if unbounded set equal to
     \code{-Inf}.
   }
@@ -93,9 +93,9 @@
 \value{
   a list of class \emph{modFit} containing the results as returned from the
   called optimisation routines.
-  
+
   This includes the following:
-  
+
   \item{par }{the best set of parameters found.
   }
   \item{ssr }{the sum of squared residuals, evaluated at the best set of
@@ -124,7 +124,7 @@
 
   Note: this means that some return arguments of the original
   optimisation functions are renamed.
-  
+
   More specifically, "objective" and "counts" from routine
   \code{\link{nlminb}} (method = "Port") are renamed; "value" and
   "counts"; "niter" and "minimum" from routine
@@ -132,11 +132,11 @@
   and "value"; "minimum" and "estimate" from routine \code{\link{nlm}}
   (\code{method = "Newton"}) are renamed.
 
-  The list returned by \code{modFit} has a method for the 
+  The list returned by \code{modFit} has a method for the
   \code{\link{summary}}, \code{\link{deviance}}, \code{\link{coef}},
   \code{\link{residuals}}, \code{\link{df.residual}} and
   \code{print.summary} -- see note.
-  
+
 }
 
 \details{
@@ -162,7 +162,7 @@
     \item "Port", the Port algorithm (see \code{\link{nlminb}}),
     \item "Pseudo", a pseudorandom-search algorithm
       (see \code{\link{pseudoOptim}}),
-    \item "bobyqa", derivative-free optimization by quadratic 
+    \item "bobyqa", derivative-free optimization by quadratic
       approximation from package \code{minqa}.
   }
 
@@ -175,9 +175,9 @@
   from \code{\link{constrOptim}} which implements an adaptive barrier
   algorithm and which allows a more flexible implementation of linear
   constraints.
-  
-  For all methods except \code{L-BFGS-B}, \code{Port}, \code{Pseudo}, and 
-  \code{bobyqa} that handle box constraints internally, bounds on parameters are 
+
+  For all methods except \code{L-BFGS-B}, \code{Port}, \code{Pseudo}, and
+  \code{bobyqa} that handle box constraints internally, bounds on parameters are
   imposed by a transformation of the parameters to be fitted.
 
   In case \emph{both lower and upper bounds} are specified, this is
@@ -204,7 +204,7 @@
 
   In case parameters are transformed (all methods) or in case the
   \code{method} \code{Port}, \code{Pseudo}, \code{Marq} or \code{bobyqa} is selected,
-  the \emph{Hessian} is approximated as \eqn{2 \cdot J^T \cdot J}{2 * J^T * J}, 
+  the \emph{Hessian} is approximated as \eqn{2 \cdot J^T \cdot J}{2 * J^T * J},
   where J is the Jacobian, estimated by finite differences.
 
   This ignores the second derivative terms, but this is reasonable if the method
@@ -253,7 +253,7 @@
     \item \code{\link{df.residual}} which returns the residual degrees of freedom
     \item \code{print.summary}, producing a nice printout of the summary.
   }
-  
+
   Specifying a function to estimate the Jacobian matrix via argument
   \code{jac} may increase speed. The Jacobian is used in the methods
   "Marq", "BFGS", "CG", "L-BFGS", "Port", and is also used at the end,
@@ -397,12 +397,12 @@ max(abs(mf$par - X))
   Bates, D., Mullen, K. D. Nash, J. C. and Varadhan, R. 2014.
   minqa: Derivative-free optimization algorithms by quadratic approximation.
   R package.
-  \url{http://CRAN.R-project.org/package=minqa}
+  \url{https://cran.r-project.org/package=minqa}
 
   Gay, D. M., 1990. Usage Summary for Selected Optimization Routines.
   Computing Science Technical Report No. 153. AT&T Bell Laboratories,
   Murray Hill, NJ 07974.
-  
+
   Powell, M. J. D. (2009). The BOBYQA algorithm for bound constrained
   optimization without derivatives. Report No. DAMTP 2009/NA06, Centre
   for Mathematical Sciences, University of Cambridge, UK.
@@ -411,12 +411,12 @@ max(abs(mf$par - X))
   Press, W. H.,  Teukolsky, S. A., Vetterling, W. T. and
   Flannery, B. P., 2007. Numerical Recipes in C. Cambridge
   University Press.
-  
+
   Price, W.L., 1977. A Controlled Random Search Procedure for Global
   Optimisation. The Computer Journal, 20: 367-370.
-  
+
   Soetaert, K. and Petzoldt, T., 2010.  Inverse Modelling, Sensitivity
-  and Monte Carlo Analysis in R Using Package FME.  
+  and Monte Carlo Analysis in R Using Package FME.
   Journal of Statistical Software 33(3) 1--28.
   \url{http://www.jstatsoft.org/v33/i03}
 
