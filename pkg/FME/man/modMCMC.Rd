@@ -118,14 +118,14 @@ modMCMC(f, p, ..., jump = NULL,  lower = -Inf, upper = +Inf,
   }
   \item{which }{the name or the index to the parameters that should be
     plotted.  Default = all parameters. If \code{Full=TRUE}, setting
-    \code{which =NULL} will plot only the function value and the model
+    \code{which = NULL} will plot only the function value and the model
     variance.
   }
   \item{trace }{if \code{TRUE}, adds smoothed line to the plot.
   }
   
   \item{remove }{a list with indices of the runs that should be removed (e.g.
-    to remove runs during burnin.
+    to remove runs during burnin).
   }
   \item{nsample }{the number of xy pairs to be plotted on the upper
     panel in the pairs plot. When \code{NULL} all xy pairs plotted. Set
