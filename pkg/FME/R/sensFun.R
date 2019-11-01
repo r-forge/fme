@@ -168,7 +168,7 @@ summary.sensFun <- function(object, vars=FALSE, ...) {
                       scale=rep(parscale, times=rep(nv,np)),out))
   } else {  # global summaries
     L1   <- colMeans(abs(Sens))
-    L2   <- sqrt(colSums(Sens*Sens)) / nout
+    L2   <- sqrt(colSums(Sens*Sens) / nout)
     Mean <- colMeans(Sens)
     Min  <- apply(Sens, 2, min)
     Max  <- apply(Sens, 2, max)
