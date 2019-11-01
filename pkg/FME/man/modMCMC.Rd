@@ -107,7 +107,9 @@ modMCMC(f, p, ..., jump = NULL,  lower = -Inf, upper = +Inf,
     decomposition of the proposal matrix is scaled with this amount; if
     \code{NULL}, it is assumed to be \code{c(0.2,0.25, 0.333, 0.333,
     ...)}  }
-  \item{verbose }{if \code{TRUE}: prints extra output.
+  \item{verbose }{if \code{TRUE} or \code{1}: prints extra output, if 
+    numeric value \code{i > 1}, prints status information every 
+	\code{i} iterations.
   }
   \item{object }{an object of class \code{\link{modMCMC}}.
   }
