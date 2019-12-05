@@ -216,7 +216,7 @@ modMCMC <- function (f, p, ..., jump = NULL, lower = -Inf, upper = +Inf,
       logP <- function(...)  logP_type2b(...)
       SSold <- SSnew^2
     }
-  } else if (class(SSnew) != "modCost")
+  } else if (!inherits(SSnew, "modCost"))
     stop("'f' should either return the -2*log of the model probability OR an instance of class 'modCost'")
   ## type III: class modCost & ! usesigma
   else if (!useSigma)  {
