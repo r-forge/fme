@@ -24,7 +24,7 @@
   \item{cost }{the model cost, or function evaluation associated to the
     optimised parameter values, i.e. the minimal cost.}
   \item{iterations}{the number of iterations performed.}
-    and if control\$verbose is TRUE:
+    and if control$verbose is TRUE:
   \item{poppar }{all parameter vectors remaining in the population, matrix
     of dimension (npop,length(par)).}
   \item{popcost }{model costs associated with all population parameter vectors,
